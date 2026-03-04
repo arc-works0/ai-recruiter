@@ -1,9 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+export const runtime = "nodejs";
+
+type AnalyzeRequestBody = {
+  githubUrl?: string;
+};
 
 type AnalyzeResponseBody = {
   technologies: string[];
@@ -13,32 +19,25 @@ type AnalyzeResponseBody = {
   scoutText: string;
 };
 
-type ErrorResponse = {
-  error: string;
-};
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<AnalyzeResponseBody | ErrorResponse>,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return res
-      .status(500)
-      .json({ error: "OpenAI API key is not configured." });
-  }
-
-  const githubUrl = (req.body?.githubUrl as string | undefined)?.trim();
-
-  if (!githubUrl) {
-    return res.status(400).json({ error: "githubUrl is required." });
-  }
-
+export async function POST(request: NextRequest) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: "OpenAI API key is not configured." },
+        { status: 500 },
+      );
+    }
+
+    const body = (await request.json()) as AnalyzeRequestBody;
+    const githubUrl = body.githubUrl?.trim();
+
+    if (!githubUrl) {
+      return NextResponse.json(
+        { error: "githubUrl is required." },
+        { status: 400 },
+      );
+    }
+
     const prompt = `
 あなたは日本のエンジニア採用担当向けのAIアシスタントです。
 以下のGitHubリポジトリURLから想定されるエンジニアのプロファイルを推定し、
@@ -78,19 +77,21 @@ ${githubUrl}
     const content = completion.choices[0]?.message?.content;
 
     if (!content) {
-      return res
-        .status(500)
-        .json({ error: "No content returned from OpenAI." });
+      return NextResponse.json(
+        { error: "No content returned from OpenAI." },
+        { status: 500 },
+      );
     }
 
     const parsed = JSON.parse(content) as AnalyzeResponseBody;
 
-    return res.status(200).json(parsed);
+    return NextResponse.json(parsed, { status: 200 });
   } catch (error) {
     console.error("Analyze API error:", error);
-    return res
-      .status(500)
-      .json({ error: "Failed to analyze GitHub profile." });
+    return NextResponse.json(
+      { error: "Failed to analyze GitHub profile." },
+      { status: 500 },
+    );
   }
 }
 
