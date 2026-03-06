@@ -187,7 +187,7 @@ function buildSystemPrompt(locale: "ja" | "en"): string {
 【CRITICAL — LANGUAGE SEPARATION】
 - When output language is Japanese: the ENTIRE response must be in Japanese only (markdown body, jobTitle, tierFeedback). No English words.
 - When output language is English: the ENTIRE response must be in English only. No Japanese.
-- jobTitle: ${isJa ? "Japanese only. Create a share-worthy, catchy title (e.g. TypeScriptの魔術師, 精密な設計士, API職人). Use the most appealing phrasing in Japanese so users want to share it." : "English only. Create a share-worthy, professional title (e.g. Master of TypeScript Architecture, System Design Specialist, API Architect). Use the most appealing phrasing in English so users want to share it."}
+- jobTitle: ${isJa ? "Japanese only. Use the most appealing phrasing (e.g. TypeScriptの魔術師, 精密な設計士, API職人). No English." : "English only. Use the most appealing phrasing (e.g. Master of TypeScript, System Design Specialist, API Architect). No Japanese."}
 - tierFeedback: ${isJa ? "Japanese only — one punchy line, no English." : "English only — one punchy line, no Japanese."}
 
 【STRICT SALARY RULES (MANDATORY)】
@@ -208,7 +208,7 @@ Output in the following format:
 
 2) Append exactly one JSON block. jobTitle and tierFeedback must be in the same language as the markdown (${isJa ? "Japanese" : "English"}).
 \`\`\`json
-{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isJa ? "TypeScriptの魔術師" : "Master of TypeScript Architecture"}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
+{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isJa ? "TypeScriptの魔術師" : "Master of TypeScript"}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
 \`\`\`
 - technical, contribution, sustainability, market: 0–100 integers
 - salaryDisplay: salary as string (within 3–15M JPY)
