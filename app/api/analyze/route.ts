@@ -7,7 +7,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// GitHubのURLからusernameを抽出
 function extractUsername(url: string): string | null {
   try {
     const u = new URL(url);
@@ -18,12 +17,10 @@ function extractUsername(url: string): string | null {
   }
 }
 
-// GitHub APIからユーザー情報とリポジトリ情報を取得
 async function fetchGitHubData(username: string) {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
   };
-  // GITHUB_TOKENがあればレート制限が緩和される（任意）
   if (process.env.GITHUB_TOKEN) {
     headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
@@ -38,7 +35,6 @@ async function fetchGitHubData(username: string) {
   const user = await userRes.json();
   const repos = reposRes.ok ? await reposRes.json() : [];
 
-  // 言語一覧を集計
   const languages: Record<string, number> = {};
   for (const repo of repos) {
     if (repo.language) {
@@ -79,7 +75,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "正しいGitHub URLを入力してください" }, { status: 400 });
     }
 
-    // GitHub APIでデータ取得
     const githubData = await fetchGitHubData(username);
 
     const profileSummary = `
@@ -92,7 +87,7 @@ export async function POST(req: NextRequest) {
 場所: ${githubData.location}
 主要言語: ${githubData.topLanguages.join(", ")}
 主なリポジトリ:
-${githubData.topRepos.map(r => `  - ${r.name}（⭐${r.stars}）${r.language} ${r.description}`).join("\n")}
+${githubData.topRepos.map((r: {name: string; stars: number; language: string; description: string}) => `  - ${r.name}（★${r.stars}）${r.language} ${r.description}`).join("\n")}
     `.trim();
 
     const completion = await openai.chat.completions.create({
@@ -100,21 +95,11 @@ ${githubData.topRepos.map(r => `  - ${r.name}（⭐${r.stars}）${r.language} ${
       messages: [
         {
           role: "system",
-          content: `あなたは年収1000万超えを狙うエンジニア専用の、冷徹でプロフェッショナルな査定エージェントです。
-入力された情報を元に、以下の形式で厳格に鑑定してください。
-
-### 【鑑定結果】市場価値診断書
-
-1. **想定年収**: 市場価値を1円単位で算出。
-2. **技術力判定**: S〜Dの5段階で厳しく評価。
-3. **キャリアアップ戦略**: 年収をあと300万上げるために、今後3ヶ月で習得すべき3つの具体的技術を提示。
-
-※Markdownの表や太字を使い、公式な鑑定書のような威厳のある見た目で出力してください。
-※口調はプロフェッショナルで、根拠に基づいたシビアなものにすること。`,
+          content: "あなたはエンジニア専用の冷徹でプロフェッショナルな査定エージェントです。GitHubプロフィール情報を元に、想定年収を1円単位で算出し、技術力をS〜Dの5段階で評価し、年収を300万上げるために今後3ヶ月で習得すべき3つの技術を提示してください。Markdownの表や太字を使い、公式な鑑定書のような見た目で出力してください。",
         },
         {
           role: "user",
-          content: `以下のGitHubプロフィール情報を査定せよ:\n\n${profileSummary}`,
+          content: `以下のGitHubプロフィール情報を査定してください:\n\n${profileSummary}`,
         },
       ],
     });
