@@ -30,7 +30,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   if (tier) ogParams.set("tier", tier);
   if (feedback) ogParams.set("feedback", feedback);
   const ogImagePath = `/api/og?${ogParams.toString()}`;
-  const ogImageUrl = baseUrl.startsWith("http") ? `${baseUrl}${ogImagePath}` : `https://${baseUrl}${ogImagePath}`;
+  const base = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
+  const ogImageUrl = `${base}${ogImagePath}`;
 
   const metaTitle = title ? `${title} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
   const metaDesc =

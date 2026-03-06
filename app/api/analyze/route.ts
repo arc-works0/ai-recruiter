@@ -212,22 +212,29 @@ Output in the following format:
 }
 
 export async function POST(req: NextRequest) {
+  let body: Record<string, unknown> = {};
+  try {
+    body = await req.json();
+  } catch {
+    /* ignore */
+  }
+  const locale = (body.locale === "en" ? "en" : "ja") as "ja" | "en";
+  const err = (ja: string, en: string) => (locale === "ja" ? ja : en);
+
   if (!OPENAI_API_KEY || OPENAI_API_KEY.trim() === "") {
     console.error("OPENAI_API_KEY is not set");
     return NextResponse.json(
-      { error: "鑑定サービスは現在設定中のためご利用できません。しばらくしてからお試しください。" },
+      { error: err("鑑定サービスは現在設定中のためご利用できません。しばらくしてからお試しください。", "Service is currently being configured. Please try again later.") },
       { status: 503 }
     );
   }
 
   try {
-    const body = await req.json().catch(() => ({}));
     const githubUrl = typeof body.githubUrl === "string" ? body.githubUrl.trim() : "";
-    const locale = (body.locale === "en" ? "en" : "ja") as "ja" | "en";
 
     if (!githubUrl) {
       return NextResponse.json(
-        { error: "GitHubのURLを入力してください" },
+        { error: err("GitHubのURLを入力してください", "Please enter a GitHub URL") },
         { status: 400 }
       );
     }
@@ -235,7 +242,7 @@ export async function POST(req: NextRequest) {
     const username = extractUsername(githubUrl);
     if (!username) {
       return NextResponse.json(
-        { error: "正しいGitHubのURLを入力してください（例: https://github.com/username）" },
+        { error: err("正しいGitHubのURLを入力してください（例: https://github.com/username）", "Please enter a valid GitHub URL (e.g. https://github.com/username)") },
         { status: 400 }
       );
     }
@@ -287,7 +294,7 @@ ${githubData.topRepos
     const content = completion.choices[0]?.message?.content?.trim();
     if (!content) {
       return NextResponse.json(
-        { error: "鑑定結果の生成に失敗しました。再実行してください。" },
+        { error: err("鑑定結果の生成に失敗しました。再実行してください。", "Failed to generate results. Please try again.") },
         { status: 500 }
       );
     }
@@ -312,10 +319,9 @@ ${githubData.topRepos
       tierFeedback,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "査定に失敗しました";
     console.error("Analyze API error:", error);
     return NextResponse.json(
-      { error: message },
+      { error: err("鑑定処理に失敗しました。再度お試しください。", "Certification failed. Please try again.") },
       { status: 500 }
     );
   }

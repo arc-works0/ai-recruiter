@@ -14,7 +14,7 @@ function parseScores(scoresParam: string | null): number[] {
 }
 
 const LABELS = ["技術力", "貢献度", "継続力", "市場性"];
-const LABELS_BUSINESS = ["技術スタックの専門性", "コードの保守性", "継続的な学習習慣", "市場価値"];
+const LABELS_BUSINESS = ["技術の深さ", "保守性", "学習習慣", "市場需要"];
 
 const TIER_STYLES: Record<string, { bg: string; label: string }> = {
   "S+": { bg: "linear-gradient(135deg, #fbbf24, #d97706)", label: "神域" },

@@ -305,9 +305,9 @@ export default function Home() {
             <span
               className="h-1.5 w-1.5 rounded-full"
               style={{
-                background: mode === "business" ? "#2563eb" : undefined,
-                boxShadow: mode === "business" ? "0 0 8px rgba(37,99,235,0.6)" : "0 0 8px rgba(99,102,241,0.6)",
-                ...(mode === "personal" && { backgroundColor: "rgb(99, 102, 241)" }),
+                background: mode === "business" ? "#1e40af" : "#8b5cf6",
+                boxShadow: mode === "business" ? "0 0 12px rgba(30,64,175,0.7)" : "0 0 12px rgba(139,92,246,0.7)",
+                ...(mode === "personal" && { backgroundColor: "#8b5cf6" }),
               }}
             />
             {mode === "personal" ? t.badge : t.businessBadge}
@@ -432,7 +432,7 @@ export default function Home() {
                   <h2 className="text-center text-lg font-semibold tracking-tight text-white">
                     {mode === "business" ? t.businessRadarHeading : t.radarHeading}
                   </h2>
-                  <div className="mx-auto mt-6 h-[280px] w-full sm:h-[320px]">
+                  <div className="print-radar-bg mx-auto mt-6 h-[280px] w-full sm:h-[320px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart
                         data={RADAR_KEYS.map((key, i) => ({
@@ -444,7 +444,7 @@ export default function Home() {
                         <PolarGrid stroke="rgba(255,255,255,0.12)" />
                         <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 11 }} />
                         <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
-                        <Radar name={t.radarScore} dataKey="value" stroke={mode === "business" ? "#2563eb" : "#6366f1"} fill={mode === "business" ? "#2563eb" : "#6366f1"} fillOpacity={0.35} strokeWidth={2} />
+                        <Radar name={t.radarScore} dataKey="value" stroke={mode === "business" ? "#1e40af" : "#8b5cf6"} fill={mode === "business" ? "#2563eb" : "#a78bfa"} fillOpacity={0.35} strokeWidth={2} />
                         <Legend wrapperStyle={{ fontSize: 11 }} />
                       </RadarChart>
                     </ResponsiveContainer>
