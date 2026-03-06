@@ -282,6 +282,72 @@ export default function Home() {
               <SimpleMarkdown content={result} />
             </div>
 
+            {/* 年収を100万円上げるための3ステップ + アフィリエイト導線 */}
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-8" style={{ boxShadow: "0 0 0 1px rgba(0,0,0,0.2) inset" }}>
+              <h2 className="text-center text-lg font-semibold text-white">
+                あなたの年収を100万円上げるための具体的な3つのステップ
+              </h2>
+              <p className="mt-2 text-center text-[13px] text-zinc-500">
+                鑑定結果を踏まえ、次のアクションで市場価値を確実に高めます。
+              </p>
+              <div className="mt-6 space-y-4 sm:mt-8">
+                <div className="flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.05] sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-sm font-bold text-indigo-300">1</span>
+                    <div>
+                      <p className="font-medium text-white">市場価値を転職市場で試す</p>
+                      <p className="mt-0.5 text-[13px] text-zinc-500">今のスキルがどのレンジで評価されるか、面接とオファーで確かめましょう。</p>
+                    </div>
+                  </div>
+                  <a
+                    href={process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER ?? "https://doda.jp/"}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="shrink-0 rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-black transition hover:bg-zinc-100"
+                  >
+                    転職サービスを比較する →
+                  </a>
+                </div>
+                <div className="flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.05] sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-sm font-bold text-emerald-300">2</span>
+                    <div>
+                      <p className="font-medium text-white">不足スキルを体系的に習得する</p>
+                      <p className="mt-0.5 text-[13px] text-zinc-500">鑑定で挙がった「習得すべき技術」を、実践的な教材で短期集中でカバー。</p>
+                    </div>
+                  </div>
+                  <a
+                    href={process.env.NEXT_PUBLIC_AFFILIATE_LEARNING ?? "https://www.udemy.com/"}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="shrink-0 rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-black transition hover:bg-zinc-100"
+                  >
+                    学習教材を探す →
+                  </a>
+                </div>
+                <div className="flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.05] sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-sm font-bold text-amber-300">3</span>
+                    <div>
+                      <p className="font-medium text-white">副業で実績と交渉材料を作る</p>
+                      <p className="mt-0.5 text-[13px] text-zinc-500">本業以外の実績は、年収交渉や転職時の「証拠」として強く効きます。</p>
+                    </div>
+                  </div>
+                  <a
+                    href={process.env.NEXT_PUBLIC_AFFILIATE_SIDEBIZ ?? "https://crowdworks.jp/"}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="shrink-0 rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-black transition hover:bg-zinc-100"
+                  >
+                    副業・案件を探す →
+                  </a>
+                </div>
+              </div>
+              <p className="mt-4 text-center text-[11px] text-zinc-600">
+                上記リンクは提携サービスです。利用規約に同意のうえご利用ください。
+              </p>
+            </div>
+
             <div className="space-y-4">
               <p className="text-center text-[11px] font-medium uppercase tracking-widest text-zinc-600">
                 鑑定結果をシェア
