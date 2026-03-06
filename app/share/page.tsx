@@ -19,9 +19,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const tier = params.tier ?? "";
   const feedback = params.feedback ?? "";
   const mode = params.mode ?? "personal";
-  const baseUrl =
+  const baseUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+  ).replace(/\/$/, "");
   const ogParams = new URLSearchParams({ scores, mode });
   if (title) ogParams.set("title", title);
   if (salary) ogParams.set("salary", salary);
@@ -29,7 +30,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   if (tier) ogParams.set("tier", tier);
   if (feedback) ogParams.set("feedback", feedback);
   const ogImagePath = `/api/og?${ogParams.toString()}`;
-  const ogImageUrl = `${baseUrl}${ogImagePath}`;
+  const ogImageUrl = baseUrl.startsWith("http") ? `${baseUrl}${ogImagePath}` : `https://${baseUrl}${ogImagePath}`;
 
   const metaTitle = title ? `${title} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
   const metaDesc =

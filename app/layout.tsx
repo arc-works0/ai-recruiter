@@ -2,10 +2,11 @@ import { ClerkProvider, SignInButton, SignUpButton, UserButton } from "@clerk/ne
 import type { Metadata } from "next";
 import "./globals.css";
 
-const baseUrl =
+const baseUrl = (
   process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-const ogImageUrl = `${baseUrl.replace(/\/$/, "")}/api/og`;
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+).replace(/\/$/, "");
+const ogImageUrl = baseUrl.startsWith("http") ? `${baseUrl}/api/og` : `https://${baseUrl}/api/og`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

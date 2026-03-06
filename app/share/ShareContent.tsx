@@ -52,6 +52,11 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08080a] font-sans text-zinc-100">
       <div className="pointer-events-none fixed inset-0 bg-mesh" aria-hidden />
+      <div className="meteors-layer" aria-hidden>
+        {[...Array(7)].map((_, i) => (
+          <div key={i} className="meteor" />
+        ))}
+      </div>
 
       <div className="fixed top-4 right-4 z-50 flex items-center gap-0 rounded-xl border border-white/[0.1] bg-black/60 backdrop-blur-xl">
         <button
@@ -73,9 +78,9 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
       </div>
 
       <div className="relative z-10 mx-auto max-w-lg px-4 py-20">
-        <div className="rounded-2xl border-2 border-white/[0.08] bg-white/[0.03] p-8 shadow-2xl backdrop-blur-xl" style={{ boxShadow: "0 0 0 1px rgba(99,102,241,0.15), 0 32px 64px -24px rgba(0,0,0,0.5)" }}>
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-            AI市場価値鑑定
+        <div className="glass-panel-strong card-gradient-border rounded-2xl overflow-hidden p-8 shadow-2xl" style={{ boxShadow: "0 0 0 1px rgba(99,102,241,0.2), 0 32px 64px -24px rgba(0,0,0,0.5)" }}>
+          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
+            {t.title}
           </p>
           {jobTitle && (
             <p className="mt-3 text-center text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300">
@@ -111,7 +116,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
             </div>
           )}
           {tierFeedback && (
-            <p className="mt-3 text-center text-sm italic text-zinc-400">&ldquo;{decode(tierFeedback)}&rdquo;</p>
+            <p className="mt-3 text-center text-sm italic text-zinc-300">&ldquo;{decode(tierFeedback)}&rdquo;</p>
           )}
           <h1 className="mt-4 text-center text-2xl font-semibold text-white">
             {t.sharePageTitle}
@@ -127,7 +132,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
               </RadarChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-6 text-center text-sm text-zinc-500">
+          <p className="mt-6 text-center text-sm text-zinc-400">
             {t.sharePageCta}
           </p>
           <a

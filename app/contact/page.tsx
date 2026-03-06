@@ -59,7 +59,8 @@ export default function ContactPage() {
     message || "—",
   ].join("\n");
 
-  const mailtoHref = `mailto:${encodeURIComponent(email || "info@example.com")}?subject=${encodeURIComponent(`【お問い合わせ】${name || "（お名前未記入）"}`)}&body=${encodeURIComponent(composedText)}`;
+  const subject = locale === "ja" ? `【お問い合わせ】${name || "（お名前未記入）"}` : `[Contact] ${name || "(Name not provided)"}`;
+  const mailtoHref = `mailto:${encodeURIComponent(email || "info@example.com")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(composedText)}`;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(composedText);
@@ -70,6 +71,11 @@ export default function ContactPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08080a] font-sans text-zinc-100">
       <div className="pointer-events-none fixed inset-0 bg-mesh" aria-hidden />
+      <div className="meteors-layer" aria-hidden>
+        {[...Array(7)].map((_, i) => (
+          <div key={i} className="meteor" />
+        ))}
+      </div>
       <div className="relative z-10 mx-auto max-w-xl px-4 py-16 sm:py-24">
         <h1 className="text-center text-2xl font-semibold text-white sm:text-3xl">
           {t.title}

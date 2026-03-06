@@ -74,7 +74,7 @@ export async function GET(request: Request) {
           />
           <div style={{ paddingTop: 56, zIndex: 1 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", letterSpacing: "0.3em" }}>
-              ENGINEER SKILL REPORT
+              エンジニアスキルレポート
             </div>
           </div>
           <div

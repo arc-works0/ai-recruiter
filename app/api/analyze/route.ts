@@ -180,33 +180,36 @@ function parseScoresFromContent(content: string): {
   return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta };
 }
 
-const SYSTEM_PROMPT = `あなたはエンジニア市場価値鑑定の専門家です。データに基づき冷徹で納得感のある鑑定を行います。
+function buildSystemPrompt(locale: "ja" | "en"): string {
+  const isJa = locale === "ja";
+  return `You are an expert in engineer market value certification. Provide data-driven, credible assessments.
 
-【年収算出の厳格ルール（必須）】
-- 想定年収は必ず300万円〜1500万円の範囲に収めること。リポジトリが少ない・スターが少ない・フォロワーが少ない・アカウント歴が短い場合は過大評価禁止。
-- 総スター数・フォロワー数・リポジトリ数・アカウント年数を厳格に評価。日本エンジニア市場の実態に即すこと。
-- 例: リポジトリ数5未満＋スター合計10未満＋フォロワー20未満 → 300万〜500万程度。スター100超＋フォロワー200超＋実績あり → 800万〜1200万程度。
+【STRICT SALARY RULES (MANDATORY)】
+- Estimated annual salary MUST fall within 3,000,000–15,000,000 JPY. Never overestimate. Be conservative.
+- Evaluate rigorously: total stars (strong signal), followers, public repo count, account age. Align with real Japanese engineer market.
+- Examples: repos<5 + stars<10 + followers<20 + account<2yr → 3–4M JPY. stars>100 + followers>200 + account>5yr + quality repos → 8–12M JPY.
+- Factor in: repo descriptions, top languages, README presence, commit/PR activity, OSS visibility. Sparse or empty repos lower scores.
 
-必ず以下の形式で出力してください。
+Output in the following format:
 
-1) 日本語のMarkdown（表・太字を多用し、公式な鑑定書のような見た目）
-- **見出し**: ### 【鑑定結果】市場価値診断書 から始める
-- **想定年収**: 300万〜1500万の範囲で1円単位（例: 5,200,000円）
-- **技術力・格付け**: S+ / S / A / B / C / D / E の7段階で厳格に判定し、理由を1行で
-- **技術スタック・GitHub活動・市場需給**: 箇条書きで簡潔に分析
-- **あと300万上げるために習得すべき技術**: 3つを具体的に提示
-- 全体は200〜300文字程度。励ましや曖昧表現は使わず、事実とデータに基づいた口調で。
+1) Markdown in ${isJa ? "Japanese" : "English"} (use tables, bold, formal report style)
+- **Heading**: Start with ### ${isJa ? "【鑑定結果】市場価値診断書" : "Certification Report — Market Value Assessment"}
+- **Estimated salary**: 3M–15M JPY, exact figure (e.g. 5,200,000円 or $52K equivalent in JPY)
+- **Grade**: S+ / S / A / B / C / D / E with one-line rationale
+- **Tech stack, GitHub activity, market demand**: Bullet points
+- **3 technologies to learn for +3M salary**: Concrete suggestions
+- 200–300 characters total. Factual, data-driven tone.
 
-2) 最後に、以下のJSONブロックを必ず1つだけ付けてください。
+2) Append exactly one JSON block:
 \`\`\`json
-{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "TypeScriptの魔術師", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。"}
+{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isJa ? "TypeScriptの魔術師" : "Master of TypeScript Architecture"}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
 \`\`\`
-- technical, contribution, sustainability, market: 0〜100の整数
-- jobTitle: **日本語のみ**。直感的でかっこいい日本語の称号1つ（例: TypeScriptの魔術師、精密な設計士、API職人）。英語禁止。
-- salaryDisplay: 想定年収をそのまま文字で（300万〜1500万範囲内）
-- rank: S / A / B / C / D のいずれか
-- tier: S+ / S / A / B / C / D / E のいずれか
-- tierFeedback: **日本語のみ**。心に刺さるプロの日本語1文。英語禁止。`;
+- technical, contribution, sustainability, market: 0–100 integers
+- jobTitle: **${isJa ? "Japanese only.** Playful, catchy title (e.g. TypeScriptの魔術師, 精密な設計士, API職人). No English." : "English only.** Professional title (e.g. Master of TypeScript Architecture, System Design Specialist, API Architect). No Japanese."}
+- salaryDisplay: salary as string (within 3–15M JPY)
+- rank, tier: S+ / S / A / B / C / D / E
+- tierFeedback: **${isJa ? "Japanese only.** One punchy professional line." : "English only.** One punchy professional line."}`;
+}
 
 export async function POST(req: NextRequest) {
   if (!OPENAI_API_KEY || OPENAI_API_KEY.trim() === "") {
@@ -220,6 +223,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const githubUrl = typeof body.githubUrl === "string" ? body.githubUrl.trim() : "";
+    const locale = (body.locale === "en" ? "en" : "ja") as "ja" | "en";
 
     if (!githubUrl) {
       return NextResponse.json(
@@ -258,7 +262,7 @@ ${githubData.topRepos
   .join("\n")}
 `.trim();
 
-    const cacheKey = username.toLowerCase();
+    const cacheKey = `${username.toLowerCase()}_${locale}`;
     type Cached = { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string };
     const cached = getAnalysisCache(cacheKey);
     if (cached) {
@@ -272,7 +276,7 @@ ${githubData.topRepos
       temperature: 0,
       seed: hashSeed(username),
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: buildSystemPrompt(locale) },
         {
           role: "user",
           content: `【重要】この鑑定は一貫性のため、ユーザー名「${username}」をシードとして使用します。同じユーザーには常に同一の鑑定結果を返してください。\n\n以下のGitHubプロフィール情報を査定し、指定フォーマットで鑑定結果を出力してください:\n\n${profileSummary}`,

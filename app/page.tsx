@@ -85,11 +85,11 @@ function SimpleMarkdown({ content }: { content: string }) {
     } else if (line.startsWith("# ")) {
       result.push(<h1 key={i} className="mb-2 mt-5 text-xl font-bold text-white first:mt-0">{line.slice(2)}</h1>);
     } else if (line.startsWith("- ")) {
-      result.push(<li key={i} className="ml-4 list-disc text-zinc-400"><InlineBold text={line.slice(2)} /></li>);
+      result.push(<li key={i} className="ml-4 list-disc text-zinc-300"><InlineBold text={line.slice(2)} /></li>);
     } else if (line.trim() === "") {
       result.push(<div key={i} className="h-2" />);
     } else {
-      result.push(<p key={i} className="leading-relaxed text-zinc-400"><InlineBold text={line} /></p>);
+      result.push(<p key={i} className="leading-relaxed text-zinc-300"><InlineBold text={line} /></p>);
     }
     i++;
   }
@@ -132,7 +132,7 @@ const DEFAULT_SIDEBIZ_JA = "https://crowdworks.jp/";
 const DEFAULT_SIDEBIZ_EN = "https://www.upwork.com/";
 
 export default function Home() {
-  const [locale, setLocale] = useState<Locale>("en");
+  const [locale, setLocale] = useState<Locale>("ja");
   const [mode, setMode] = useState<AppMode>("personal");
   const [githubUrl, setGithubUrl] = useState("");
   const [result, setResult] = useState("");
@@ -163,7 +163,7 @@ export default function Home() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubUrl: githubUrl.trim() }),
+        body: JSON.stringify({ githubUrl: githubUrl.trim(), locale }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -315,7 +315,7 @@ export default function Home() {
           <h1 className="text-4xl font-semibold tracking-[-0.02em] text-white sm:text-5xl">
             {mode === "personal" ? t.title : t.businessTitle}
           </h1>
-          <p className="mx-auto max-w-md text-[15px] leading-[1.7] text-zinc-500 sm:text-base">
+          <p className="mx-auto max-w-md text-[15px] leading-[1.7] text-zinc-400 sm:text-base">
             {mode === "personal" ? t.subtitle : t.businessSubtitle}
           </p>
         </header>
@@ -415,7 +415,7 @@ export default function Home() {
                     </div>
                   </div>
                   {tierFeedback && (
-                    <p className="mt-4 text-center text-sm italic leading-relaxed text-zinc-400">
+                    <p className="mt-4 text-center text-sm italic leading-relaxed text-zinc-300">
                       &ldquo;{tierFeedback}&rdquo;
                     </p>
                   )}
@@ -451,22 +451,12 @@ export default function Home() {
                   </div>
                   {mode === "business" && (
                     <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{t.businessReportCodeQuality}</p>
-                        <p className="mt-1 text-2xl font-bold text-white">{scores.technical}</p>
-                      </div>
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{t.businessReportSustainability}</p>
-                        <p className="mt-1 text-2xl font-bold text-white">{scores.sustainability}</p>
-                      </div>
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{t.businessReportMarketValue}</p>
-                        <p className="mt-1 text-lg font-bold text-white">{salaryDisplay || "—"}</p>
-                      </div>
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{t.businessRadarLabels[1]}</p>
-                        <p className="mt-1 text-2xl font-bold text-white">{scores.contribution}</p>
-                      </div>
+                      {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
+                        <div key={i} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{t.businessRadarLabels[i]}</p>
+                          <p className="mt-1 text-2xl font-bold text-white">{val}</p>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -489,26 +479,26 @@ export default function Home() {
                   href={transferUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="golden-vip-button flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px] sm:py-6"
+                  className="golden-vip-button flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] sm:min-h-[64px] sm:py-6"
                 >
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200/95">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100">
                     {t.vipCtaTransfer}
                   </span>
-                  <span className="text-base font-bold text-white">
-                    doda・転職サイト →
+                  <span className="text-base font-bold text-white drop-shadow-sm sm:text-lg">
+                    {locale === "ja" ? "doda・転職サイト →" : "LinkedIn / Job Boards →"}
                   </span>
                 </a>
                 <a
                   href={learningUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="golden-vip-button flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px] sm:py-6"
+                  className="golden-vip-button flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] sm:min-h-[64px] sm:py-6"
                 >
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200/95">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100">
                     {t.vipCtaLearning}
                   </span>
-                  <span className="text-base font-bold text-white">
-                    Udemy・スクール →
+                  <span className="text-base font-bold text-white drop-shadow-sm sm:text-lg">
+                    {locale === "ja" ? "Udemy・スクール →" : "Udemy / Courses →"}
                   </span>
                 </a>
               </div>
