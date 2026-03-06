@@ -21,21 +21,21 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const mode = params.mode ?? "personal";
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
   const ogParams = new URLSearchParams({ scores, mode });
   if (title) ogParams.set("title", title);
   if (salary) ogParams.set("salary", salary);
   if (rank) ogParams.set("rank", rank);
   if (tier) ogParams.set("tier", tier);
   if (feedback) ogParams.set("feedback", feedback);
-  const ogImageUrl = baseUrl
-    ? `${baseUrl}/api/og?${ogParams.toString()}`
-    : `/api/og?${ogParams.toString()}`;
+  const ogImagePath = `/api/og?${ogParams.toString()}`;
+  const ogImageUrl = `${baseUrl}${ogImagePath}`;
 
-  const metaTitle = title ? `${title} | AI Market Value Certification` : "Certification Summary | AI Market Value";
-  const metaDesc = title && (salary || rank)
-    ? `My title: ${title}. ${salary ? `Est. ${salary}. ` : ""}${rank ? `Rank ${rank}. ` : ""}Get your GitHub-based certification.`
-    : "GitHub-based market value certification. Technical, Contribution, Sustainability, Market scores.";
+  const metaTitle = title ? `${title} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
+  const metaDesc =
+    title && (salary || rank)
+      ? `${title}。${salary ? `推定年収 ${salary}。` : ""}${tier || rank ? `格付け ${tier || rank}。` : ""}GitHubからあなたの市場価値を鑑定。`
+      : "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
 
   return {
     title: metaTitle,
@@ -43,7 +43,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     openGraph: {
       title: metaTitle,
       description: metaDesc,
-      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: "AI Market Value Certification" }],
+      url: `${baseUrl}/share?${ogParams.toString()}`,
+      type: "website",
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: "AI市場価値鑑定ポスター" }],
     },
     twitter: {
       card: "summary_large_image",

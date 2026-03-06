@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { JSX, useCallback, useEffect, useRef, useState } from "react";
 import {
   Radar,
@@ -483,7 +484,7 @@ export default function Home() {
               <p className="text-center text-sm font-semibold text-zinc-300">
                 {t.nextActionTitle}
               </p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <a
                   href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
                   target="_blank"
@@ -498,25 +499,45 @@ export default function Home() {
                   rel="noopener noreferrer sponsored"
                   className="golden-vip-button flex items-center justify-center gap-2 rounded-xl px-4 py-4 text-center text-sm font-bold text-white transition-all hover:opacity-95"
                 >
-                  {t.nextActionVip}
+                  {t.nextActionTransfer}
+                </a>
+                <a
+                  href={learningUrl}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="golden-vip-button flex items-center justify-center gap-2 rounded-xl px-4 py-4 text-center text-sm font-bold text-white transition-all hover:opacity-95"
+                >
+                  {t.nextActionLearning}
                 </a>
               </div>
-              <a
-                href={transferUrl}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="golden-vip-button block w-full rounded-2xl px-6 py-5 text-center text-lg font-bold transition-all duration-300 hover:opacity-95 hover:scale-[1.01] active:scale-[0.99]"
-              >
-                <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200/90">
-                  {t.vipTitlePersonal}
-                </span>
-                <span className="mt-1 block text-[13px] font-medium text-amber-100/90">
-                  {t.vipSubtitlePersonal}
-                </span>
-                <span className="mt-3 inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm">
-                  {t.vipCtaPersonal} →
-                </span>
-              </a>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <a
+                  href={transferUrl}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="golden-vip-button block rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:opacity-95 hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200/90">
+                    {t.vipCtaTransfer}
+                  </span>
+                  <span className="mt-2 block text-sm font-bold text-white">
+                    {t.vipTransferSite} →
+                  </span>
+                </a>
+                <a
+                  href={learningUrl}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="golden-vip-button block rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:opacity-95 hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200/90">
+                    {t.vipCtaLearning}
+                  </span>
+                  <span className="mt-2 block text-sm font-bold text-white">
+                    {t.vipLearningSite} →
+                  </span>
+                </a>
+              </div>
             </div>
             )}
 
@@ -546,6 +567,12 @@ export default function Home() {
                   <h2 id="contact-modal-title" className="text-lg font-semibold text-white">{t.contactModalTitle}</h2>
                   <p className="mt-2 text-sm text-zinc-400">{t.contactModalDesc}</p>
                   <div className="mt-6 space-y-3">
+                    <Link
+                      href="/contact"
+                      className="block rounded-xl border border-indigo-500/30 bg-indigo-500/20 px-4 py-3 text-sm font-medium text-indigo-200 transition hover:bg-indigo-500/30"
+                    >
+                      {t.contactFormPage}
+                    </Link>
                     {(process.env.NEXT_PUBLIC_CONTACT_FORM_URL || process.env.NEXT_PUBLIC_CONTACT_GOOGLE_FORM) && (
                       <a
                         href={process.env.NEXT_PUBLIC_CONTACT_FORM_URL || process.env.NEXT_PUBLIC_CONTACT_GOOGLE_FORM}
@@ -564,16 +591,6 @@ export default function Home() {
                         className="block rounded-xl border border-white/[0.1] bg-white/[0.05] px-4 py-3 text-sm font-medium text-white transition hover:bg-white/[0.08]"
                       >
                         {t.contactX}
-                      </a>
-                    )}
-                    {(process.env.NEXT_PUBLIC_CONTACT_EMAIL || process.env.NEXT_PUBLIC_CONTACT_ENTERPRISE) && (
-                      <a
-                        href={typeof process.env.NEXT_PUBLIC_CONTACT_EMAIL === "string" ? `mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}` : (process.env.NEXT_PUBLIC_CONTACT_ENTERPRISE || "mailto:info@example.com")}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block rounded-xl border border-white/[0.1] bg-white/[0.05] px-4 py-3 text-sm font-medium text-white transition hover:bg-white/[0.08]"
-                      >
-                        {t.contactEmail}
                       </a>
                     )}
                     {(() => {

@@ -1,5 +1,26 @@
 import { ClerkProvider, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import type { Metadata } from "next";
 import "./globals.css";
+
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
+export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
+  title: "AI市場価値鑑定 | GitHubからあなたの市場価値を可視化",
+  description: "GitHubデータに基づき、エンジニアの市場価値を鑑定。推定年収・格付け・スキルレーダーを1枚の鑑定書で。",
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    url: baseUrl,
+    siteName: "AI市場価値鑑定",
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "AI市場価値鑑定" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
