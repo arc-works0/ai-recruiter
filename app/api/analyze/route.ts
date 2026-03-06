@@ -189,11 +189,11 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       : "Professional title only (e.g. Senior Engineer (Top 5%), Full-stack Architect). No Japanese.")
     : (isJa
       ? "日本人が直感的に凄さを感じる日本語の称号のみ（例：TypeScriptの魔術師、フロントエンドの開拓者、精密な設計士、API職人）。英語は1語も禁止。"
-      : "Professional English title suited to global engineer culture (e.g. Master of TypeScript Architecture, Frontend Visionary, Full-stack Architect, Backend Specialist). No Japanese. Use titles that recruiters worldwide recognize.");
+      : "Professional English title only. Use titles like 'Master of TypeScript', 'Frontend Architect', 'Full-stack Specialist' — natural for English-speaking engineers. NO Japanese (no 魔術師, 開拓者, etc).");
 
   const langBlock = isJa
     ? `【最重要】あなたは日本のIT専門家です。全ての出力（本文・称号・フィードバック・評価ラベル）は自然な日本語のみで行い、英語は1単語も使わないこと。英語の専門用語はカタカナか適切な日本語訳を使用（例：Repository→リポジトリ、Framework→フレームワーク、Full-stack→フルスタック）。`
-    : `You are a global tech recruitment expert. All outputs (markdown body, jobTitle, tierFeedback, labels, advice) MUST be in professional English only. Do NOT use any Japanese. Every single word must be in English.`;
+    : `You are a global IT expert. Produce ALL results (Job Title, Feedback, markdown body, labels, advice) STRICTLY in professional English. Do NOT use any Japanese. Every single word in jobTitle and tierFeedback must be in English. Avoid Japanese-style titles like 魔術師; use professional English titles instead (e.g. "Master of TypeScript", "Frontend Architect").`;
 
   const formatBlock = isJa
     ? `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。

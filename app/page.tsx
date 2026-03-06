@@ -163,7 +163,12 @@ export default function Home() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubUrl: githubUrl.trim(), locale, mode }),
+        body: JSON.stringify({
+          githubUrl: githubUrl.trim(),
+          locale,
+          language: locale,
+          mode,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
