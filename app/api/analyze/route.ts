@@ -189,11 +189,11 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       : "Professional title only (e.g. Senior Engineer (Top 5%), Full-stack Architect). No Japanese.")
     : (isJa
       ? "日本人が直感的に凄さを感じる日本語の称号のみ（例：TypeScriptの魔術師、フロントエンドの開拓者、精密な設計士、API職人）。英語は1語も禁止。"
-      : "Professional English title (e.g. Master of TypeScript, System Design Specialist). No Japanese.");
+      : "Professional English title suited to global engineer culture (e.g. Master of TypeScript Architecture, Frontend Visionary, Full-stack Architect, Backend Specialist). No Japanese. Use titles that recruiters worldwide recognize.");
 
   const langBlock = isJa
     ? `【最重要】あなたは日本のIT専門家です。全ての出力（本文・称号・フィードバック・評価ラベル）は自然な日本語のみで行い、英語は1単語も使わないこと。英語の専門用語はカタカナか適切な日本語訳を使用（例：Repository→リポジトリ、Framework→フレームワーク、Full-stack→フルスタック）。`
-    : "Output in natural business English only. No Japanese.";
+    : `You are a global tech recruitment expert. All outputs (markdown body, jobTitle, tierFeedback, labels, advice) MUST be in professional English only. Do NOT use any Japanese. Every single word must be in English.`;
 
   const formatBlock = isJa
     ? `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。
@@ -207,7 +207,17 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 **【実務への貢献度】** 開発頻度・継続性から見える、エンジニアとしての信頼性。
 
 **【今後の展望】** 年収・市場価値を上げるために、次に学ぶべき技術を3つ具体的に。`
-    : `1) Markdown in English (tables, bold, formal style). Include: estimated salary, grade (S+ to E), technical strengths, contribution/sustainability, and 3 concrete learning recommendations.`;
+    : `1) Markdown in English only (tables, bold, formal style). All text must be in professional English. No Japanese.
+
+- ### Certification Report — Market Value Assessment
+- **Estimated salary**: 3M–15M JPY, exact figure (e.g. 5,200,000円)
+- **Grade**: S+ / S / A / B / C / D / E with one-line rationale
+
+**【Technical strengths】** Which languages and frameworks, and how well they are used. Be specific.
+
+**【Contribution & reliability】** Development frequency and consistency that demonstrate reliability as an engineer.
+
+**【Next steps】** 3 concrete technologies to learn next to increase salary and market value.`;
 
   return `You are an expert in engineer market value certification. Provide data-driven, credible assessments.
 
@@ -224,7 +234,7 @@ ${formatBlock}
 
 2) Append exactly one JSON block. jobTitle and tierFeedback: ${isJa ? "必ず日本語のみ。英語禁止。" : "English only."}
 \`\`\`json
-{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isBusiness ? (isJa ? "シニアエンジニア（トップ5％）" : "Senior Engineer (Top 5%)") : (isJa ? "TypeScriptの魔術師" : "Master of TypeScript")}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
+{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isBusiness ? (isJa ? "シニアエンジニア（トップ5％）" : "Senior Engineer (Top 5%)") : (isJa ? "TypeScriptの魔術師" : "Master of TypeScript Architecture")}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
 \`\`\`
 - technical, contribution, sustainability, market: 0–100 integers
 - salaryDisplay: salary string (3–15M JPY)
@@ -238,7 +248,7 @@ export async function POST(req: NextRequest) {
   } catch {
     /* ignore */
   }
-  const locale = (body.locale === "en" ? "en" : "ja") as "ja" | "en";
+  const locale = (body.locale === "en" || body.language === "en" ? "en" : "ja") as "ja" | "en";
   const mode = (body.mode === "business" ? "business" : "personal") as "personal" | "business";
   const err = (ja: string, en: string) => (locale === "ja" ? ja : en);
 
@@ -270,7 +280,8 @@ export async function POST(req: NextRequest) {
 
     const githubData = await fetchGitHubData(username);
 
-    const profileSummary = `
+    const profileSummary = locale === "ja"
+      ? `
 ユーザー名: ${username}
 名前: ${githubData.name}
 自己紹介: ${githubData.bio}
@@ -286,6 +297,25 @@ ${githubData.topRepos
   .map(
     (r: { name: string; stars: number; language: string; description: string }) =>
       `  - ${r.name}（★${r.stars}）${r.language} ${r.description}`
+  )
+  .join("\n")}
+`.trim()
+      : `
+Username: ${username}
+Name: ${githubData.name}
+Bio: ${githubData.bio}
+Followers: ${githubData.followers}
+Public repos: ${githubData.publicRepos}
+Total stars: ${githubData.totalStars}
+Account age: ${githubData.accountYears} years
+Company: ${githubData.company}
+Location: ${githubData.location}
+Top languages: ${githubData.topLanguages.join(", ")}
+Top repos:
+${githubData.topRepos
+  .map(
+    (r: { name: string; stars: number; language: string; description: string }) =>
+      `  - ${r.name} (★${r.stars}) ${r.language} ${r.description}`
   )
   .join("\n")}
 `.trim();
@@ -307,7 +337,9 @@ ${githubData.topRepos
         { role: "system", content: buildSystemPrompt(locale, mode) },
         {
           role: "user",
-          content: `【重要】この鑑定は一貫性のため、ユーザー名「${username}」をシードとして使用します。同じユーザーには常に同一の鑑定結果を返してください。\n\n以下のGitHubプロフィール情報を査定し、指定フォーマットで鑑定結果を出力してください。${locale === "ja" ? "出力はすべて自然な日本語で。英語は使用しないこと。" : ""}\n\n${profileSummary}`,
+          content: locale === "ja"
+            ? `【重要】この鑑定は一貫性のため、ユーザー名「${username}」をシードとして使用します。同じユーザーには常に同一の鑑定結果を返してください。\n\n以下のGitHubプロフィール情報を査定し、指定フォーマットで鑑定結果を出力してください。出力はすべて自然な日本語で。英語は使用しないこと。\n\n${profileSummary}`
+            : `IMPORTANT: Use username "${username}" as seed for consistency. Return identical results for the same user.\n\nAssess the following GitHub profile and output the certification in the specified format. All output MUST be in professional English only. Do not use any Japanese.\n\n${profileSummary}`,
         },
       ],
     });
