@@ -315,7 +315,7 @@ export default function Home() {
           <h1 className="text-4xl font-semibold tracking-[-0.02em] text-white sm:text-5xl">
             {mode === "personal" ? t.title : t.businessTitle}
           </h1>
-          <p className="mx-auto max-w-md text-[15px] leading-[1.7] text-zinc-400 sm:text-base">
+          <p className="mx-auto max-w-md text-[15px] leading-[1.7] text-zinc-300 sm:text-base">
             {mode === "personal" ? t.subtitle : t.businessSubtitle}
           </p>
         </header>

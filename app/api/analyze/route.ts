@@ -184,6 +184,12 @@ function buildSystemPrompt(locale: "ja" | "en"): string {
   const isJa = locale === "ja";
   return `You are an expert in engineer market value certification. Provide data-driven, credible assessments.
 
+【CRITICAL — LANGUAGE SEPARATION】
+- When output language is Japanese: the ENTIRE response must be in Japanese only (markdown body, jobTitle, tierFeedback). No English words.
+- When output language is English: the ENTIRE response must be in English only. No Japanese.
+- jobTitle: ${isJa ? "Japanese only — playful, catchy title (e.g. TypeScriptの魔術師, 精密な設計士, API職人). Most appealing phrasing in Japanese." : "English only — professional title (e.g. Master of TypeScript Architecture, System Design Specialist, API Architect). Most appealing phrasing in English."}
+- tierFeedback: ${isJa ? "Japanese only — one punchy line, no English." : "English only — one punchy line, no Japanese."}
+
 【STRICT SALARY RULES (MANDATORY)】
 - Estimated annual salary MUST fall within 3,000,000–15,000,000 JPY. Never overestimate. Be conservative.
 - Evaluate rigorously: total stars (strong signal), followers, public repo count, account age. Align with real Japanese engineer market.
@@ -192,23 +198,21 @@ function buildSystemPrompt(locale: "ja" | "en"): string {
 
 Output in the following format:
 
-1) Markdown in ${isJa ? "Japanese" : "English"} (use tables, bold, formal report style)
+1) Markdown in ${isJa ? "Japanese" : "English"} (use tables, bold, formal report style). All text in that language only.
 - **Heading**: Start with ### ${isJa ? "【鑑定結果】市場価値診断書" : "Certification Report — Market Value Assessment"}
-- **Estimated salary**: 3M–15M JPY, exact figure (e.g. 5,200,000円 or $52K equivalent in JPY)
+- **Estimated salary**: 3M–15M JPY, exact figure (e.g. 5,200,000円 or equivalent in JPY)
 - **Grade**: S+ / S / A / B / C / D / E with one-line rationale
 - **Tech stack, GitHub activity, market demand**: Bullet points
 - **3 technologies to learn for +3M salary**: Concrete suggestions
 - 200–300 characters total. Factual, data-driven tone.
 
-2) Append exactly one JSON block:
+2) Append exactly one JSON block. jobTitle and tierFeedback must be in the same language as the markdown (${isJa ? "Japanese" : "English"}).
 \`\`\`json
 {"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isJa ? "TypeScriptの魔術師" : "Master of TypeScript Architecture"}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
 \`\`\`
 - technical, contribution, sustainability, market: 0–100 integers
-- jobTitle: **${isJa ? "Japanese only.** Playful, catchy title (e.g. TypeScriptの魔術師, 精密な設計士, API職人). No English." : "English only.** Professional title (e.g. Master of TypeScript Architecture, System Design Specialist, API Architect). No Japanese."}
 - salaryDisplay: salary as string (within 3–15M JPY)
-- rank, tier: S+ / S / A / B / C / D / E
-- tierFeedback: **${isJa ? "Japanese only.** One punchy professional line." : "English only.** One punchy professional line."}`;
+- rank, tier: S+ / S / A / B / C / D / E`;
 }
 
 export async function POST(req: NextRequest) {
