@@ -267,14 +267,6 @@ export default function Home() {
     }
   }, [t, locale, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, shareImageLoading]);
 
-  const handleOpenXFromModal = useCallback(() => {
-    if (pendingShareUrl) {
-      window.open(pendingShareUrl, "_blank", "noopener,noreferrer");
-      setShareModalOpen(false);
-      setPendingShareUrl(null);
-    }
-  }, [pendingShareUrl]);
-
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current) return;
     const prevTitle = document.title;
@@ -339,7 +331,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24">
+      <div className="relative z-10 mx-auto max-w-2xl px-6 py-16 sm:py-24">
         <header className="space-y-6 text-center break-words">
           <div
             className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-500 backdrop-blur-xl"
@@ -644,13 +636,16 @@ export default function Home() {
                 <div className="relative w-full max-w-md rounded-2xl border border-white/[0.1] bg-[#0f0f12] p-6 shadow-2xl">
                   <p id="share-modal-title" className="text-center text-sm text-zinc-200">{t.saveImageAndShareAlert}</p>
                   <div className="mt-6 flex flex-col gap-3">
-                    <button
-                      type="button"
-                      onClick={handleOpenXFromModal}
-                      className="w-full rounded-xl border border-amber-500/40 bg-amber-500/20 py-3.5 text-sm font-semibold text-amber-200 transition hover:bg-amber-500/30"
-                    >
-                      {t.openXToShare}
-                    </button>
+                    {pendingShareUrl && (
+                      <a
+                        href={pendingShareUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full rounded-xl border border-amber-500/40 bg-amber-500/20 py-3.5 text-center text-sm font-semibold text-amber-200 transition hover:bg-amber-500/30"
+                      >
+                        {t.openXToShare}
+                      </a>
+                    )}
                     <button
                       type="button"
                       onClick={() => { setShareModalOpen(false); setPendingShareUrl(null); }}

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import HeaderButtons from "./HeaderButtons";
 
-// 画像指定は意図的になし（𝕏の古いキャッシュ画像表示を防ぎ、ユーザーは保存画像を自分で添付）
+// openGraph.images / twitter.images は一切指定しない（𝕏の古いキャッシュ画像を出さない）
 export const metadata: Metadata = {
   metadataBase: new URL("https://ai-recruiter-4o7e.vercel.app"),
   title: "AI Market Value Assessment",
