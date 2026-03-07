@@ -357,10 +357,16 @@ export default function Home() {
             />
             {mode === "personal" ? t.badge : t.businessBadge}
           </div>
-          <h1 className={`font-semibold tracking-[-0.02em] text-white break-words ${mode === "personal" ? "text-4xl sm:text-5xl" : "text-xl sm:text-3xl md:text-4xl"}`}>
+          <h1
+            className={`font-semibold tracking-[-0.02em] text-white break-words ${mode === "personal" ? "text-4xl sm:text-5xl" : "text-xl sm:text-3xl md:text-4xl"}`}
+            style={mode === "business" ? { textWrap: "balance" } : undefined}
+          >
             {mode === "personal" ? t.title : t.businessTitle}
           </h1>
-          <p className={`mx-auto max-w-md break-words text-zinc-200 ${mode === "personal" ? "text-[15px] leading-[1.7] sm:text-base" : "text-sm leading-[1.6] sm:text-base"}`}>
+          <p
+            className={`mx-auto max-w-md break-words text-zinc-200 ${mode === "personal" ? "text-[15px] leading-[1.7] sm:text-base" : "text-sm leading-[1.6] sm:text-base"}`}
+            style={mode === "business" ? { textWrap: "balance" } : undefined}
+          >
             {mode === "personal" ? t.subtitle : t.businessSubtitle}
           </p>
         </header>

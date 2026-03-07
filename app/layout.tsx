@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import HeaderButtons from "./HeaderButtons";
 
+// 画像指定は意図的になし（𝕏の古いキャッシュ画像表示を防ぎ、ユーザーは保存画像を自分で添付）
 export const metadata: Metadata = {
   metadataBase: new URL("https://ai-recruiter-4o7e.vercel.app"),
   title: "AI Market Value Assessment",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     siteName: "AI Market Value Assessment",
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "AI Market Value Assessment",
     description: "Analyze your GitHub and estimate your market value.",
   },
