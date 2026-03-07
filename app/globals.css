@@ -512,6 +512,7 @@ body {
   [data-print-report] .print-buttons-container {
     flex-direction: column !important;
     display: flex !important;
+    gap: 24px !important;
   }
   [data-print-report] .print-buttons-container > * {
     width: 100% !important;
