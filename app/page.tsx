@@ -145,7 +145,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [contactOpen, setContactOpen] = useState(false);
-  const [shareImageLoading, setShareImageLoading] = useState(false);
+
   useEffect(() => {
     setLocale(getLocaleFromBrowser());
   }, []);
@@ -217,11 +217,9 @@ export default function Home() {
   const tierLabel = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : "";
 
   const reportRef = useRef<HTMLElement>(null);
-  const resultCardsRef = useRef<HTMLDivElement>(null);
 
-  const handleSaveImageAndShare = useCallback(async () => {
-    const el = resultCardsRef.current || reportRef.current;
-    if (typeof window === "undefined" || !el || shareImageLoading) return;
+  const handleShareOnX = useCallback(() => {
+    if (typeof window === "undefined") return;
     const appUrl = scores
       ? `${window.location.origin}/share?${new URLSearchParams({
           scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
@@ -236,32 +234,7 @@ export default function Home() {
       : window.location.href;
     const tweetUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-    setShareImageLoading(true);
-    try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#08080a",
-        logging: false,
-      });
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          setShareImageLoading(false);
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `ai-market-value-${locale}-${Date.now()}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-        setShareImageLoading(false);
-      }, "image/png");
-    } catch {
-      setShareImageLoading(false);
-    }
-  }, [locale, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, shareImageLoading]);
+  }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current) return;
@@ -349,7 +322,15 @@ export default function Home() {
             className={`font-semibold tracking-[-0.02em] text-white break-words ${mode === "personal" ? "text-2xl sm:text-4xl md:text-5xl" : "text-xl sm:text-3xl md:text-4xl"}`}
             style={mode === "business" ? { textWrap: "balance" } : undefined}
           >
-            {mode === "personal" ? t.title : t.businessTitle}
+            {mode === "personal" ? (
+              t.title
+            ) : (
+              <>
+                {t.businessTitle1}
+                <br className="sm:hidden" />
+                {t.businessTitle2}
+              </>
+            )}
           </h1>
           <p
             className={`mx-auto max-w-md break-words text-zinc-200 ${mode === "personal" ? "text-sm leading-[1.7] sm:text-base" : "text-sm leading-[1.6] sm:text-base"}`}
@@ -388,7 +369,7 @@ export default function Home() {
 
         {result && (
           <section ref={reportRef} data-print-report className="mt-14 space-y-8">
-            <div ref={resultCardsRef} className="space-y-8">
+            <div className="space-y-8">
             {mode === "business" && jobTitle && (
               <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
                 <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
@@ -681,18 +662,10 @@ export default function Home() {
               <div className="flex justify-center">
                 <button
                   type="button"
-                  onClick={handleSaveImageAndShare}
-                  disabled={shareImageLoading}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-8 py-3.5 text-sm font-medium text-amber-200 backdrop-blur-xl transition-all duration-300 hover:bg-amber-500/20 hover:border-amber-500/50 hover:translate-y-[-1px] disabled:pointer-events-none disabled:opacity-70"
+                  onClick={handleShareOnX}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-8 py-3.5 text-sm font-medium text-amber-200 backdrop-blur-xl transition-all duration-300 hover:bg-amber-500/20 hover:border-amber-500/50 hover:translate-y-[-1px]"
                 >
-                  {shareImageLoading ? (
-                    <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-300/30 border-t-amber-300" />
-                      {t.saveImageCreating}
-                    </>
-                  ) : (
-                    t.saveImageAndShare
-                  )}
+                  {t.saveImageAndShare}
                 </button>
               </div>
             </div>
