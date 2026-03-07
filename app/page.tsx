@@ -235,7 +235,47 @@ export default function Home() {
   const tierCfg = tier ? getTierConfig(tier) : null;
   const tierLabel = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : "";
 
-  const reportRef = useRef<HTMLDivElement>(null);
+  const reportRef = useRef<HTMLElement>(null);
+  const resultCardsRef = useRef<HTMLDivElement>(null);
+
+  const handleSaveImageAndShare = useCallback(async () => {
+    const el = resultCardsRef.current || reportRef.current;
+    if (typeof window === "undefined" || !el) return;
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#08080a",
+        logging: false,
+      });
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ai-market-value-${locale}-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        const appUrl = scores
+          ? `${window.location.origin}/share?${new URLSearchParams({
+              scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
+              ...(jobTitle && { title: jobTitle }),
+              ...(salaryDisplay && { salary: salaryDisplay }),
+              ...(rank && { rank }),
+              ...(tier && { tier }),
+              ...(tierFeedback && { feedback: tierFeedback }),
+              mode,
+              v: "final",
+            }).toString()}`
+          : window.location.href;
+        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(appUrl)}`, "_blank", "noopener,noreferrer");
+      }, "image/png");
+    } catch {
+      // ignore
+    }
+  }, [locale, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback]);
+
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current) return;
     const prevTitle = document.title;
@@ -355,6 +395,7 @@ export default function Home() {
 
         {result && (
           <section ref={reportRef} data-print-report className="mt-14 space-y-8">
+            <div ref={resultCardsRef} className="space-y-8">
             {mode === "business" && jobTitle && (
               <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
                 <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
@@ -474,6 +515,7 @@ export default function Home() {
               <SimpleMarkdown content={result} />
               </div>
             </GlassCard>
+            </div>
 
             {mode === "personal" && (
             <div className="animate-fade-in-up stagger-4b space-y-4">
@@ -653,7 +695,14 @@ export default function Home() {
               <p className="text-center text-[11px] font-medium uppercase tracking-widest text-zinc-600">
                 {t.shareLabel}
               </p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <button
+                  type="button"
+                  onClick={handleSaveImageAndShare}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 py-3.5 text-sm font-medium text-amber-200 backdrop-blur-xl transition-all duration-300 hover:bg-amber-500/20 hover:border-amber-500/50 hover:translate-y-[-1px]"
+                >
+                  {t.saveImageAndShare}
+                </button>
                 <a
                   href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
                   target="_blank"
