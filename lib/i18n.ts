@@ -31,7 +31,7 @@ export const translations = {
     ctaSideBiz: "副業・案件を探す →",
     affiliateNote: "上記リンクは提携サービスです。利用規約に同意のうえご利用ください。",
     shareLabel: "鑑定結果をシェア",
-    saveImageAndShare: "鑑定結果をシェア（画像を自動保存）",
+    saveImageAndShare: "鑑定結果を𝕏でシェア",
     saveImageCreating: "画像を作成中...",
     saveImageAndShareAlert: "【重要】診断結果を保存しました！次の画面で、カメラマークから今保存した画像を選んでポストしてください。",
     openXToShare: "𝕏でシェアする",
