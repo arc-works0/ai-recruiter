@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TypeScriptの魔術師 | AI市場価値鑑定",
-    description: "GitHubからあなたの市場価値を鑑定します。",
+    title: "AI市場価値鑑定 | GitHubからあなたの市場価値を可視化",
+    description: "GitHubデータに基づきエンジニアの市場価値を鑑定。推定年収・格付け・スキルレーダーを可視化。",
     images: ["https://ai-recruiter-4o7e.vercel.app/api/og"],
   },
 };
