@@ -18,10 +18,10 @@ export const metadata: Metadata = {
     images: [OGP_IMAGE_URL],
   },
   twitter: {
-    card: "summary_large_image" as const,
-    title: "AI市場価値鑑定 | GitHubからあなたの市場価値を可視化",
-    description: "GitHubデータに基づき、エンジニアの市場価値を鑑定。推定年収・格付け・スキルレーダーを1枚の鑑定書で。",
-    images: ["https://ai-recruiter-4o7e.vercel.app/api/og?v=final"],
+    card: "summary_large_image",
+    title: "TypeScriptの魔術師 | AI市場価値鑑定",
+    description: "GitHubからあなたの市場価値を鑑定します。",
+    images: ["https://ai-recruiter-4o7e.vercel.app/api/og"],
   },
 };
 
