@@ -332,7 +332,7 @@ export default function Home() {
             {mode === "personal" ? t.badge : t.businessBadge}
           </div>
           <h1
-            className={`font-semibold tracking-[-0.02em] text-white break-words ${mode === "personal" ? "text-2xl sm:text-4xl md:text-5xl" : "text-xl sm:text-3xl md:text-4xl"}`}
+            className={`font-semibold tracking-[-0.02em] text-white leading-tight ${mode === "personal" ? "break-words text-2xl sm:text-4xl md:text-5xl" : "max-w-none text-xl sm:text-3xl md:text-4xl"}`}
             style={mode === "business" ? { textWrap: "balance" } : undefined}
           >
             {mode === "personal" ? (
@@ -340,6 +340,7 @@ export default function Home() {
             ) : (
               <>
                 <span className="block sm:inline">{t.businessTitle1}</span>
+                <span className="hidden sm:inline">&nbsp;</span>
                 <span className="block sm:inline">{t.businessTitle2}</span>
               </>
             )}
