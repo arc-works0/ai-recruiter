@@ -3,25 +3,24 @@ import type { Metadata } from "next";
 import "./globals.css";
 import HeaderButtons from "./HeaderButtons";
 
-// Xカード: 超・強制設定（環境変数なし・フルURL・キャッシュバイパス ?v=final）
-const OGP_IMAGE_URL = "https://ai-recruiter-4o7e.vercel.app/api/og?v=final";
+const OGP_IMAGE_URL = "https://ai-recruiter-4o7e.vercel.app/api/og";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ai-recruiter-4o7e.vercel.app"),
-  title: "AI市場価値鑑定 | GitHubからあなたの市場価値を可視化",
-  description: "GitHubデータに基づき、エンジニアの市場価値を鑑定。推定年収・格付け・スキルレーダーを1枚の鑑定書で。",
+  title: "AI Market Value Assessment",
+  description: "Analyze your GitHub and estimate your market value.",
   openGraph: {
     type: "website",
-    locale: "ja_JP",
+    locale: "en_US",
     url: "https://ai-recruiter-4o7e.vercel.app",
-    siteName: "AI市場価値鑑定",
+    siteName: "AI Market Value Assessment",
     images: [OGP_IMAGE_URL],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI市場価値鑑定 | GitHubからあなたの市場価値を可視化",
-    description: "GitHubデータに基づきエンジニアの市場価値を鑑定。推定年収・格付け・スキルレーダーを可視化。",
-    images: ["https://ai-recruiter-4o7e.vercel.app/api/og"],
+    title: "AI Market Value Assessment",
+    description: "Analyze your GitHub and estimate your market value.",
+    images: [OGP_IMAGE_URL],
   },
 };
 
