@@ -548,7 +548,7 @@ export default function Home() {
             )}
 
             {mode === "business" && (
-            <div className="print-buttons-container animate-fade-in-up stagger-4b flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-center print:flex-col print:gap-6 print:w-full">
+            <div className="print-buttons-container animate-fade-in-up stagger-4b flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-center print:flex-col print:gap-6">
               <div className="flex flex-col gap-1.5 print:mb-6">
                 <button
                   type="button"

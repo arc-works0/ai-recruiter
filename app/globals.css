@@ -528,3 +528,7 @@ body {
     display: none !important;
   }
 }
+
+[data-print-report] .print-buttons-container {
+  gap: 24px !important;
+}
