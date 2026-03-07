@@ -339,9 +339,8 @@ export default function Home() {
               t.title
             ) : (
               <>
-                {t.businessTitle1}
-                <br className="block sm:hidden" aria-hidden />
-                {t.businessTitle2}
+                <span className="block sm:inline">{t.businessTitle1}</span>
+                <span className="block sm:inline">{t.businessTitle2}</span>
               </>
             )}
           </h1>
