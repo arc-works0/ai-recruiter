@@ -249,7 +249,7 @@ export default function Home() {
 
   const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
   const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
-  const businessStep3Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP3 || process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL || "#";
+  const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
   const stripeCheckoutUrl = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
 
   const transferUrl = locale === "ja"
@@ -410,7 +410,7 @@ export default function Home() {
             {error && <p className="text-sm font-medium text-rose-400/90">{error}</p>}
             <button
               onClick={analyze}
-              disabled={loading || isCoolingDown || usageCount >= USAGE_LIMIT}
+              disabled={loading || isCoolingDown}
               className="flex items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {loading ? (
