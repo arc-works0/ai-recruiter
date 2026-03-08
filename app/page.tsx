@@ -182,12 +182,12 @@ export default function Home() {
   const t = translations[locale];
 
   const analyze = async () => {
-    if (!githubUrl.trim()) {
-      setError(t.errorUrlRequired);
-      return;
-    }
     if (usageCount >= USAGE_LIMIT) {
       setLimitExceededOpen(true);
+      return;
+    }
+    if (!githubUrl.trim()) {
+      setError(t.errorUrlRequired);
       return;
     }
     if (isCoolingDown) {
@@ -411,7 +411,7 @@ export default function Home() {
             <button
               onClick={analyze}
               disabled={loading}
-              className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 ${(isCoolingDown || usageCount >= USAGE_LIMIT) ? "opacity-60" : ""}`}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {loading ? (
                 <>
