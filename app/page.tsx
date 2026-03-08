@@ -410,8 +410,8 @@ export default function Home() {
             {error && <p className="text-sm font-medium text-rose-400/90">{error}</p>}
             <button
               onClick={analyze}
-              disabled={loading || isCoolingDown}
-              className="flex items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0"
+              disabled={loading}
+              className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 ${(isCoolingDown || usageCount >= USAGE_LIMIT) ? "opacity-60" : ""}`}
             >
               {loading ? (
                 <>
@@ -693,19 +693,44 @@ export default function Home() {
             {limitExceededOpen && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div className="relative w-full max-w-md rounded-2xl border border-white/[0.1] bg-[#0f0f12] p-6 shadow-2xl">
-                  <h2 id="limit-modal-title" className="text-lg font-semibold text-white">{t.limitExceededTitle}</h2>
-                  <p className="mt-2 text-sm text-zinc-400">{t.limitExceededMessage}</p>
-                  <a
-                    href={stripeCheckoutUrl}
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                <div
+                  className={`relative w-full max-w-md rounded-2xl p-6 shadow-2xl ${
+                    mode === "business"
+                      ? "border border-amber-500/50 bg-gradient-to-b from-slate-900 to-slate-800"
+                      : "border border-indigo-200/50 bg-gradient-to-b from-white to-blue-50"
+                  }`}
+                >
+                  <h2
+                    id="limit-modal-title"
+                    className={`text-lg font-semibold ${mode === "business" ? "text-amber-400" : "text-indigo-900"}`}
                   >
-                    {t.fullReportCta}
+                    {t.limitExceededTitle}
+                  </h2>
+                  <p
+                    className={`mt-3 text-sm leading-relaxed ${
+                      mode === "business" ? "text-zinc-300" : "text-indigo-800/90"
+                    }`}
+                  >
+                    {t.limitExceededMessage}
+                  </p>
+                  <a
+                    href={businessStep1Url}
+                    className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold transition ${
+                      mode === "business"
+                        ? "border border-amber-500/50 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                        : "bg-indigo-600 text-white hover:bg-indigo-500"
+                    }`}
+                  >
+                    {t.limitExceededCta}
                   </a>
                   <button
                     type="button"
                     onClick={() => setLimitExceededOpen(false)}
-                    className="mt-4 w-full rounded-xl bg-white/10 py-2.5 text-sm font-medium text-white hover:bg-white/15"
+                    className={`mt-4 w-full rounded-xl py-2.5 text-sm font-medium transition ${
+                      mode === "business"
+                        ? "border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                        : "border border-indigo-200 bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100"
+                    }`}
                   >
                     {t.contactClose}
                   </button>
