@@ -131,6 +131,11 @@ const DEFAULT_LEARNING_EN = "https://www.udemy.com/";
 const DEFAULT_SIDEBIZ_JA = "https://crowdworks.jp/";
 const DEFAULT_SIDEBIZ_EN = "https://www.upwork.com/";
 
+const DEFAULT_BUSINESS_STEP1 = "https://www.geekly.co.jp/";
+const DEFAULT_BUSINESS_STEP2 = "https://techacademy.jp/biz/training";
+const USAGE_LIMIT = 3;
+const RATE_LIMIT_MS = 5000;
+
 export default function Home() {
   const [locale, setLocale] = useState<Locale>("ja");
   const [mode, setMode] = useState<AppMode>("personal");
@@ -147,6 +152,20 @@ export default function Home() {
   const [contactOpen, setContactOpen] = useState(false);
   const [pdfExporting, setPdfExporting] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [limitExceededOpen, setLimitExceededOpen] = useState(false);
+  const [usageCount, setUsageCount] = useState(0);
+  const [isCoolingDown, setIsCoolingDown] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const count = parseInt(localStorage.getItem("ai-recruiter-usage") ?? "0", 10);
+        setUsageCount(isNaN(count) ? 0 : count);
+      } catch {
+        setUsageCount(0);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     setLocale(getLocaleFromBrowser());
@@ -165,6 +184,14 @@ export default function Home() {
   const analyze = async () => {
     if (!githubUrl.trim()) {
       setError(t.errorUrlRequired);
+      return;
+    }
+    if (usageCount >= USAGE_LIMIT) {
+      setLimitExceededOpen(true);
+      return;
+    }
+    if (isCoolingDown) {
+      setError(t.rateLimitMessage);
       return;
     }
     setError("");
@@ -199,6 +226,13 @@ export default function Home() {
       setRank(data.rank ?? "");
       setTier(data.tier ?? "");
       setTierFeedback(data.tierFeedback ?? "");
+      const newCount = usageCount + 1;
+      setUsageCount(newCount);
+      try {
+        localStorage.setItem("ai-recruiter-usage", String(newCount));
+      } catch {}
+      setIsCoolingDown(true);
+      setTimeout(() => setIsCoolingDown(false), RATE_LIMIT_MS);
     } catch {
       setResult("");
       setScores(null);
@@ -212,6 +246,11 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
+  const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
+  const businessStep3Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP3 || process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL || "#";
+  const stripeCheckoutUrl = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
 
   const transferUrl = locale === "ja"
     ? (process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER ?? DEFAULT_TRANSFER_JA)
@@ -268,7 +307,7 @@ export default function Home() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#08080a] font-sans text-zinc-100 animate-page-in"
+      className="relative min-h-screen overflow-hidden font-sans text-zinc-100 animate-page-in"
       data-theme={mode}
     >
       <div className="pointer-events-none fixed inset-0 bg-mesh" aria-hidden />
@@ -306,7 +345,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setLocale("ja")}
-            className={`rounded-l-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "ja" ? "bg-indigo-500/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-l-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "ja" ? (mode === "business" ? "bg-amber-600/80 text-white" : "bg-blue-500/80 text-white") : "text-zinc-500 hover:text-zinc-300"}`}
             aria-label={t.langJa}
           >
             JA
@@ -314,7 +353,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setLocale("en")}
-            className={`rounded-r-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "en" ? "bg-indigo-500/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-r-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "en" ? (mode === "business" ? "bg-amber-600/80 text-white" : "bg-blue-500/80 text-white") : "text-zinc-500 hover:text-zinc-300"}`}
             aria-label={t.langEn}
           >
             EN
@@ -327,15 +366,14 @@ export default function Home() {
           <div
             className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-500 backdrop-blur-xl"
             style={{
-              boxShadow: mode === "business" ? "0 0 0 1px rgba(29,78,216,0.2) inset" : "0 0 0 1px rgba(0,0,0,0.3) inset",
+              boxShadow: mode === "business" ? "0 0 0 1px rgba(217,119,6,0.25) inset" : "0 0 0 1px rgba(59,130,246,0.2) inset",
             }}
           >
             <span
               className="h-1.5 w-1.5 rounded-full"
               style={{
-                background: mode === "business" ? "#1e40af" : "#8b5cf6",
-                boxShadow: mode === "business" ? "0 0 12px rgba(30,64,175,0.7)" : "0 0 12px rgba(139,92,246,0.7)",
-                ...(mode === "personal" && { backgroundColor: "#8b5cf6" }),
+                background: mode === "business" ? "#d97706" : "#3b82f6",
+                boxShadow: mode === "business" ? "0 0 12px rgba(217,119,6,0.6)" : "0 0 12px rgba(59,130,246,0.6)",
               }}
             />
             {mode === "personal" ? t.badge : t.businessBadge}
@@ -372,7 +410,7 @@ export default function Home() {
             {error && <p className="text-sm font-medium text-rose-400/90">{error}</p>}
             <button
               onClick={analyze}
-              disabled={loading}
+              disabled={loading || isCoolingDown || usageCount >= USAGE_LIMIT}
               className="flex items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {loading ? (
@@ -391,21 +429,70 @@ export default function Home() {
           <section ref={reportRef} data-print-report className="mt-14 space-y-8">
             <div className="space-y-8">
             {mode === "business" && jobTitle && (
-              <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
-                <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
-                  <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-                    {t.businessReportSummary}
-                  </p>
-                  <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl">
-                    {jobTitle}
-                  </p>
-                  {salaryDisplay && (
-                    <p className="mt-3 text-center text-lg font-semibold text-zinc-300">
-                      {t.businessReportMarketValue}: {salaryDisplay}
+              <div className="print-cert-single">
+                <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
+                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:max-h-[100%] print:overflow-hidden">
+                    <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[9px]">
+                      {t.certTitle}
                     </p>
-                  )}
-                </div>
-              </GlassCard>
+                    <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl print:text-lg">
+                      {jobTitle}
+                    </p>
+                    {salaryDisplay && (
+                      <p className="mt-3 text-center text-lg font-semibold text-zinc-300 print:mt-2 print:text-base">
+                        {t.businessReportMarketValue}: {salaryDisplay}
+                      </p>
+                    )}
+                    {scores && (
+                      <div className="print-skill-scores mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 print:mt-3 print:gap-2 print:p-2 print:rounded">
+                        {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
+                          <div key={i} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
+                            <p className="mt-1 text-2xl font-bold text-white print:mt-0 print:text-lg print:text-slate-900">{val}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {(tierFeedback || result) && (
+                      <div className="mx-auto mt-6 max-w-lg print:mt-3 print:max-w-full">
+                        <p className="text-center text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
+                          {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
+                        </p>
+                      </div>
+                    )}
+                    {scores && (
+                      <div className="print-radar-section mt-6 print:mt-3">
+                        <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-1 print:text-[8px]">
+                          {t.businessRadarHeading}
+                        </p>
+                        <div className="print-radar-bg mx-auto h-[200px] w-[200px] sm:h-[280px] sm:w-full max-w-[320px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart
+                              data={RADAR_KEYS.map((key, i) => ({
+                                subject: t.businessRadarLabels[i],
+                                value: scores[key],
+                                fullMark: 100,
+                              }))}
+                            >
+                              <PolarGrid stroke="rgba(255,255,255,0.12)" />
+                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 11 }} />
+                              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
+                              <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
+                              <Legend wrapperStyle={{ fontSize: 10 }} />
+                            </RadarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    )}
+                    <div className="print-advice-section mt-6 print:mt-3 print:flex-1 print:min-h-0">
+                      <SimpleMarkdown content={result} />
+                    </div>
+                    <p className="print-cert-footer mt-8 hidden text-center text-[9px] font-medium tracking-widest text-zinc-500 print:mt-4 print:block print:text-[8px] print:text-slate-500">
+                      {t.certFooter}
+                    </p>
+                  </div>
+                </GlassCard>
+              </div>
             )}
 
             {mode === "personal" && jobTitle && (
@@ -414,7 +501,7 @@ export default function Home() {
                   <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                     {t.jobTitleLabel}
                   </p>
-                  <p className="text-center text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 sm:text-3xl">
+                    <p className="text-center text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-sky-300 to-indigo-300 sm:text-3xl">
                     {jobTitle}
                   </p>
                   {(salaryDisplay || rank) && (
@@ -425,7 +512,7 @@ export default function Home() {
                         </span>
                       )}
                       {rank && (
-                        <span className="rounded-lg border border-indigo-500/30 bg-indigo-500/20 px-4 py-2 text-sm font-bold text-indigo-200">
+                        <span className="rounded-lg border border-blue-500/30 bg-blue-500/20 px-4 py-2 text-sm font-bold text-blue-200">
                           {t.rankLabel} {rank}
                         </span>
                       )}
@@ -464,20 +551,20 @@ export default function Home() {
               </GlassCard>
             )}
 
-            {scores && (
+            {mode === "personal" && scores && (
               <GlassCard className="animate-fade-in-up stagger-3 card-gradient-border rounded-2xl overflow-hidden">
                 <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
                   <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-                    {mode === "business" ? t.businessRadarTitle : t.radarTitle}
+                    {t.radarTitle}
                   </p>
                   <h2 className="text-center text-lg font-semibold tracking-tight text-white">
-                    {mode === "business" ? t.businessRadarHeading : t.radarHeading}
+                    {t.radarHeading}
                   </h2>
-                  <div className="print-radar-bg mx-auto mt-6 h-[280px] w-full sm:h-[320px]">
+                  <div className="mx-auto mt-6 h-[280px] w-full sm:h-[320px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart
                         data={RADAR_KEYS.map((key, i) => ({
-                          subject: mode === "business" ? t.businessRadarLabels[i] : t.radarLabels[i],
+                          subject: t.radarLabels[i],
                           value: scores[key],
                           fullMark: 100,
                         }))}
@@ -485,34 +572,25 @@ export default function Home() {
                         <PolarGrid stroke="rgba(255,255,255,0.12)" />
                         <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 11 }} />
                         <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
-                        <Radar name={t.radarScore} dataKey="value" stroke={mode === "business" ? "#1e40af" : "#8b5cf6"} fill={mode === "business" ? "#2563eb" : "#a78bfa"} fillOpacity={0.35} strokeWidth={2} />
+                        <Radar name={t.radarScore} dataKey="value" stroke="#8b5cf6" fill="#a78bfa" fillOpacity={0.35} strokeWidth={2} />
                         <Legend wrapperStyle={{ fontSize: 11 }} />
                       </RadarChart>
                     </ResponsiveContainer>
                   </div>
-                  {mode === "business" && (
-                    <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                      {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
-                        <div key={i} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center">
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{t.businessRadarLabels[i]}</p>
-                          <p className="mt-1 text-2xl font-bold text-white">{val}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </GlassCard>
             )}
 
+            {mode === "personal" && (
             <GlassCard className="animate-fade-in-up stagger-4 card-gradient-border rounded-2xl overflow-hidden">
               <div className="rounded-2xl glass-panel-strong overflow-hidden p-6 sm:p-8">
-              <SimpleMarkdown content={result} />
+                <SimpleMarkdown content={result} />
               </div>
             </GlassCard>
-            </div>
+            )}
 
             {mode === "personal" && (
-            <div className="animate-fade-in-up stagger-4b space-y-4">
+            <div className="no-print animate-fade-in-up stagger-4b space-y-4">
               <p className="text-center text-sm font-semibold text-zinc-300">
                 {t.nextActionTitle}
               </p>
@@ -548,33 +626,91 @@ export default function Home() {
             )}
 
             {mode === "business" && (
-            <div className="print-buttons-container animate-fade-in-up stagger-4b flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-center print:flex-col print:gap-6">
-              <div className="flex flex-col gap-1.5 print:mb-6">
+            <>
+            <div className="no-print animate-fade-in-up stagger-4b space-y-4">
+              <p className="text-center text-sm font-semibold text-zinc-300">{t.nextActionTitle}</p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <a
+                  href={businessStep1Url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="flex flex-col items-center justify-center gap-1 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-4 text-center text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/50 sm:py-5"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Step 1</span>
+                  {t.businessStep1}
+                </a>
+                <a
+                  href={businessStep2Url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="flex flex-col items-center justify-center gap-1 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-4 text-center text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/50 sm:py-5"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Step 2</span>
+                  {t.businessStep2}
+                </a>
+                <a
+                  href={businessStep3Url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="flex flex-col items-center justify-center gap-1 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-4 text-center text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/50 sm:py-5"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Step 3</span>
+                  {t.businessStep3}
+                </a>
+              </div>
+            </div>
+            <div className="no-print animate-fade-in-up stagger-4b flex flex-col gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:justify-center">
                 <button
                   type="button"
                   onClick={handlePdfExport}
                   disabled={pdfExporting || isMobile}
-                  className="rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/[0.1] hover:border-white/[0.18] disabled:pointer-events-none disabled:opacity-80"
+                  className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/[0.1] hover:border-white/[0.18] disabled:pointer-events-none disabled:opacity-80 sm:min-w-0"
                 >
                   {pdfExporting ? (
                     <>
-                      <span className="mr-2 inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       {t.pdfExporting}
                     </>
                   ) : (
                     t.pdfExport
                   )}
                 </button>
-                <p className="text-xs text-zinc-500">{t.pdfNote}</p>
+                <button
+                  type="button"
+                  onClick={() => setContactOpen(true)}
+                  className="flex min-h-12 flex-1 items-center justify-center rounded-xl border border-amber-500/50 bg-amber-500/20 px-6 py-3.5 text-center text-sm font-semibold text-amber-400 transition-all hover:bg-amber-500/30 sm:min-w-0"
+                >
+                  {t.contactEnterprise}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setContactOpen(true)}
-                className="rounded-xl border border-[#2563eb]/50 bg-[#2563eb]/20 px-6 py-3.5 text-center text-sm font-semibold text-blue-200 transition-all hover:bg-[#2563eb]/30 print:w-full print:mb-6"
-              >
-                {t.contactEnterprise}
-              </button>
+              <p className="text-center text-xs text-zinc-500">{t.pdfNote}</p>
             </div>
+            </>
+            )}
+            </div>
+
+            {limitExceededOpen && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setLimitExceededOpen(false)} aria-hidden />
+                <div className="relative w-full max-w-md rounded-2xl border border-white/[0.1] bg-[#0f0f12] p-6 shadow-2xl">
+                  <h2 id="limit-modal-title" className="text-lg font-semibold text-white">{t.limitExceededTitle}</h2>
+                  <p className="mt-2 text-sm text-zinc-400">{t.limitExceededMessage}</p>
+                  <a
+                    href={stripeCheckoutUrl}
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                  >
+                    {t.fullReportCta}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setLimitExceededOpen(false)}
+                    className="mt-4 w-full rounded-xl bg-white/10 py-2.5 text-sm font-medium text-white hover:bg-white/15"
+                  >
+                    {t.contactClose}
+                  </button>
+                </div>
+              </div>
             )}
 
             {contactOpen && (
@@ -722,6 +858,12 @@ export default function Home() {
             )}
           </section>
         )}
+
+        <footer className="mt-16 pb-8 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
+            <span className="text-[11px] font-medium text-zinc-500">{t.securityBadge}</span>
+          </div>
+        </footer>
       </div>
     </main>
   );
