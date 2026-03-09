@@ -150,7 +150,7 @@ body {
   pointer-events: none;
 }
 
-/* 実績カード ID/認定証スタイル */
+/* 実績カード — 認定証フレーム・基板パターン */
 .achievement-id-card {
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
   border: 1px solid rgba(96, 165, 250, 0.25);
@@ -158,6 +158,47 @@ body {
     0 0 0 1px rgba(0,0,0,0.3) inset,
     0 0 24px rgba(96, 165, 250, 0.15),
     0 8px 32px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.achievement-id-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(96, 165, 250, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+/* 4回目モーダル — 封印ロック演出 */
+.modal-lock-overlay {
+  background: #050505;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal-lock-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.4) 2px,
+    rgba(0, 0, 0, 0.4) 4px
+  );
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 /* Animated glow orbs — 漆黒ベース統一 */

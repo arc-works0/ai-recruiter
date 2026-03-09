@@ -385,7 +385,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-2xl px-6 py-16 sm:py-24">
+      <div className="relative z-10 mx-auto w-full max-w-xl px-6 py-16 sm:py-24">
         <header className="space-y-6 text-center break-words">
           <div
             className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-500 backdrop-blur-xl"
@@ -526,8 +526,11 @@ export default function Home() {
                   <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                     {t.jobTitleLabel}
                   </p>
-                  <p className="text-center text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-sky-200 to-indigo-300 sm:text-4xl md:text-5xl">
+                  <p className="text-center font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-sky-200 to-indigo-400 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
                     {jobTitle}
+                  </p>
+                  <p className="mt-2 text-center text-xs font-medium tracking-widest text-sky-400/80">
+                    {t.verifiedByAI}
                   </p>
                   {(salaryDisplay || rank) && (
                     <div className="mt-5 flex flex-wrap justify-center gap-4">
@@ -558,9 +561,9 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={handleShareBrag}
-                      className="flex w-full min-h-[56px] items-center justify-center gap-3 rounded-xl bg-[#1DA1F2] py-4 text-lg font-bold text-white shadow-[0_0_24px_rgba(29,161,242,0.4)] transition-all hover:bg-[#1a91da] hover:shadow-[0_0_32px_rgba(29,161,242,0.5)] active:scale-[0.99]"
+                      className="flex w-full min-h-[60px] items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#1DA1F2] via-sky-500 to-indigo-500 py-4 text-lg font-bold text-white shadow-[0_0_28px_rgba(29,161,242,0.45)] transition-all hover:from-sky-400 hover:via-sky-400 hover:to-indigo-400 hover:shadow-[0_0_36px_rgba(56,189,248,0.5)] active:scale-[0.99]"
                     >
-                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
                       {t.shareBragCta}
@@ -570,7 +573,7 @@ export default function Home() {
               </GlassCard>
               {githubStats && (
                 <GlassCard className="achievement-id-card refined-card animate-fade-in-up stagger-1b rounded-2xl overflow-hidden">
-                  <div className="rounded-2xl p-6 sm:p-8">
+                  <div className="relative rounded-2xl p-6 sm:p-8 z-[1]">
                     <p className="mb-5 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-300/90">
                       {t.achievementCardTitle}
                     </p>
@@ -652,14 +655,14 @@ export default function Home() {
                       >
                         <defs>
                           <linearGradient id="radarGrad" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#4338ca" stopOpacity={0.7} />
-                            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.4} />
+                            <stop offset="0%" stopColor="#4f46e5" stopOpacity={0.85} />
+                            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.6} />
                           </linearGradient>
                         </defs>
-                        <PolarGrid stroke="rgba(96, 165, 250, 0.25)" />
+                        <PolarGrid stroke="rgba(96, 165, 250, 0.3)" />
                         <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 11 }} />
                         <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 10 }} />
-                        <Radar name={t.radarScore} dataKey="value" stroke="#6366f1" fill="url(#radarGrad)" fillOpacity={1} strokeWidth={2} />
+                        <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.95)" strokeWidth={2.5} fill="url(#radarGrad)" fillOpacity={1} />
                         <Legend wrapperStyle={{ fontSize: 11 }} />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -841,18 +844,18 @@ export default function Home() {
             </div>
 
             {limitExceededOpen && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
-                <div className="absolute inset-0 bg-[#050505]/95 backdrop-blur-xl" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div className="relative flex min-h-full w-full flex-col items-center justify-center px-6 py-12 sm:px-8">
-                  <h2 id="limit-modal-title" className="text-center text-2xl font-bold text-white sm:text-3xl">
+              <div className="modal-lock-overlay" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
+                <div className="absolute inset-0 bg-[#050505]/98 backdrop-blur-xl" onClick={() => setLimitExceededOpen(false)} aria-hidden />
+                <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
+                  <h2 id="limit-modal-title" className="text-2xl font-bold text-white sm:text-3xl">
                     {t.limitExceededTitle}
                   </h2>
-                  <p className="mt-6 text-center text-xl font-semibold text-zinc-200">
+                  <p className="mt-6 text-lg font-medium text-zinc-300">
                     {t.limitExceededMessage}
                   </p>
                   <a
                     href={businessStep1Url}
-                    className="mt-10 flex w-full max-w-md items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-600 px-8 py-5 text-lg font-bold text-white shadow-[0_0_40px_rgba(251,191,36,0.35)] transition hover:from-yellow-300 hover:to-orange-500 hover:shadow-[0_0_48px_rgba(251,191,36,0.45)] active:scale-[0.98]"
+                    className="mt-10 flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-5 text-lg font-bold text-white shadow-[0_0_32px_rgba(251,191,36,0.4)] transition hover:from-amber-300 hover:to-orange-400 hover:shadow-[0_0_40px_rgba(251,191,36,0.5)] active:scale-[0.98]"
                   >
                     <span className="text-2xl">→</span>
                     {t.limitExceededCta}
@@ -1021,6 +1024,9 @@ export default function Home() {
           <p className="mt-6 text-[10px] leading-relaxed text-zinc-500 max-w-xl mx-auto">
             {t.footerTrust}
             <span className="block mt-1 text-zinc-600">{t.footerTrustEn}</span>
+          </p>
+          <p className="mt-4 text-[10px] text-zinc-600">
+            {t.footerPartners}
           </p>
         </footer>
       </div>
