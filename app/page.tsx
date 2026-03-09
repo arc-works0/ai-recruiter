@@ -156,6 +156,7 @@ export default function Home() {
   const [limitExceededOpen, setLimitExceededOpen] = useState(false);
   const [usageCount, setUsageCount] = useState(0);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
+  const [shareSparkle, setShareSparkle] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -297,6 +298,8 @@ export default function Home() {
 
   const handleShareBrag = useCallback(() => {
     if (typeof window === "undefined") return;
+    setShareSparkle(true);
+    setTimeout(() => setShareSparkle(false), 650);
     const appUrl = scores
       ? `${window.location.origin}/share?${new URLSearchParams({
           scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
@@ -306,9 +309,8 @@ export default function Home() {
           v: "final",
         }).toString()}`
       : window.location.href;
-    const shareText = locale === "ja"
-      ? (t.shareBragTweet as string).replace("{salary}", salaryDisplay || "〇〇万円")
-      : (t.shareBragTweet as string).replace("{salary}", salaryDisplay || "$XXX");
+    const salaryStr = salaryDisplay || (locale === "ja" ? "〇〇" : "—");
+    const shareText = (t.shareBragTweet as string).replace("{salary}", salaryStr);
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, locale, t]);
@@ -329,10 +331,10 @@ export default function Home() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden font-sans text-zinc-100 animate-page-in"
+      className="relative min-h-screen overflow-hidden font-sans text-zinc-100 animate-page-in bg-[#050505]"
       data-theme={mode}
     >
-      <div className="pointer-events-none fixed inset-0 bg-mesh" aria-hidden />
+      <div className="pointer-events-none fixed inset-0 bg-mesh bg-[#050505]" aria-hidden />
       <div className="meteors-layer" aria-hidden>
         {[...Array(7)].map((_, i) => (
           <div key={i} className="meteor" />
@@ -420,7 +422,7 @@ export default function Home() {
           </p>
         </header>
 
-        <GlassCard className="mt-14 rounded-2xl glass-panel-strong p-6 transition-all duration-300 sm:p-8">
+        <GlassCard className="refined-card mt-14 rounded-2xl p-6 transition-all duration-300 sm:p-8">
           <div className="flex flex-col gap-5 relative">
             <input
               type="text"
@@ -519,57 +521,70 @@ export default function Home() {
 
             {mode === "personal" && jobTitle && (
               <>
-              <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
-                <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
+              <GlassCard className="refined-card animate-fade-in-up stagger-1 rounded-2xl overflow-hidden">
+                <div className="rounded-2xl p-6 sm:p-8">
                   <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                     {t.jobTitleLabel}
                   </p>
-                    <p className="text-center text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-sky-300 to-indigo-300 sm:text-3xl">
+                  <p className="text-center text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-sky-200 to-indigo-300 sm:text-4xl md:text-5xl">
                     {jobTitle}
                   </p>
                   {(salaryDisplay || rank) && (
-                    <div className="mt-4 flex flex-wrap justify-center gap-4">
+                    <div className="mt-5 flex flex-wrap justify-center gap-4">
                       {salaryDisplay && (
-                        <span className="rounded-lg border border-white/[0.1] bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white">
+                        <span className="rounded-xl border border-white/[0.12] bg-white/[0.06] px-5 py-2.5 text-base font-bold text-white">
                           {salaryDisplay}
                         </span>
                       )}
                       {rank && (
-                        <span className="rounded-lg border border-blue-500/30 bg-blue-500/20 px-4 py-2 text-sm font-bold text-blue-200">
+                        <span className="rounded-xl border border-sky-500/40 bg-sky-500/20 px-5 py-2.5 text-base font-bold text-sky-200">
                           {t.rankLabel} {rank}
                         </span>
                       )}
                     </div>
                   )}
-                  <button
-                    type="button"
-                    onClick={handleShareBrag}
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1DA1F2] py-4 text-base font-bold text-white shadow-lg transition-all hover:bg-[#1a91da] hover:shadow-xl active:scale-[0.99]"
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                    {t.shareBragCta}
-                  </button>
+                  <div className={`share-sparkle-container relative mt-8 ${shareSparkle ? "is-sparkling" : ""}`}>
+                    {shareSparkle && [...Array(12)].map((_, i) => (
+                      <span
+                        key={i}
+                        className="share-sparkle"
+                        style={{
+                          left: `${15 + (i % 4) * 25}%`,
+                          top: `${20 + Math.floor(i / 4) * 60}%`,
+                          animationDelay: `${i * 0.04}s`,
+                        }}
+                      />
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleShareBrag}
+                      className="flex w-full min-h-[56px] items-center justify-center gap-3 rounded-xl bg-[#1DA1F2] py-4 text-lg font-bold text-white shadow-[0_0_24px_rgba(29,161,242,0.4)] transition-all hover:bg-[#1a91da] hover:shadow-[0_0_32px_rgba(29,161,242,0.5)] active:scale-[0.99]"
+                    >
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg>
+                      {t.shareBragCta}
+                    </button>
+                  </div>
                 </div>
               </GlassCard>
               {githubStats && (
-                <GlassCard className="animate-fade-in-up stagger-1b rounded-2xl overflow-hidden border border-indigo-500/30 bg-gradient-to-br from-slate-900/90 via-indigo-950/40 to-slate-900/90">
+                <GlassCard className="achievement-id-card refined-card animate-fade-in-up stagger-1b rounded-2xl overflow-hidden">
                   <div className="rounded-2xl p-6 sm:p-8">
-                    <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-indigo-300/90">
+                    <p className="mb-5 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-300/90">
                       {t.achievementCardTitle}
                     </p>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
+                      <div className="rounded-xl border border-sky-500/20 bg-white/[0.04] p-4 text-center">
                         <p className="text-2xl font-bold text-amber-400 sm:text-3xl">{githubStats.totalStars}</p>
                         <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementStars}</p>
                       </div>
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
+                      <div className="rounded-xl border border-sky-500/20 bg-white/[0.04] p-4 text-center">
                         <p className="text-2xl font-bold text-emerald-400 sm:text-3xl">{githubStats.publicRepos}</p>
                         <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementRepos}</p>
                       </div>
                       {githubStats.topLanguages.slice(0, 2).map((lang, i) => (
-                        <div key={i} className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
+                        <div key={i} className="rounded-xl border border-sky-500/20 bg-white/[0.04] p-4 text-center">
                           <p className="text-lg font-bold text-indigo-300 sm:text-xl truncate" title={lang}>{lang}</p>
                           <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
                             {locale === "ja" ? "主要言語" : "Top Lang"}
@@ -584,8 +599,8 @@ export default function Home() {
             )}
 
             {mode === "personal" && tier && tierCfg && (
-              <GlassCard className="animate-fade-in-up stagger-2 card-gradient-border rounded-2xl overflow-hidden">
-                <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
+              <GlassCard className="refined-card animate-fade-in-up stagger-2 rounded-2xl overflow-hidden">
+                <div className="rounded-2xl p-6 sm:p-8">
                   <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                     {t.tierBadge}
                   </p>
@@ -603,6 +618,11 @@ export default function Home() {
                       <span className="text-sm font-bold opacity-90">（{tierLabel}）</span>
                     </div>
                   </div>
+                  {["D", "E"].includes(tier) && (
+                    <p className="mt-3 text-center text-sm font-medium text-sky-300/90">
+                      {t.potentialInfinite}
+                    </p>
+                  )}
                   {tierFeedback && (
                     <p className="mt-4 text-center text-sm italic leading-relaxed text-zinc-200">
                       &ldquo;{tierFeedback}&rdquo;
@@ -613,15 +633,15 @@ export default function Home() {
             )}
 
             {mode === "personal" && scores && (
-              <GlassCard className="animate-fade-in-up stagger-3 card-gradient-border rounded-2xl overflow-hidden">
-                <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
+              <GlassCard className="refined-card animate-fade-in-up stagger-3 rounded-2xl overflow-hidden">
+                <div className="rounded-2xl p-6 sm:p-8">
                   <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                     {t.radarTitle}
                   </p>
                   <h2 className="text-center text-lg font-semibold tracking-tight text-white">
                     {t.radarHeading}
                   </h2>
-                  <div className="mx-auto mt-6 h-[280px] w-full sm:h-[320px]">
+                  <div className="radar-reveal mx-auto mt-6 h-[280px] w-full sm:h-[320px] opacity-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart
                         data={RADAR_KEYS.map((key, i) => ({
@@ -630,10 +650,16 @@ export default function Home() {
                           fullMark: 100,
                         }))}
                       >
-                        <PolarGrid stroke="rgba(255,255,255,0.12)" />
-                        <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 11 }} />
-                        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
-                        <Radar name={t.radarScore} dataKey="value" stroke="#8b5cf6" fill="#a78bfa" fillOpacity={0.35} strokeWidth={2} />
+                        <defs>
+                          <linearGradient id="radarGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor="#4338ca" stopOpacity={0.7} />
+                            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.4} />
+                          </linearGradient>
+                        </defs>
+                        <PolarGrid stroke="rgba(96, 165, 250, 0.25)" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 11 }} />
+                        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 10 }} />
+                        <Radar name={t.radarScore} dataKey="value" stroke="#6366f1" fill="url(#radarGrad)" fillOpacity={1} strokeWidth={2} />
                         <Legend wrapperStyle={{ fontSize: 11 }} />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -703,8 +729,8 @@ export default function Home() {
             )}
 
             {mode === "personal" && (
-            <GlassCard className="animate-fade-in-up stagger-4 card-gradient-border rounded-2xl overflow-hidden">
-              <div className="rounded-2xl glass-panel-strong overflow-hidden p-6 sm:p-8">
+            <GlassCard className="refined-card animate-fade-in-up stagger-4 rounded-2xl overflow-hidden">
+              <div className="rounded-2xl overflow-hidden p-6 sm:p-8">
                 <SimpleMarkdown content={result} />
               </div>
             </GlassCard>
@@ -712,8 +738,11 @@ export default function Home() {
 
             {mode === "personal" && (
             <div className="no-print animate-fade-in-up stagger-4b space-y-4">
-              <p className="text-center text-sm font-semibold text-zinc-300">
+              <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
                 {t.nextActionTitle}
+              </p>
+              <p className="text-center text-base font-bold text-white">
+                {t.nextActionSubtitle}
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                 <a
@@ -813,25 +842,25 @@ export default function Home() {
 
             {limitExceededOpen && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
-                <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div className="relative w-full max-w-md rounded-2xl border border-white/[0.12] bg-zinc-900/95 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
-                  <h2 id="limit-modal-title" className="text-center text-xl font-bold text-white">
+                <div className="absolute inset-0 bg-[#050505]/95 backdrop-blur-xl" onClick={() => setLimitExceededOpen(false)} aria-hidden />
+                <div className="relative flex min-h-full w-full flex-col items-center justify-center px-6 py-12 sm:px-8">
+                  <h2 id="limit-modal-title" className="text-center text-2xl font-bold text-white sm:text-3xl">
                     {t.limitExceededTitle}
                   </h2>
-                  <p className="mt-4 text-center text-base font-medium text-zinc-300">
+                  <p className="mt-6 text-center text-xl font-semibold text-zinc-200">
                     {t.limitExceededMessage}
                   </p>
                   <a
                     href={businessStep1Url}
-                    className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:from-indigo-500 hover:to-indigo-400 hover:shadow-indigo-500/40 active:scale-[0.98]"
+                    className="mt-10 flex w-full max-w-md items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-600 px-8 py-5 text-lg font-bold text-white shadow-[0_0_40px_rgba(251,191,36,0.35)] transition hover:from-yellow-300 hover:to-orange-500 hover:shadow-[0_0_48px_rgba(251,191,36,0.45)] active:scale-[0.98]"
                   >
-                    <span className="text-xl">→</span>
+                    <span className="text-2xl">→</span>
                     {t.limitExceededCta}
                   </a>
                   <button
                     type="button"
                     onClick={() => setLimitExceededOpen(false)}
-                    className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/10 hover:text-zinc-200"
+                    className="mt-6 rounded-xl border border-white/10 bg-white/5 px-8 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/10 hover:text-zinc-200"
                   >
                     {t.contactClose}
                   </button>
@@ -985,10 +1014,14 @@ export default function Home() {
           </section>
         )}
 
-        <footer className="mt-16 pb-8 text-center">
+        <footer className="mt-16 pb-12 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
             <span className="text-[11px] font-medium text-zinc-500">{t.securityBadge}</span>
           </div>
+          <p className="mt-6 text-[10px] leading-relaxed text-zinc-500 max-w-xl mx-auto">
+            {t.footerTrust}
+            <span className="block mt-1 text-zinc-600">{t.footerTrustEn}</span>
+          </p>
         </footer>
       </div>
     </main>

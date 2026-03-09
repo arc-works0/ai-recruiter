@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #08080a;
+  --background: #050505;
   --foreground: #fafafa;
   --muted: #a1a1aa;
   --border: rgba(255, 255, 255, 0.08);
-  --glass: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --accent: #818cf8;
+  --glass: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(96, 165, 250, 0.25);
+  --accent: #60a5fa;
+  --neon-blue: rgba(96, 165, 250, 0.6);
   --mouse-x: 50%;
   --mouse-y: 50%;
 }
@@ -86,26 +87,88 @@
 .stagger-7 { animation-delay: 0.65s; opacity: 0; }
 
 body {
-  background: #08080a;
+  background: #050505;
   color: var(--foreground);
   font-feature-settings: "rlig" 1, "calt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animated glow orbs — world-class SaaS */
+/* Refined card — 漆黒ベース・濃紺カード・ネオンブルーグロー */
+.refined-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(96, 165, 250, 0.08),
+    0 0 20px rgba(96, 165, 250, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Radar chart じわっと表示 */
+@keyframes radar-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.radar-reveal {
+  animation: radar-reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Share ボタン — キラキラパーティクル風 */
+@keyframes sparkle-burst {
+  0% { opacity: 1; transform: scale(0); }
+  50% { opacity: 0.8; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+.share-sparkle-container {
+  position: relative;
+  overflow: visible;
+}
+
+.share-sparkle-container.is-sparkling .share-sparkle {
+  animation: sparkle-burst 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+.share-sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(96,165,250,0.8) 100%);
+  box-shadow: 0 0 12px rgba(255,255,255,0.8);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 実績カード ID/認定証スタイル */
+.achievement-id-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.3) inset,
+    0 0 24px rgba(96, 165, 250, 0.15),
+    0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* Animated glow orbs — 漆黒ベース統一 */
 .bg-mesh {
-  background: #08080a;
+  background: #050505;
   position: relative;
   overflow: hidden;
 }
 
-/* Theme gradients — 高級化 */
-[data-theme="personal"] .bg-mesh {
-  background: linear-gradient(to bottom right, #eff6ff, #e0e7ff); /* from-blue-50 to-indigo-100 */
-}
 [data-theme="business"] .bg-mesh {
-  background: linear-gradient(to bottom right, #0f172a, #172554, #1e293b); /* from-slate-900 via-navy to-slate-800 */
+  background: #050505;
 }
 
 .bg-mesh::before,
@@ -231,13 +294,14 @@ body {
 }
 
 .glass-panel-strong {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.18) inset,
-    0 32px 64px -24px rgba(0, 0, 0, 0.5);
+    0 0 0 1px rgba(96, 165, 250, 0.06),
+    0 0 20px rgba(96, 165, 250, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 /* Mouse-follow radial highlight (set --mouse-x, --mouse-y via JS) */
