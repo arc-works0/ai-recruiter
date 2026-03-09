@@ -100,7 +100,7 @@ export const translations = {
     limitExceededTitle: "無料枠終了",
     limitExceededMessage: "プロの査定へ移行します",
     limitExceededCta: "→ プロの査定を受ける（無料）",
-    shareBragCta: "ここを押して自慢しろ",
+    shareBragCta: "結果を𝕏で自慢する",
     shareBragTweet: "私のGitHub市場価値は{salary}！AIが技術力を証明しました。 #AI市場価値診断",
     verifiedByAI: "Verified by AI Engine v3.0",
     potentialInfinite: "Potential: Infinite（伸びしろ：無限大）",

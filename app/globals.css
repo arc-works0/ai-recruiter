@@ -173,9 +173,9 @@ body {
   pointer-events: none;
 }
 
-/* 4回目モーダル — プレミアム招待状（全画面） */
+/* 4回目モーダル — プレミアム招待状（全画面・背景を完全に隠す） */
 .modal-lock-overlay {
-  background: #030303;
+  background: #050505;
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -191,9 +191,15 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(217, 119, 6, 0.08) 0%, transparent 50%),
-    linear-gradient(180deg, rgba(79, 70, 229, 0.04) 0%, transparent 40%);
+  background: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(217, 119, 6, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(79, 70, 229, 0.03) 0%, transparent 40%);
   pointer-events: none;
+}
+
+/* モーダル表示時は背景の装飾を非表示 */
+[data-modal-open="true"] .modal-bg {
+  visibility: hidden;
+  opacity: 0;
 }
 
 /* Animated glow orbs — 漆黒ベース統一 */

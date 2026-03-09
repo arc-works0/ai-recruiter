@@ -333,9 +333,10 @@ export default function Home() {
     <main
       className="relative min-h-screen overflow-hidden font-sans text-zinc-100 animate-page-in bg-[#050505]"
       data-theme={mode}
+      data-modal-open={String(limitExceededOpen)}
     >
-      <div className="pointer-events-none fixed inset-0 bg-mesh bg-[#050505]" aria-hidden />
-      <div className="meteors-layer" aria-hidden>
+      <div className="pointer-events-none fixed inset-0 bg-mesh bg-[#050505] modal-bg" aria-hidden />
+      <div className="meteors-layer modal-bg" aria-hidden>
         {[...Array(7)].map((_, i) => (
           <div key={i} className="meteor" />
         ))}
@@ -346,7 +347,8 @@ export default function Home() {
         </div>
       )}
 
-      <div className="fixed top-14 right-4 z-50 flex items-center gap-2">
+      {/* スマホ: フロー内に配置して重なり防止 / PC: fixed */}
+      <div className="relative z-50 flex flex-wrap items-center justify-end gap-2 px-4 pt-4 sm:fixed sm:right-4 sm:top-14 sm:flex-nowrap sm:pt-0">
         <div className="mode-tabs">
           <button
             type="button"
@@ -369,7 +371,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setLocale("ja")}
-            className={`rounded-l-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "ja" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-l-xl px-3 py-2.5 text-xs font-semibold transition-colors min-h-[44px] sm:min-h-0 sm:py-2 ${locale === "ja" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
             aria-label={t.langJa}
           >
             JA
@@ -377,7 +379,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setLocale("en")}
-            className={`rounded-r-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "en" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-r-xl px-3 py-2.5 text-xs font-semibold transition-colors min-h-[44px] sm:min-h-0 sm:py-2 ${locale === "en" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
             aria-label={t.langEn}
           >
             EN
@@ -385,13 +387,13 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-xl px-4 py-6 sm:px-6 sm:py-12">
+      <div className="relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
         <GlassCard className="refined-card rounded-2xl p-4 transition-all duration-300 sm:p-6">
-          <div className="flex flex-col gap-5 relative">
+          <div className="flex flex-col gap-4 relative">
             <input
               type="text"
               placeholder={t.placeholder}
-              className="input-premium w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3.5 text-[15px] text-white outline-none transition-all duration-300 placeholder:text-zinc-600 focus:border-white/[0.12] focus:bg-white/[0.06] sm:text-base"
+              className="input-premium w-full min-h-14 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-4 text-[15px] text-white outline-none transition-all duration-300 placeholder:text-zinc-600 focus:border-white/[0.12] focus:bg-white/[0.06] sm:text-base sm:min-h-12 sm:py-3.5"
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
             />
@@ -399,7 +401,7 @@ export default function Home() {
             <button
               onClick={analyze}
               disabled={loading}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0"
+              className="flex w-full min-h-14 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white py-4 text-[15px] font-medium text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 sm:min-h-12 sm:py-3.5"
             >
               {loading ? (
                 <>
@@ -485,8 +487,57 @@ export default function Home() {
 
             {mode === "personal" && jobTitle && (
               <>
-              {/* 称号＋グラフを1画面に収めるコンパクトカード */}
+              {/* 1. 推定年収＋シェア＋Geeklyを最優先表示 */}
               <GlassCard className="refined-card animate-fade-in-up stagger-1 rounded-2xl overflow-hidden">
+                <div className="rounded-2xl p-4 sm:p-6 space-y-4">
+                  {salaryDisplay && (
+                    <div className="text-center">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-400/90">
+                        {locale === "ja" ? "推定年収" : "Est. Salary"}
+                      </p>
+                      <p className="mt-1 text-3xl sm:text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-100 to-indigo-300">
+                        {salaryDisplay}
+                      </p>
+                    </div>
+                  )}
+                  <div className={`share-sparkle-container relative ${shareSparkle ? "is-sparkling" : ""}`}>
+                    {shareSparkle && [...Array(12)].map((_, i) => (
+                      <span
+                        key={i}
+                        className="share-sparkle"
+                        style={{
+                          left: `${15 + (i % 4) * 25}%`,
+                          top: `${20 + Math.floor(i / 4) * 60}%`,
+                          animationDelay: `${i * 0.04}s`,
+                        }}
+                      />
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleShareBrag}
+                      className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3"
+                    >
+                      <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg>
+                      {t.shareBragCta}
+                    </button>
+                  </div>
+                  <a
+                    href={businessStep1Url}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
+                  >
+                    <span className="text-lg font-bold text-white drop-shadow-sm">
+                      {t.geeklyMainCta}
+                    </span>
+                    <span className="text-2xl">→</span>
+                  </a>
+                </div>
+              </GlassCard>
+              {/* 2. 称号＋グラフ */}
+              <GlassCard className="refined-card animate-fade-in-up stagger-1b rounded-2xl overflow-hidden">
                 <div className="rounded-2xl p-4 sm:p-6">
                   <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 sm:gap-6 items-center">
                     <div className="order-2 sm:order-1 text-center sm:text-left">
@@ -499,18 +550,11 @@ export default function Home() {
                       <p className="mt-1 text-[10px] font-medium tracking-widest text-indigo-400/80">
                         {t.verifiedByAI}
                       </p>
-                      {(salaryDisplay || rank) && (
+                      {rank && (
                         <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
-                          {salaryDisplay && (
-                            <span className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-sm font-bold text-amber-200">
-                              {salaryDisplay}
-                            </span>
-                          )}
-                          {rank && (
-                            <span className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-sm font-bold text-indigo-200">
-                              {t.rankLabel} {rank}
-                            </span>
-                          )}
+                          <span className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-sm font-bold text-indigo-200">
+                            {t.rankLabel} {rank}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -538,29 +582,6 @@ export default function Home() {
                         </ResponsiveContainer>
                       </div>
                     )}
-                  </div>
-                  <div className={`share-sparkle-container relative mt-4 ${shareSparkle ? "is-sparkling" : ""}`}>
-                    {shareSparkle && [...Array(12)].map((_, i) => (
-                      <span
-                        key={i}
-                        className="share-sparkle"
-                        style={{
-                          left: `${15 + (i % 4) * 25}%`,
-                          top: `${20 + Math.floor(i / 4) * 60}%`,
-                          animationDelay: `${i * 0.04}s`,
-                        }}
-                      />
-                    ))}
-                    <button
-                      type="button"
-                      onClick={handleShareBrag}
-                      className="flex w-full min-h-[52px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-3 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99]"
-                    >
-                      <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                      </svg>
-                      {t.shareBragCta}
-                    </button>
                   </div>
                 </div>
               </GlassCard>
@@ -636,91 +657,16 @@ export default function Home() {
             </GlassCard>
             )}
 
-            {/* あなたに最適な次のステップ — Geeklyメイン・doda/Udemyサブ */}
-            {mode === "personal" && (
-            <div className="no-print animate-fade-in-up stagger-4b space-y-4">
-              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-400/90">
-                {t.nextActionTitle}
-              </p>
-              <p className="text-center text-sm font-bold text-white">
-                {t.nextActionSubtitle}
-              </p>
-              <a
-                href={businessStep1Url}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="golden-vip-button flex w-full min-h-[56px] items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[64px] sm:py-5"
-              >
-                <span className="text-lg font-bold text-white drop-shadow-sm sm:text-xl">
-                  {t.geeklyMainCta}
-                </span>
-                <span className="text-2xl">→</span>
-              </a>
-              <div className="grid grid-cols-2 gap-3">
-                <a
-                  href={transferUrl}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
-                >
-                  {locale === "ja" ? "doda" : "LinkedIn"}
-                </a>
-                <a
-                  href={learningUrl}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
-                >
-                  Udemy
-                </a>
-              </div>
-            </div>
-            )}
-
+            {/* 法人: Geekly/アフィリエイトなし。PDF・お問い合わせのみ */}
             {mode === "business" && (
             <>
-            {/* あなたに最適な次のステップ — Geeklyメイン */}
-            <div className="no-print animate-fade-in-up stagger-4b space-y-4">
-              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-400/90">
-                {t.nextActionTitle}
-              </p>
-              <a
-                href={businessStep1Url}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="golden-vip-button flex w-full min-h-[56px] items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[64px] sm:py-5"
-              >
-                <span className="text-lg font-bold text-white drop-shadow-sm sm:text-xl">
-                  {t.geeklyMainCta}
-                </span>
-                <span className="text-2xl">→</span>
-              </a>
-              <div className="grid grid-cols-2 gap-3">
-                <a
-                  href={businessStep2Url}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
-                >
-                  {t.businessStep2}
-                </a>
-                <a
-                  href={businessStep3Url}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
-                >
-                  {t.businessStep3}
-                </a>
-              </div>
-            </div>
             <div className="no-print animate-fade-in-up stagger-4b flex flex-col gap-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:justify-center">
                 <button
                   type="button"
                   onClick={handlePdfExport}
                   disabled={pdfExporting || isMobile}
-                  className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/[0.1] hover:border-white/[0.18] disabled:pointer-events-none disabled:opacity-80 sm:min-w-0"
+                  className="flex w-full min-h-14 flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/[0.1] hover:border-white/[0.18] disabled:pointer-events-none disabled:opacity-80 sm:min-w-0 sm:min-h-12 sm:py-3.5"
                 >
                   {pdfExporting ? (
                     <>
@@ -734,7 +680,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setContactOpen(true)}
-                  className="flex min-h-12 flex-1 items-center justify-center rounded-xl border border-amber-500/50 bg-amber-500/20 px-6 py-3.5 text-center text-sm font-semibold text-amber-400 transition-all hover:bg-amber-500/30 sm:min-w-0"
+                  className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl border border-amber-500/50 bg-amber-500/20 px-6 py-4 text-center text-sm font-semibold text-amber-400 transition-all hover:bg-amber-500/30 sm:min-w-0 sm:min-h-12 sm:py-3.5"
                 >
                   {t.contactEnterprise}
                 </button>
@@ -841,21 +787,26 @@ export default function Home() {
               </div>
             )}
 
-            {mode === "personal" && (
-            <div className="animate-fade-in-up stagger-5 flex justify-center">
-              <button
-                type="button"
-                onClick={handleShareOnX}
-                className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-6 py-3 text-sm font-medium text-amber-200 backdrop-blur-xl transition-all duration-300 hover:bg-amber-500/20 hover:border-amber-500/50"
-              >
-                {t.saveImageAndShare}
-              </button>
-            </div>
-            )}
           </section>
         )}
 
-        <footer className="mt-16 pb-12 text-center">
+        {/* スマホ: 結果画面でシェアボタンを画面下部に固定（モーダル中は非表示） */}
+        {mode === "personal" && result && !limitExceededOpen && (
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:hidden">
+            <button
+              type="button"
+              onClick={handleShareBrag}
+              className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98]"
+            >
+              <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              {t.shareBragCta}
+            </button>
+          </div>
+        )}
+
+        <footer className="mt-16 pb-12 text-center sm:pb-12">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
             <span className="text-[11px] font-medium text-zinc-500">{t.securityBadge}</span>
           </div>
