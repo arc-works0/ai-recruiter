@@ -94,13 +94,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Refined card — 漆黒ベース・濃紺カード・ネオンブルーグロー */
+/* Refined card — 漆黒ベース・ゴールド／インディゴアクセント */
 .refined-card {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(96, 165, 250, 0.2);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(217, 119, 6, 0.2);
   box-shadow:
-    0 0 0 1px rgba(96, 165, 250, 0.08),
-    0 0 20px rgba(96, 165, 250, 0.12),
+    0 0 0 1px rgba(79, 70, 229, 0.08),
+    0 0 20px rgba(217, 119, 6, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -150,13 +150,13 @@ body {
   pointer-events: none;
 }
 
-/* 実績カード — 認定証フレーム・基板パターン */
+/* 実績カード — ゴールド／インディゴ統一 */
 .achievement-id-card {
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.25);
+  border: 1px solid rgba(217, 119, 6, 0.25);
   box-shadow:
     0 0 0 1px rgba(0,0,0,0.3) inset,
-    0 0 24px rgba(96, 165, 250, 0.15),
+    0 0 24px rgba(79, 70, 229, 0.12),
     0 8px 32px rgba(0,0,0,0.4);
   position: relative;
   overflow: hidden;
@@ -167,15 +167,15 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(96, 165, 250, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(96, 165, 250, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(217, 119, 6, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 70, 229, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
   pointer-events: none;
 }
 
-/* 4回目モーダル — 封印ロック演出 */
+/* 4回目モーダル — プレミアム招待状（全画面） */
 .modal-lock-overlay {
-  background: #050505;
+  background: #030303;
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -184,21 +184,16 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  min-height: 100dvh;
 }
 
 .modal-lock-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.4) 2px,
-    rgba(0, 0, 0, 0.4) 4px
-  );
+  background: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(217, 119, 6, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(79, 70, 229, 0.04) 0%, transparent 40%);
   pointer-events: none;
-  opacity: 0.5;
 }
 
 /* Animated glow orbs — 漆黒ベース統一 */
@@ -221,13 +216,13 @@ body {
   pointer-events: none;
 }
 
-/* Personal theme — 親しみやすくモチベーションが上がる青系 */
+/* Personal / Business 共通 — 漆黒＋ゴールド／インディゴ */
 .bg-mesh::before {
   width: 70vmax;
   height: 70vmax;
   top: -25vmax;
   left: -15vmax;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(96, 165, 250, 0.25) 40%, transparent 55%);
+  background: radial-gradient(circle, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.5) 30%, rgba(180, 83, 9, 0.15) 50%, transparent 70%);
   animation: glow-float 12s ease-in-out infinite;
 }
 
@@ -236,11 +231,11 @@ body {
   height: 55vmax;
   bottom: -20vmax;
   right: -15vmax;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(129, 140, 248, 0.2) 40%, transparent 55%);
+  background: radial-gradient(circle, rgba(161, 98, 7, 0.25) 0%, rgba(79, 70, 229, 0.2) 40%, transparent 60%);
   animation: glow-float-2 14s ease-in-out infinite;
 }
 
-/* Business theme — 信頼と重厚感のあるネイビー×ゴールド系 */
+/* Business theme — 同様のゴールド／インディゴ */
 [data-theme="business"] .bg-mesh::before {
   background: radial-gradient(circle, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.5) 30%, rgba(180, 83, 9, 0.15) 50%, transparent 70%);
   animation: glow-float 14s ease-in-out infinite;
@@ -298,10 +293,11 @@ body {
   transition: all 0.25s ease;
 }
 
+/* 個人・法人共通 — ゴールドアクセント */
 .mode-tabs button[data-active="true"] {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(180, 83, 9, 0.3);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 16px rgba(217, 119, 6, 0.2);
 }
 
 .mode-tabs button[data-active="false"] {
@@ -310,11 +306,6 @@ body {
 
 .mode-tabs button[data-active="false"]:hover {
   color: #e4e4e7;
-}
-
-[data-theme="business"] .mode-tabs button[data-active="true"] {
-  background: rgba(180, 83, 9, 0.3);
-  box-shadow: 0 0 20px rgba(217, 119, 6, 0.2);
 }
 
 /* 企業用トップ: 1文字改行を防止 */

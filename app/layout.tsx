@@ -31,7 +31,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider>
       <html lang="ja">
         <body className="antialiased bg-[#050505] text-zinc-100">
-          <header className="sticky top-0 z-50 flex justify-end border-b border-white/[0.06] bg-[#050505]/90 px-4 py-3 backdrop-blur-xl">
+          <header className="sticky top-0 z-50 flex items-center justify-between border-b border-white/[0.06] bg-[#050505]/95 px-4 py-3 backdrop-blur-xl">
+            <p className="text-sm font-bold text-amber-400/90">30秒でAI年収査定</p>
             <HeaderButtons />
           </header>
           <main>{children}</main>

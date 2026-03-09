@@ -369,7 +369,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setLocale("ja")}
-            className={`rounded-l-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "ja" ? (mode === "business" ? "bg-amber-600/80 text-white" : "bg-blue-500/80 text-white") : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-l-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "ja" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
             aria-label={t.langJa}
           >
             JA
@@ -377,7 +377,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setLocale("en")}
-            className={`rounded-r-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "en" ? (mode === "business" ? "bg-amber-600/80 text-white" : "bg-blue-500/80 text-white") : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-r-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "en" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
             aria-label={t.langEn}
           >
             EN
@@ -385,44 +385,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-xl px-6 py-16 sm:py-24">
-        <header className="space-y-6 text-center break-words">
-          <div
-            className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-500 backdrop-blur-xl"
-            style={{
-              boxShadow: mode === "business" ? "0 0 0 1px rgba(217,119,6,0.25) inset" : "0 0 0 1px rgba(59,130,246,0.2) inset",
-            }}
-          >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{
-                background: mode === "business" ? "#d97706" : "#3b82f6",
-                boxShadow: mode === "business" ? "0 0 12px rgba(217,119,6,0.6)" : "0 0 12px rgba(59,130,246,0.6)",
-              }}
-            />
-            {mode === "personal" ? t.badge : t.businessBadge}
-          </div>
-          <h1
-            className={`font-semibold tracking-[-0.02em] text-white leading-tight ${mode === "personal" ? "break-words text-2xl sm:text-4xl md:text-5xl" : "mx-auto w-full text-center text-xl sm:text-3xl md:text-4xl"}`}
-          >
-            {mode === "personal" ? (
-              t.title
-            ) : (
-              <>
-                {t.businessTitle1}<br />
-                {t.businessTitle2}
-              </>
-            )}
-          </h1>
-          <p
-            className={`mx-auto max-w-md break-words text-zinc-200 ${mode === "personal" ? "text-sm leading-[1.7] sm:text-base" : "text-sm leading-[1.6] sm:text-base"}`}
-            style={mode === "business" ? { textWrap: "balance" } : undefined}
-          >
-            {mode === "personal" ? t.subtitle : t.businessSubtitle}
-          </p>
-        </header>
-
-        <GlassCard className="refined-card mt-14 rounded-2xl p-6 transition-all duration-300 sm:p-8">
+      <div className="relative z-10 mx-auto w-full max-w-xl px-4 py-6 sm:px-6 sm:py-12">
+        <GlassCard className="refined-card rounded-2xl p-4 transition-all duration-300 sm:p-6">
           <div className="flex flex-col gap-5 relative">
             <input
               type="text"
@@ -450,8 +414,8 @@ export default function Home() {
         </GlassCard>
 
         {result && (
-          <section ref={reportRef} data-print-report className="mt-14 space-y-8">
-            <div className="space-y-8">
+          <section ref={reportRef} data-print-report className="mt-6 sm:mt-10 space-y-5 sm:space-y-6">
+            <div className="space-y-5 sm:space-y-6">
             {mode === "business" && jobTitle && (
               <div className="print-cert-single">
                 <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
@@ -521,32 +485,61 @@ export default function Home() {
 
             {mode === "personal" && jobTitle && (
               <>
+              {/* 称号＋グラフを1画面に収めるコンパクトカード */}
               <GlassCard className="refined-card animate-fade-in-up stagger-1 rounded-2xl overflow-hidden">
-                <div className="rounded-2xl p-6 sm:p-8">
-                  <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-                    {t.jobTitleLabel}
-                  </p>
-                  <p className="text-center font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-sky-200 to-indigo-400 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-                    {jobTitle}
-                  </p>
-                  <p className="mt-2 text-center text-xs font-medium tracking-widest text-sky-400/80">
-                    {t.verifiedByAI}
-                  </p>
-                  {(salaryDisplay || rank) && (
-                    <div className="mt-5 flex flex-wrap justify-center gap-4">
-                      {salaryDisplay && (
-                        <span className="rounded-xl border border-white/[0.12] bg-white/[0.06] px-5 py-2.5 text-base font-bold text-white">
-                          {salaryDisplay}
-                        </span>
-                      )}
-                      {rank && (
-                        <span className="rounded-xl border border-sky-500/40 bg-sky-500/20 px-5 py-2.5 text-base font-bold text-sky-200">
-                          {t.rankLabel} {rank}
-                        </span>
+                <div className="rounded-2xl p-4 sm:p-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 sm:gap-6 items-center">
+                    <div className="order-2 sm:order-1 text-center sm:text-left">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-400/90">
+                        {t.jobTitleLabel}
+                      </p>
+                      <p className="mt-1 font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-100 to-indigo-300 text-2xl sm:text-3xl md:text-4xl">
+                        {jobTitle}
+                      </p>
+                      <p className="mt-1 text-[10px] font-medium tracking-widest text-indigo-400/80">
+                        {t.verifiedByAI}
+                      </p>
+                      {(salaryDisplay || rank) && (
+                        <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
+                          {salaryDisplay && (
+                            <span className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-sm font-bold text-amber-200">
+                              {salaryDisplay}
+                            </span>
+                          )}
+                          {rank && (
+                            <span className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-sm font-bold text-indigo-200">
+                              {t.rankLabel} {rank}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                  <div className={`share-sparkle-container relative mt-8 ${shareSparkle ? "is-sparkling" : ""}`}>
+                    {scores && (
+                      <div className="order-1 sm:order-2 radar-reveal mx-auto w-full max-w-[200px] sm:max-w-[180px] h-[180px] sm:h-[160px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RadarChart
+                            data={RADAR_KEYS.map((key, i) => ({
+                              subject: t.radarLabels[i],
+                              value: scores[key],
+                              fullMark: 100,
+                            }))}
+                          >
+                            <defs>
+                              <linearGradient id="radarGradPersonal" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stopColor="#d97706" stopOpacity={0.85} />
+                                <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.6} />
+                              </linearGradient>
+                            </defs>
+                            <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
+                            <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 9 }} />
+                            <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" strokeWidth={2} fill="url(#radarGradPersonal)" fillOpacity={1} />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </div>
+                  <div className={`share-sparkle-container relative mt-4 ${shareSparkle ? "is-sparkling" : ""}`}>
                     {shareSparkle && [...Array(12)].map((_, i) => (
                       <span
                         key={i}
@@ -561,9 +554,9 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={handleShareBrag}
-                      className="flex w-full min-h-[60px] items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#1DA1F2] via-sky-500 to-indigo-500 py-4 text-lg font-bold text-white shadow-[0_0_28px_rgba(29,161,242,0.45)] transition-all hover:from-sky-400 hover:via-sky-400 hover:to-indigo-400 hover:shadow-[0_0_36px_rgba(56,189,248,0.5)] active:scale-[0.99]"
+                      className="flex w-full min-h-[52px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-3 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99]"
                     >
-                      <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
                       {t.shareBragCta}
@@ -573,23 +566,23 @@ export default function Home() {
               </GlassCard>
               {githubStats && (
                 <GlassCard className="achievement-id-card refined-card animate-fade-in-up stagger-1b rounded-2xl overflow-hidden">
-                  <div className="relative rounded-2xl p-6 sm:p-8 z-[1]">
-                    <p className="mb-5 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-sky-300/90">
+                  <div className="relative rounded-2xl p-4 sm:p-6 z-[1]">
+                    <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-400/90">
                       {t.achievementCardTitle}
                     </p>
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                      <div className="rounded-xl border border-sky-500/20 bg-white/[0.04] p-4 text-center">
-                        <p className="text-2xl font-bold text-amber-400 sm:text-3xl">{githubStats.totalStars}</p>
-                        <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementStars}</p>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      <div className="rounded-xl border border-amber-500/20 bg-white/[0.04] p-3 text-center">
+                        <p className="text-xl font-bold text-amber-400 sm:text-2xl">{githubStats.totalStars}</p>
+                        <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementStars}</p>
                       </div>
-                      <div className="rounded-xl border border-sky-500/20 bg-white/[0.04] p-4 text-center">
-                        <p className="text-2xl font-bold text-emerald-400 sm:text-3xl">{githubStats.publicRepos}</p>
-                        <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementRepos}</p>
+                      <div className="rounded-xl border border-indigo-500/20 bg-white/[0.04] p-3 text-center">
+                        <p className="text-xl font-bold text-emerald-400 sm:text-2xl">{githubStats.publicRepos}</p>
+                        <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementRepos}</p>
                       </div>
                       {githubStats.topLanguages.slice(0, 2).map((lang, i) => (
-                        <div key={i} className="rounded-xl border border-sky-500/20 bg-white/[0.04] p-4 text-center">
-                          <p className="text-lg font-bold text-indigo-300 sm:text-xl truncate" title={lang}>{lang}</p>
-                          <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+                        <div key={i} className="rounded-xl border border-indigo-500/20 bg-white/[0.04] p-3 text-center">
+                          <p className="text-base font-bold text-indigo-300 sm:text-lg truncate" title={lang}>{lang}</p>
+                          <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
                             {locale === "ja" ? "主要言語" : "Top Lang"}
                           </p>
                         </div>
@@ -603,7 +596,7 @@ export default function Home() {
 
             {mode === "personal" && tier && tierCfg && (
               <GlassCard className="refined-card animate-fade-in-up stagger-2 rounded-2xl overflow-hidden">
-                <div className="rounded-2xl p-6 sm:p-8">
+                <div className="rounded-2xl p-4 sm:p-6">
                   <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
                     {t.tierBadge}
                   </p>
@@ -622,7 +615,7 @@ export default function Home() {
                     </div>
                   </div>
                   {["D", "E"].includes(tier) && (
-                    <p className="mt-3 text-center text-sm font-medium text-sky-300/90">
+                    <p className="mt-3 text-center text-sm font-medium text-amber-400/90">
                       {t.potentialInfinite}
                     </p>
                   )}
@@ -635,144 +628,50 @@ export default function Home() {
               </GlassCard>
             )}
 
-            {mode === "personal" && scores && (
-              <GlassCard className="refined-card animate-fade-in-up stagger-3 rounded-2xl overflow-hidden">
-                <div className="rounded-2xl p-6 sm:p-8">
-                  <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-                    {t.radarTitle}
-                  </p>
-                  <h2 className="text-center text-lg font-semibold tracking-tight text-white">
-                    {t.radarHeading}
-                  </h2>
-                  <div className="radar-reveal mx-auto mt-6 h-[280px] w-full sm:h-[320px] opacity-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RadarChart
-                        data={RADAR_KEYS.map((key, i) => ({
-                          subject: t.radarLabels[i],
-                          value: scores[key],
-                          fullMark: 100,
-                        }))}
-                      >
-                        <defs>
-                          <linearGradient id="radarGrad" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#4f46e5" stopOpacity={0.85} />
-                            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.6} />
-                          </linearGradient>
-                        </defs>
-                        <PolarGrid stroke="rgba(96, 165, 250, 0.3)" />
-                        <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 11 }} />
-                        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 10 }} />
-                        <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.95)" strokeWidth={2.5} fill="url(#radarGrad)" fillOpacity={1} />
-                        <Legend wrapperStyle={{ fontSize: 11 }} />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </GlassCard>
-            )}
-
-            {mode === "personal" && scores && (
-              <div className="no-print animate-fade-in-up stagger-3b">
-                <div className="mx-auto max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl ring-1 ring-slate-900/5 sm:p-8">
-                  <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-                    <div className="flex-1 space-y-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">
-                        {locale === "ja" ? "ポートフォリオモード（SNSシェア用）" : "Portfolio mode (for SNS share)"}
-                      </p>
-                      <p className="text-sm font-medium text-slate-500">
-                        {locale === "ja"
-                          ? "履歴書代わりに、そのままスクリーンショットでシェアできます。"
-                          : "Use this card as a visual resume on social media."}
-                      </p>
-                      <p className="text-2xl font-bold tracking-tight text-slate-900 break-words sm:text-3xl">
-                        {jobTitle || (locale === "ja" ? "ソフトウェアエンジニア" : "Software Engineer")}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {tier && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/5 px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-900/5">
-                            <span className="text-slate-400">
-                              {locale === "ja" ? "ランク" : "Tier"}
-                            </span>
-                            <span>{tierLabel || tier}</span>
-                          </span>
-                        )}
-                        {salaryDisplay && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
-                            <span>{salaryDisplay}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-4 h-40 w-full rounded-2xl bg-slate-900/3 p-3 sm:mt-0 sm:h-44 sm:w-44">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart
-                          data={RADAR_KEYS.map((key, i) => ({
-                            subject: t.radarLabels[i],
-                            value: scores[key],
-                            fullMark: 100,
-                          }))}
-                        >
-                          <PolarGrid stroke="rgba(15,23,42,0.12)" />
-                          <PolarAngleAxis dataKey="subject" tick={{ fill: "#475569", fontSize: 10 }} />
-                          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#9ca3af", fontSize: 9 }} />
-                          <Radar
-                            name={t.radarScore}
-                            dataKey="value"
-                            stroke="#4f46e5"
-                            fill="#6366f1"
-                            fillOpacity={0.28}
-                            strokeWidth={2}
-                          />
-                        </RadarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {mode === "personal" && (
             <GlassCard className="refined-card animate-fade-in-up stagger-4 rounded-2xl overflow-hidden">
-              <div className="rounded-2xl overflow-hidden p-6 sm:p-8">
+              <div className="rounded-2xl overflow-hidden p-4 sm:p-6">
                 <SimpleMarkdown content={result} />
               </div>
             </GlassCard>
             )}
 
+            {/* あなたに最適な次のステップ — Geeklyメイン・doda/Udemyサブ */}
             {mode === "personal" && (
             <div className="no-print animate-fade-in-up stagger-4b space-y-4">
-              <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
+              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-400/90">
                 {t.nextActionTitle}
               </p>
-              <p className="text-center text-base font-bold text-white">
+              <p className="text-center text-sm font-bold text-white">
                 {t.nextActionSubtitle}
               </p>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+              <a
+                href={businessStep1Url}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="golden-vip-button flex w-full min-h-[56px] items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[64px] sm:py-5"
+              >
+                <span className="text-lg font-bold text-white drop-shadow-sm sm:text-xl">
+                  {t.geeklyMainCta}
+                </span>
+                <span className="text-2xl">→</span>
+              </a>
+              <div className="grid grid-cols-2 gap-3">
                 <a
                   href={transferUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="golden-vip-button flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] sm:min-h-[64px] sm:py-6"
+                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100">
-                    {t.vipCtaTransfer}
-                  </span>
-                  <span className="text-base font-bold text-white drop-shadow-sm sm:text-lg">
-                    {locale === "ja" ? "doda・転職サイト →" : "LinkedIn / Job Boards →"}
-                  </span>
+                  {locale === "ja" ? "doda" : "LinkedIn"}
                 </a>
                 <a
                   href={learningUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="golden-vip-button flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-6 py-5 text-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] sm:min-h-[64px] sm:py-6"
+                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100">
-                    {t.vipCtaLearning}
-                  </span>
-                  <span className="text-base font-bold text-white drop-shadow-sm sm:text-lg">
-                    {locale === "ja" ? "Udemy・スクール →" : "Udemy / Courses →"}
-                  </span>
+                  Udemy
                 </a>
               </div>
             </div>
@@ -780,34 +679,37 @@ export default function Home() {
 
             {mode === "business" && (
             <>
+            {/* あなたに最適な次のステップ — Geeklyメイン */}
             <div className="no-print animate-fade-in-up stagger-4b space-y-4">
-              <p className="text-center text-sm font-semibold text-zinc-300">{t.nextActionTitle}</p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <a
-                  href={businessStep1Url}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="flex flex-col items-center justify-center gap-1 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-4 text-center text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/50 sm:py-5"
-                >
-                  <span className="text-[10px] font-bold uppercase tracking-wider">Step 1</span>
-                  {t.businessStep1}
-                </a>
+              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-400/90">
+                {t.nextActionTitle}
+              </p>
+              <a
+                href={businessStep1Url}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="golden-vip-button flex w-full min-h-[56px] items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[64px] sm:py-5"
+              >
+                <span className="text-lg font-bold text-white drop-shadow-sm sm:text-xl">
+                  {t.geeklyMainCta}
+                </span>
+                <span className="text-2xl">→</span>
+              </a>
+              <div className="grid grid-cols-2 gap-3">
                 <a
                   href={businessStep2Url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="flex flex-col items-center justify-center gap-1 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-4 text-center text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/50 sm:py-5"
+                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-wider">Step 2</span>
                   {t.businessStep2}
                 </a>
                 <a
                   href={businessStep3Url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="flex flex-col items-center justify-center gap-1 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-4 text-center text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/50 sm:py-5"
+                  className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-center text-xs font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-wider">Step 3</span>
                   {t.businessStep3}
                 </a>
               </div>
@@ -845,28 +747,35 @@ export default function Home() {
 
             {limitExceededOpen && (
               <div className="modal-lock-overlay" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
-                <div className="absolute inset-0 bg-[#050505]/98 backdrop-blur-xl" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
-                  <h2 id="limit-modal-title" className="text-2xl font-bold text-white sm:text-3xl">
-                    {t.limitExceededTitle}
-                  </h2>
-                  <p className="mt-6 text-lg font-medium text-zinc-300">
-                    {t.limitExceededMessage}
-                  </p>
-                  <a
-                    href={businessStep1Url}
-                    className="mt-10 flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-5 text-lg font-bold text-white shadow-[0_0_32px_rgba(251,191,36,0.4)] transition hover:from-amber-300 hover:to-orange-400 hover:shadow-[0_0_40px_rgba(251,191,36,0.5)] active:scale-[0.98]"
-                  >
-                    <span className="text-2xl">→</span>
-                    {t.limitExceededCta}
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => setLimitExceededOpen(false)}
-                    className="mt-6 rounded-xl border border-white/10 bg-white/5 px-8 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/10 hover:text-zinc-200"
-                  >
-                    {t.contactClose}
-                  </button>
+                <div className="absolute inset-0" onClick={() => setLimitExceededOpen(false)} aria-hidden />
+                <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 text-center sm:min-h-0">
+                  <div className="w-full max-w-sm space-y-8">
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-400/90">
+                        {t.limitInvitationLabel}
+                      </p>
+                      <h2 id="limit-modal-title" className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                        {t.limitExceededTitle}
+                      </h2>
+                      <p className="text-base font-medium text-zinc-400">
+                        {t.limitExceededMessage}
+                      </p>
+                    </div>
+                    <a
+                      href={businessStep1Url}
+                      className="golden-vip-button flex w-full items-center justify-center gap-3 rounded-2xl px-8 py-5 text-lg font-bold text-white transition hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      {t.limitExceededCta}
+                      <span className="text-2xl">→</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setLimitExceededOpen(false)}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-zinc-500 transition hover:bg-white/10 hover:text-zinc-300"
+                    >
+                      {t.contactClose}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -933,85 +842,14 @@ export default function Home() {
             )}
 
             {mode === "personal" && (
-            <GlassCard className="animate-fade-in-up stagger-5 card-gradient-border rounded-2xl overflow-hidden">
-              <div className="rounded-2xl glass-panel border border-white/[0.06] p-6 sm:p-8">
-              <h2 className="text-center text-lg font-semibold tracking-tight text-white">
-                {t.threeStepsTitle}
-              </h2>
-              <p className="mt-2 text-center text-[13px] leading-relaxed text-zinc-500">
-                {t.threeStepsSubtitle}
-              </p>
-              <div className="mt-6 space-y-4 sm:mt-8">
-                {[
-                  { title: t.step1Title, desc: t.step1Desc, cta: t.ctaTransfer, href: transferUrl, bg: "rgba(99,102,241,0.2)", fg: "#a5b4fc" },
-                  { title: t.step2Title, desc: t.step2Desc, cta: t.ctaLearning, href: learningUrl, bg: "rgba(16,185,129,0.2)", fg: "#6ee7b7" },
-                  { title: t.step3Title, desc: t.step3Desc, cta: t.ctaSideBiz, href: sideBizUrl, bg: "rgba(245,158,11,0.2)", fg: "#fcd34d" },
-                ].map((step, idx) => (
-                  <div
-                    key={idx}
-                    className="group flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 transition-all duration-300 hover:border-white/[0.1] hover:bg-white/[0.05] hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:translate-y-[-2px] sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="flex gap-4">
-                      <span
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold transition-colors"
-                        style={{ backgroundColor: step.bg, color: step.fg }}
-                      >
-                        {idx + 1}
-                      </span>
-                      <div>
-                        <p className="font-medium text-white">{step.title}</p>
-                        <p className="mt-0.5 text-[13px] text-zinc-500">{step.desc}</p>
-                      </div>
-                    </div>
-                    <a
-                      href={step.href}
-                      target="_blank"
-                      rel="noopener noreferrer sponsored"
-                      className="shrink-0 rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-black shadow-[0_2px_12px_rgba(0,0,0,0.25)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:translate-y-[-1px]"
-                    >
-                      {step.cta}
-                    </a>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-5 text-center text-[11px] text-zinc-600">{t.affiliateNote}</p>
-              </div>
-            </GlassCard>
-            )}
-
-            {mode === "personal" && (
-            <div className="animate-fade-in-up stagger-6 space-y-4">
-              <p className="text-center text-[11px] font-medium uppercase tracking-widest text-zinc-600">
-                {t.shareLabel}
-              </p>
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={handleShareOnX}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-8 py-3.5 text-sm font-medium text-amber-200 backdrop-blur-xl transition-all duration-300 hover:bg-amber-500/20 hover:border-amber-500/50 hover:translate-y-[-1px]"
-                >
-                  {t.saveImageAndShare}
-                </button>
-              </div>
-            </div>
-            )}
-
-            {mode === "personal" && (
-            <div className="animate-fade-in-up stagger-7 rounded-2xl glass-panel border border-white/[0.06] p-6 sm:p-8">
-              <p className="mb-1 text-center text-[11px] font-semibold uppercase tracking-widest text-zinc-500">
-                {t.recommendLabel}
-              </p>
-              <p className="text-center text-sm text-zinc-500">{t.recommendDesc}</p>
-              <div className="mt-4 flex justify-center">
-                <a
-                  href="https://google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-300 hover:bg-white/[0.06]"
-                >
-                  {t.recommendCta}
-                </a>
-              </div>
+            <div className="animate-fade-in-up stagger-5 flex justify-center">
+              <button
+                type="button"
+                onClick={handleShareOnX}
+                className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-6 py-3 text-sm font-medium text-amber-200 backdrop-blur-xl transition-all duration-300 hover:bg-amber-500/20 hover:border-amber-500/50"
+              >
+                {t.saveImageAndShare}
+              </button>
             </div>
             )}
           </section>
