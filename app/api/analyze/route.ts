@@ -323,8 +323,13 @@ ${githubData.topRepos
     const cacheKey = `${username.toLowerCase()}_${locale}_${mode}`;
     type Cached = { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string };
     const cached = getAnalysisCache(cacheKey);
+    const githubStats = {
+      totalStars: githubData.totalStars,
+      publicRepos: githubData.publicRepos,
+      topLanguages: githubData.topLanguages,
+    };
     if (cached) {
-      return NextResponse.json(cached);
+      return NextResponse.json({ ...cached, githubStats });
     }
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -370,6 +375,7 @@ ${githubData.topRepos
       rank,
       tier,
       tierFeedback,
+      githubStats,
     });
   } catch (error: unknown) {
     console.error("Analyze API error:", error);

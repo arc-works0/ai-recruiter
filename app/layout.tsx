@@ -6,6 +6,11 @@ import HeaderButtons from "./HeaderButtons";
 // openGraph.images / twitter.images は一切指定しない（𝕏の古いキャッシュ画像を出さない）
 export const metadata: Metadata = {
   metadataBase: new URL("https://ai-recruiter-4o7e.vercel.app"),
+  verification: {
+    other: {
+      "impact-site-verification": "97613a4f-e37a-499c-9cc0-0cb18e20695b",
+    },
+  },
   title: "AI Market Value Assessment",
   description: "Analyze your GitHub and estimate your market value.",
   openGraph: {

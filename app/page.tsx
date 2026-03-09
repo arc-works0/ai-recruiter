@@ -147,6 +147,7 @@ export default function Home() {
   const [rank, setRank] = useState("");
   const [tier, setTier] = useState("");
   const [tierFeedback, setTierFeedback] = useState("");
+  const [githubStats, setGithubStats] = useState<{ totalStars: number; publicRepos: number; topLanguages: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [contactOpen, setContactOpen] = useState(false);
@@ -216,6 +217,7 @@ export default function Home() {
         setRank("");
         setTier("");
         setTierFeedback("");
+        setGithubStats(null);
         setError(data.error || t.errorAnalyzeFailed);
         return;
       }
@@ -226,6 +228,7 @@ export default function Home() {
       setRank(data.rank ?? "");
       setTier(data.tier ?? "");
       setTierFeedback(data.tierFeedback ?? "");
+      setGithubStats(data.githubStats ?? null);
       const newCount = usageCount + 1;
       setUsageCount(newCount);
       try {
@@ -239,9 +242,10 @@ export default function Home() {
       setJobTitle("");
       setSalaryDisplay("");
       setRank("");
-      setTier("");
-      setTierFeedback("");
-      setError(t.errorNetwork);
+        setTier("");
+        setTierFeedback("");
+        setGithubStats(null);
+        setError(t.errorNetwork);
     } finally {
       setLoading(false);
     }
@@ -290,6 +294,24 @@ export default function Home() {
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, locale]);
+
+  const handleShareBrag = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const appUrl = scores
+      ? `${window.location.origin}/share?${new URLSearchParams({
+          scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
+          ...(jobTitle && { title: jobTitle }),
+          ...(salaryDisplay && { salary: salaryDisplay }),
+          mode,
+          v: "final",
+        }).toString()}`
+      : window.location.href;
+    const shareText = locale === "ja"
+      ? (t.shareBragTweet as string).replace("{salary}", salaryDisplay || "〇〇万円")
+      : (t.shareBragTweet as string).replace("{salary}", salaryDisplay || "$XXX");
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
+    window.open(tweetUrl, "_blank", "noopener,noreferrer");
+  }, [scores, jobTitle, salaryDisplay, locale, t]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -496,6 +518,7 @@ export default function Home() {
             )}
 
             {mode === "personal" && jobTitle && (
+              <>
               <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
                 <div className="rounded-2xl glass-panel-strong p-6 sm:p-8">
                   <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
@@ -518,8 +541,46 @@ export default function Home() {
                       )}
                     </div>
                   )}
+                  <button
+                    type="button"
+                    onClick={handleShareBrag}
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1DA1F2] py-4 text-base font-bold text-white shadow-lg transition-all hover:bg-[#1a91da] hover:shadow-xl active:scale-[0.99]"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    {t.shareBragCta}
+                  </button>
                 </div>
               </GlassCard>
+              {githubStats && (
+                <GlassCard className="animate-fade-in-up stagger-1b rounded-2xl overflow-hidden border border-indigo-500/30 bg-gradient-to-br from-slate-900/90 via-indigo-950/40 to-slate-900/90">
+                  <div className="rounded-2xl p-6 sm:p-8">
+                    <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-indigo-300/90">
+                      {t.achievementCardTitle}
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
+                        <p className="text-2xl font-bold text-amber-400 sm:text-3xl">{githubStats.totalStars}</p>
+                        <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementStars}</p>
+                      </div>
+                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
+                        <p className="text-2xl font-bold text-emerald-400 sm:text-3xl">{githubStats.publicRepos}</p>
+                        <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">{t.achievementRepos}</p>
+                      </div>
+                      {githubStats.topLanguages.slice(0, 2).map((lang, i) => (
+                        <div key={i} className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
+                          <p className="text-lg font-bold text-indigo-300 sm:text-xl truncate" title={lang}>{lang}</p>
+                          <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+                            {locale === "ja" ? "主要言語" : "Top Lang"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </GlassCard>
+              )}
+              </>
             )}
 
             {mode === "personal" && tier && tierCfg && (
@@ -579,6 +640,66 @@ export default function Home() {
                   </div>
                 </div>
               </GlassCard>
+            )}
+
+            {mode === "personal" && scores && (
+              <div className="no-print animate-fade-in-up stagger-3b">
+                <div className="mx-auto max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl ring-1 ring-slate-900/5 sm:p-8">
+                  <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+                    <div className="flex-1 space-y-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+                        {locale === "ja" ? "ポートフォリオモード（SNSシェア用）" : "Portfolio mode (for SNS share)"}
+                      </p>
+                      <p className="text-sm font-medium text-slate-500">
+                        {locale === "ja"
+                          ? "履歴書代わりに、そのままスクリーンショットでシェアできます。"
+                          : "Use this card as a visual resume on social media."}
+                      </p>
+                      <p className="text-2xl font-bold tracking-tight text-slate-900 break-words sm:text-3xl">
+                        {jobTitle || (locale === "ja" ? "ソフトウェアエンジニア" : "Software Engineer")}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {tier && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/5 px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-900/5">
+                            <span className="text-slate-400">
+                              {locale === "ja" ? "ランク" : "Tier"}
+                            </span>
+                            <span>{tierLabel || tier}</span>
+                          </span>
+                        )}
+                        {salaryDisplay && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
+                            <span>{salaryDisplay}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-4 h-40 w-full rounded-2xl bg-slate-900/3 p-3 sm:mt-0 sm:h-44 sm:w-44">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart
+                          data={RADAR_KEYS.map((key, i) => ({
+                            subject: t.radarLabels[i],
+                            value: scores[key],
+                            fullMark: 100,
+                          }))}
+                        >
+                          <PolarGrid stroke="rgba(15,23,42,0.12)" />
+                          <PolarAngleAxis dataKey="subject" tick={{ fill: "#475569", fontSize: 10 }} />
+                          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#9ca3af", fontSize: 9 }} />
+                          <Radar
+                            name={t.radarScore}
+                            dataKey="value"
+                            stroke="#4f46e5"
+                            fill="#6366f1"
+                            fillOpacity={0.28}
+                            strokeWidth={2}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
             {mode === "personal" && (
@@ -692,45 +813,25 @@ export default function Home() {
 
             {limitExceededOpen && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div
-                  className={`relative w-full max-w-md rounded-2xl p-6 shadow-2xl ${
-                    mode === "business"
-                      ? "border border-amber-500/50 bg-gradient-to-b from-slate-900 to-slate-800"
-                      : "border border-indigo-200/50 bg-gradient-to-b from-white to-blue-50"
-                  }`}
-                >
-                  <h2
-                    id="limit-modal-title"
-                    className={`text-lg font-semibold ${mode === "business" ? "text-amber-400" : "text-indigo-900"}`}
-                  >
+                <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setLimitExceededOpen(false)} aria-hidden />
+                <div className="relative w-full max-w-md rounded-2xl border border-white/[0.12] bg-zinc-900/95 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+                  <h2 id="limit-modal-title" className="text-center text-xl font-bold text-white">
                     {t.limitExceededTitle}
                   </h2>
-                  <p
-                    className={`mt-3 text-sm leading-relaxed ${
-                      mode === "business" ? "text-zinc-300" : "text-indigo-800/90"
-                    }`}
-                  >
+                  <p className="mt-4 text-center text-base font-medium text-zinc-300">
                     {t.limitExceededMessage}
                   </p>
                   <a
                     href={businessStep1Url}
-                    className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold transition ${
-                      mode === "business"
-                        ? "border border-amber-500/50 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
-                        : "bg-indigo-600 text-white hover:bg-indigo-500"
-                    }`}
+                    className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:from-indigo-500 hover:to-indigo-400 hover:shadow-indigo-500/40 active:scale-[0.98]"
                   >
+                    <span className="text-xl">→</span>
                     {t.limitExceededCta}
                   </a>
                   <button
                     type="button"
                     onClick={() => setLimitExceededOpen(false)}
-                    className={`mt-4 w-full rounded-xl py-2.5 text-sm font-medium transition ${
-                      mode === "business"
-                        ? "border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
-                        : "border border-indigo-200 bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100"
-                    }`}
+                    className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/10 hover:text-zinc-200"
                   >
                     {t.contactClose}
                   </button>
