@@ -150,6 +150,7 @@ export default function Home() {
   const [summaryStrengths, setSummaryStrengths] = useState("");
   const [summaryMarketValue, setSummaryMarketValue] = useState("");
   const [summaryOutlook, setSummaryOutlook] = useState("");
+  const [showFullMobile, setShowFullMobile] = useState(false);
   const [githubStats, setGithubStats] = useState<{ totalStars: number; publicRepos: number; topLanguages: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -224,6 +225,7 @@ export default function Home() {
         setSummaryStrengths("");
         setSummaryMarketValue("");
         setSummaryOutlook("");
+        setShowFullMobile(false);
         setGithubStats(null);
         setError(data.error || t.errorAnalyzeFailed);
         return;
@@ -238,6 +240,7 @@ export default function Home() {
       setSummaryStrengths(data.summaryStrengths ?? "");
       setSummaryMarketValue(data.summaryMarketValue ?? "");
       setSummaryOutlook(data.summaryOutlook ?? "");
+      setShowFullMobile(false);
       setGithubStats(data.githubStats ?? null);
       const newCount = usageCount + 1;
       setUsageCount(newCount);
@@ -495,7 +498,18 @@ export default function Home() {
                       </div>
                     )}
                     <div className="print-advice-section mt-6 print:mt-3 print:flex-1 print:min-h-0">
-                      <SimpleMarkdown content={result} />
+                      {(!isMobile || showFullMobile) && (
+                        <SimpleMarkdown content={result} />
+                      )}
+                      {isMobile && (
+                        <button
+                          type="button"
+                          onClick={() => setShowFullMobile((v) => !v)}
+                          className="mt-4 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-200 transition-colors hover:bg-white/10"
+                        >
+                          {showFullMobile ? t.readLessMobile : t.readMoreMobile}
+                        </button>
+                      )}
                     </div>
                     <p className="print-cert-footer mt-8 hidden text-center text-[9px] font-medium tracking-widest text-zinc-500 print:mt-4 print:block print:text-[8px] print:text-slate-500">
                       {t.certFooter}
@@ -673,35 +687,51 @@ export default function Home() {
             <GlassCard className="refined-card animate-fade-in-up stagger-4 rounded-2xl overflow-hidden">
               <div className="rounded-2xl overflow-hidden p-4 sm:p-6">
                 {(summaryStrengths || summaryMarketValue || summaryOutlook) ? (
-                  <ul className="space-y-3 text-zinc-200">
-                    {summaryStrengths && (
-                      <li className="flex gap-2">
-                        <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-amber-400/90" aria-hidden />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">{t.summaryLabelStrengths}</p>
-                          <p className="mt-0.5 text-sm leading-relaxed">{summaryStrengths}</p>
-                        </div>
-                      </li>
+                  <>
+                    <ul className="space-y-3 text-zinc-200">
+                      {summaryStrengths && (
+                        <li className="flex gap-2">
+                          <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-amber-400/90" aria-hidden />
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">{t.summaryLabelStrengths}</p>
+                            <p className="mt-0.5 text-sm leading-relaxed">{summaryStrengths}</p>
+                          </div>
+                        </li>
+                      )}
+                      {summaryMarketValue && (
+                        <li className="flex gap-2">
+                          <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-indigo-400/90" aria-hidden />
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90">{t.summaryLabelMarketValue}</p>
+                            <p className="mt-0.5 text-sm leading-relaxed">{summaryMarketValue}</p>
+                          </div>
+                        </li>
+                      )}
+                      {summaryOutlook && (
+                        <li className="flex gap-2">
+                          <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400/90" aria-hidden />
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400/90">{t.summaryLabelOutlook}</p>
+                            <p className="mt-0.5 text-sm leading-relaxed">{summaryOutlook}</p>
+                          </div>
+                        </li>
+                      )}
+                    </ul>
+                    {isMobile && (
+                      <button
+                        type="button"
+                        onClick={() => setShowFullMobile((v) => !v)}
+                        className="mt-4 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-200 transition-colors hover:bg-white/10"
+                      >
+                        {showFullMobile ? t.readLessMobile : t.readMoreMobile}
+                      </button>
                     )}
-                    {summaryMarketValue && (
-                      <li className="flex gap-2">
-                        <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-indigo-400/90" aria-hidden />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90">{t.summaryLabelMarketValue}</p>
-                          <p className="mt-0.5 text-sm leading-relaxed">{summaryMarketValue}</p>
-                        </div>
-                      </li>
+                    {(!isMobile || showFullMobile) && (
+                      <div className="mt-4 border-t border-white/5 pt-4">
+                        <SimpleMarkdown content={result} />
+                      </div>
                     )}
-                    {summaryOutlook && (
-                      <li className="flex gap-2">
-                        <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400/90" aria-hidden />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400/90">{t.summaryLabelOutlook}</p>
-                          <p className="mt-0.5 text-sm leading-relaxed">{summaryOutlook}</p>
-                        </div>
-                      </li>
-                    )}
-                  </ul>
+                  </>
                 ) : (
                   <SimpleMarkdown content={result} />
                 )}

@@ -231,6 +231,12 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
+@media (max-width: 640px) {
+  .print-advice-section p {
+    margin-bottom: 0.85rem;
+  }
+}
+
 /* モーダル表示時は背景の装飾を非表示 */
 [data-modal-open="true"] .modal-bg {
   visibility: hidden;
