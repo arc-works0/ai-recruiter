@@ -11,9 +11,14 @@ export type SummaryTriple = {
   summaryOutlook: string;
 };
 
+export type BusinessExtra = {
+  candidateStrengths: string;
+  interviewConcerns: string;
+};
+
 const analysisCache = new Map<
   string,
-  { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple
+  { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple & Partial<BusinessExtra>
 >();
 
 function getAnalysisCache(username: string) {
@@ -22,7 +27,7 @@ function getAnalysisCache(username: string) {
 
 function setAnalysisCache(
   username: string,
-  data: { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple
+  data: { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple & Partial<BusinessExtra>
 ) {
   analysisCache.set(username, data);
   if (analysisCache.size > 500) {
@@ -142,6 +147,11 @@ const defaultSummary: SummaryTriple = {
   summaryOutlook: "",
 };
 
+const defaultBusinessExtra: BusinessExtra = {
+  candidateStrengths: "",
+  interviewConcerns: "",
+};
+
 function parseScoresFromContent(content: string): {
   markdown: string;
   scores: RadarScores;
@@ -150,7 +160,7 @@ function parseScoresFromContent(content: string): {
   rank: string;
   tier: string;
   tierFeedback: string;
-} & SummaryTriple {
+} & SummaryTriple & Partial<BusinessExtra> {
   const jsonBlock = content.match(/```json\s*([\s\S]*?)\s*```/);
   const defaultMeta = {
     jobTitle: "フルスタックの設計士",
@@ -178,6 +188,10 @@ function parseScoresFromContent(content: string): {
         summaryMarketValue: typeof parsed.summaryMarketValue === "string" ? parsed.summaryMarketValue.trim() : defaultSummary.summaryMarketValue,
         summaryOutlook: typeof parsed.summaryOutlook === "string" ? parsed.summaryOutlook.trim() : defaultSummary.summaryOutlook,
       };
+      const businessExtra: Partial<BusinessExtra> = {
+        candidateStrengths: typeof parsed.candidateStrengths === "string" ? parsed.candidateStrengths.trim() : defaultBusinessExtra.candidateStrengths,
+        interviewConcerns: typeof parsed.interviewConcerns === "string" ? parsed.interviewConcerns.trim() : defaultBusinessExtra.interviewConcerns,
+      };
       return {
         markdown,
         scores,
@@ -190,12 +204,13 @@ function parseScoresFromContent(content: string): {
             ? parsed.tierFeedback.trim()
             : defaultMeta.tierFeedback,
         ...summary,
+        ...businessExtra,
       };
     } catch {
-      return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta, ...defaultSummary };
+      return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta, ...defaultSummary, ...defaultBusinessExtra };
     }
   }
-  return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta, ...defaultSummary };
+  return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta, ...defaultSummary, ...defaultBusinessExtra };
 }
 
 function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): string {
@@ -219,7 +234,19 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
     : `You are a global IT expert. Produce ALL results (Job Title, Feedback, markdown body, labels, advice) STRICTLY in professional English. Do NOT use any Japanese. Every single word in jobTitle and tierFeedback must be in English. Avoid Japanese-style titles like 魔術師; use professional English titles instead (e.g. "Master of TypeScript", "Frontend Architect").\n${isBusiness ? toneBusinessEn : tonePersonalEn}`;
 
   const formatBlock = isJa
-    ? `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。
+    ? (isBusiness
+      ? `1) Markdownで、以下のセクションを日本語で記述。意味の通る自然な日本語のみ。採用担当者が面接でそのまま使える情報にする。
+
+- ### 【鑑定結果】技術アセスメント
+- **想定年収**: 300万〜1500万円の範囲で1円単位（例：5,200,000円）
+- **市場価値ランク**: S+ / S / A / B / C / D / E の7段階と1行の理由
+
+**【この候補者の強み】** 採用・面接でアピールすべき技術的強みを2〜3文で。具体例（言語・リポジトリ・貢献）を含める。
+
+**【面接で深掘りすべき技術的懸念点】** コード品質・経験の偏り・スキルギャップなど、面接で確認すべき点を2〜3文で。
+
+**【技術の深さ】** どの言語・フレームワークをどの程度使いこなしているか。**【保守性・可読性】** 開発頻度・継続性から見える信頼性。**【今後の展望】** 次に学ぶべき技術を具体的に。`
+      : `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。
 
 - ### 【鑑定結果】市場価値診断書
 - **想定年収**: 300万〜1500万円の範囲で1円単位（例：5,200,000円）
@@ -229,8 +256,20 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 
 **【実務への貢献度】** 開発頻度・継続性から見える、エンジニアとしての信頼性。
 
-**【今後の展望】** 年収・市場価値を上げるために、次に学ぶべき技術を3つ具体的に。`
-    : `1) Markdown in English only (tables, bold, formal style). All text must be in professional English. No Japanese.
+**【今後の展望】** 年収・市場価値を上げるために、次に学ぶべき技術を3つ具体的に。`)
+    : (isBusiness
+      ? `1) Markdown in English. Produce hiring-manager-ready content.
+
+- ### Technical Assessment Report
+- **Estimated salary**: 3M–15M JPY, exact figure
+- **Market value rank**: S+ / S / A / B / C / D / E with one-line rationale
+
+**【Candidate strengths】** 2–3 sentences on technical strengths to highlight in interview (languages, repos, contributions).
+
+**【Technical concerns to probe in interview】** 2–3 sentences on code quality, experience gaps, or skills to verify.
+
+**【Technical depth】** Languages/frameworks proficiency. **【Maintainability & readability】** Reliability from activity. **【Next steps】** Concrete technologies to learn.`
+      : `1) Markdown in English only (tables, bold, formal style). All text must be in professional English. No Japanese.
 
 - ### Certification Report — Market Value Assessment
 - **Estimated salary**: 3M–15M JPY, exact figure (e.g. 5,200,000円)
@@ -240,11 +279,15 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 
 **【Contribution & reliability】** Development frequency and consistency that demonstrate reliability as an engineer.
 
-**【Next steps】** 3 concrete technologies to learn next to increase salary and market value.`;
+**【Next steps】** 3 concrete technologies to learn next to increase salary and market value.`);
 
-  const jsonExample = isJa
-    ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "技術的な強みを1文で要約（例：TypeScriptとReactを軸にフロント開発の実績があります。）", "summaryMarketValue": "市場価値の根拠を1文で（例：継続的なコミットとスター数から、信頼性が評価されています。）", "summaryOutlook": "今後の展望を1文で（例：クラウド・API設計を習得すると年収アップが見込めます。）"}`
-    : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "One-sentence summary of technical strengths.", "summaryMarketValue": "One-sentence basis for market value.", "summaryOutlook": "One-sentence future outlook."}`;
+  const jsonExample = isBusiness
+    ? (isJa
+      ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "...", "summaryMarketValue": "...", "summaryOutlook": "...", "candidateStrengths": "この候補者の技術的強みを2〜3文で。", "interviewConcerns": "面接で深掘りすべき技術的懸念点を2〜3文で。"}`
+      : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "...", "summaryMarketValue": "...", "summaryOutlook": "...", "candidateStrengths": "2-3 sentences on candidate strengths.", "interviewConcerns": "2-3 sentences on technical concerns to probe."}`)
+    : (isJa
+      ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "技術的な強みを1文で要約（例：TypeScriptとReactを軸にフロント開発の実績があります。）", "summaryMarketValue": "市場価値の根拠を1文で（例：継続的なコミットとスター数から、信頼性が評価されています。）", "summaryOutlook": "今後の展望を1文で（例：クラウド・API設計を習得すると年収アップが見込めます。）"}`
+      : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "One-sentence summary of technical strengths.", "summaryMarketValue": "One-sentence basis for market value.", "summaryOutlook": "One-sentence future outlook."}`);
 
   return `You are an expert in engineer market value certification. Provide data-driven, credible assessments.
 
@@ -261,13 +304,15 @@ ${formatBlock}
 
 2) Append exactly one JSON block. jobTitle and tierFeedback: ${isJa ? "必ず日本語のみ。英語禁止。" : "English only."}
 ${isJa ? "JSONには必ず summaryStrengths, summaryMarketValue, summaryOutlook を1文ずつ含めること（スマホで箇条書き表示する要約用）。" : "Include summaryStrengths, summaryMarketValue, summaryOutlook (one sentence each) for bullet display."}
+${isBusiness ? (isJa ? "法人モードでは candidateStrengths（この候補者の強み・2〜3文）と interviewConcerns（面接で深掘りすべき技術的懸念点・2〜3文）を必ず含めること。" : "In business mode include candidateStrengths and interviewConcerns (2-3 sentences each).") : ""}
 \`\`\`json
 ${jsonExample}
 \`\`\`
 - technical, contribution, sustainability, market: 0–100 integers
 - salaryDisplay: salary string (3–15M JPY)
 - rank, tier: S+ / S / A / B / C / D / E
-- summaryStrengths, summaryMarketValue, summaryOutlook: 各1文の要約（必須）`;
+- summaryStrengths, summaryMarketValue, summaryOutlook: 各1文の要約（必須）
+${isBusiness ? "- candidateStrengths, interviewConcerns: 法人時は必須（各2〜3文）" : ""}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -358,7 +403,7 @@ ${githubData.topRepos
       topLanguages: githubData.topLanguages,
     };
     if (cached) {
-      return NextResponse.json({ ...defaultSummary, ...cached, githubStats });
+      return NextResponse.json({ ...defaultSummary, ...defaultBusinessExtra, ...cached, githubStats });
     }
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -387,7 +432,7 @@ ${githubData.topRepos
     }
 
     const parsed = parseScoresFromContent(content);
-    const { markdown, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, summaryStrengths, summaryMarketValue, summaryOutlook } = parsed;
+    const { markdown, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, summaryStrengths, summaryMarketValue, summaryOutlook, candidateStrengths, interviewConcerns } = parsed;
     setAnalysisCache(cacheKey, {
       result: markdown,
       scores,
@@ -399,6 +444,8 @@ ${githubData.topRepos
       summaryStrengths,
       summaryMarketValue,
       summaryOutlook,
+      candidateStrengths: candidateStrengths ?? "",
+      interviewConcerns: interviewConcerns ?? "",
     });
     return NextResponse.json({
       result: markdown,
@@ -411,6 +458,8 @@ ${githubData.topRepos
       summaryStrengths,
       summaryMarketValue,
       summaryOutlook,
+      candidateStrengths: candidateStrengths ?? "",
+      interviewConcerns: interviewConcerns ?? "",
       githubStats,
     });
   } catch (error: unknown) {

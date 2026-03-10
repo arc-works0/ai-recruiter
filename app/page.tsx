@@ -150,6 +150,8 @@ export default function Home() {
   const [summaryStrengths, setSummaryStrengths] = useState("");
   const [summaryMarketValue, setSummaryMarketValue] = useState("");
   const [summaryOutlook, setSummaryOutlook] = useState("");
+  const [candidateStrengths, setCandidateStrengths] = useState("");
+  const [interviewConcerns, setInterviewConcerns] = useState("");
   const [showFullMobile, setShowFullMobile] = useState(false);
   const [githubStats, setGithubStats] = useState<{ totalStars: number; publicRepos: number; topLanguages: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -225,6 +227,8 @@ export default function Home() {
         setSummaryStrengths("");
         setSummaryMarketValue("");
         setSummaryOutlook("");
+        setCandidateStrengths("");
+        setInterviewConcerns("");
         setShowFullMobile(false);
         setGithubStats(null);
         setError(data.error || t.errorAnalyzeFailed);
@@ -240,6 +244,8 @@ export default function Home() {
       setSummaryStrengths(data.summaryStrengths ?? "");
       setSummaryMarketValue(data.summaryMarketValue ?? "");
       setSummaryOutlook(data.summaryOutlook ?? "");
+      setCandidateStrengths(data.candidateStrengths ?? "");
+      setInterviewConcerns(data.interviewConcerns ?? "");
       setShowFullMobile(false);
       setGithubStats(data.githubStats ?? null);
       const newCount = usageCount + 1;
@@ -260,6 +266,8 @@ export default function Home() {
       setSummaryStrengths("");
       setSummaryMarketValue("");
       setSummaryOutlook("");
+      setCandidateStrengths("");
+      setInterviewConcerns("");
       setGithubStats(null);
       setError(t.errorNetwork);
     } finally {
@@ -267,6 +275,7 @@ export default function Home() {
     }
   };
 
+  const contactFormUrl = process.env.NEXT_PUBLIC_CONTACT_FORM_URL || process.env.NEXT_PUBLIC_CONTACT_GOOGLE_FORM || "/contact";
   const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
   const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
   const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
@@ -403,6 +412,22 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
+        <section className="mb-8 sm:mb-10 text-center">
+          <h1 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl tracking-tight">
+            {locale === "ja" ? "エンジニア採用の書類選考を1分に短縮。" : "Shorten document screening to 1 minute."}
+          </h1>
+          <p className="mt-2 text-sm text-zinc-400 sm:text-base">
+            {locale === "ja" ? "GitHubから技術力と自社適性をAIが即座に可視化" : "AI visualizes technical skills and fit from GitHub instantly."}
+          </p>
+            <a
+            href={contactFormUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-8 py-3 text-sm font-bold text-black shadow-[0_4px_24px_rgba(217,119,6,0.5)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_8px_32px_rgba(217,119,6,0.55)] active:scale-[0.98]"
+          >
+            {t.ctaEnterpriseTrial}
+          </a>
+        </section>
         <GlassCard className="refined-card rounded-2xl p-4 transition-all duration-300 sm:p-6">
           <div className="flex flex-col gap-4 relative">
             <input
@@ -443,11 +468,21 @@ export default function Home() {
                     <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl print:text-lg">
                       {jobTitle}
                     </p>
-                    {salaryDisplay && (
-                      <p className="mt-3 text-center text-lg font-semibold text-zinc-300 print:mt-2 print:text-base">
-                        {t.businessReportMarketValue}: {salaryDisplay}
-                      </p>
-                    )}
+                    <div className="mt-3 flex flex-wrap items-center justify-center gap-3 print:mt-2">
+                      {salaryDisplay && (
+                        <p className="text-center text-lg font-semibold text-zinc-300 print:text-base">
+                          {t.businessReportMarketValue}: {salaryDisplay}
+                        </p>
+                      )}
+                      {(tier || rank) && tierCfg && (
+                        <span
+                          className="rounded-lg border border-amber-500/40 bg-amber-500/20 px-3 py-1.5 text-sm font-bold text-amber-200 print:border-amber-400/60 print:bg-amber-400/20 print:text-amber-900"
+                          style={{ boxShadow: `0 0 12px ${tierCfg.color}30` }}
+                        >
+                          {t.marketValueRankLabel} {tier || rank}
+                        </span>
+                      )}
+                    </div>
                     {scores && (
                       <div className="print-skill-scores mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 print:mt-3 print:gap-2 print:p-2 print:rounded">
                         {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
@@ -470,6 +505,22 @@ export default function Home() {
                           <p className="text-center text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
                             {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
                           </p>
+                        )}
+                      </div>
+                    )}
+                    {(candidateStrengths || interviewConcerns) && (
+                      <div className="mx-auto mt-6 max-w-lg space-y-4 print:mt-3 print:max-w-full">
+                        {candidateStrengths && (
+                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80">
+                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-amber-400/90 print:text-slate-600">{t.candidateStrengthsLabel}</p>
+                            <p className="text-sm leading-relaxed text-zinc-200 print:text-slate-700">{candidateStrengths}</p>
+                          </div>
+                        )}
+                        {interviewConcerns && (
+                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80">
+                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90 print:text-slate-600">{t.interviewConcernsLabel}</p>
+                            <p className="text-sm leading-relaxed text-zinc-200 print:text-slate-700">{interviewConcerns}</p>
+                          </div>
                         )}
                       </div>
                     )}
@@ -759,13 +810,14 @@ export default function Home() {
                     t.pdfExport
                   )}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setContactOpen(true)}
-                  className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl border border-amber-500/50 bg-amber-500/20 px-6 py-4 text-center text-sm font-semibold text-amber-400 transition-all hover:bg-amber-500/30 sm:min-w-0 sm:min-h-12 sm:py-3.5"
+                <a
+                  href={contactFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-6 py-4 text-center text-sm font-bold text-black shadow-[0_4px_20px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(217,119,6,0.5)] sm:min-w-0 sm:min-h-12 sm:py-3.5"
                 >
-                  {t.contactEnterprise}
-                </button>
+                  {t.ctaEnterpriseTrial}
+                </a>
               </div>
               <p className="text-center text-xs text-zinc-500">{t.pdfNote}</p>
             </div>
@@ -790,9 +842,9 @@ export default function Home() {
                       </p>
                     </div>
                     <a
-                      href={businessStep1Url}
+                      href={contactFormUrl}
                       target="_blank"
-                      rel="noopener noreferrer sponsored"
+                      rel="noopener noreferrer"
                       className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-16 items-center justify-center gap-3 rounded-2xl px-8 py-5 text-lg font-bold text-white transition hover:scale-[1.02] active:scale-[0.98] sm:min-h-[72px] sm:text-xl"
                     >
                       {t.limitExceededCta}

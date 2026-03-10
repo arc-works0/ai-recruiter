@@ -141,7 +141,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
           </div>
         </div>
 
-        {/* その直下に「自分も今すぐ無料で診断する」を大きく表示 */}
+        {/* その直下に「あなたも鑑定する」を大きく表示 */}
         <a
           href="/"
           className="mt-6 flex w-full min-h-14 sm:min-h-[60px] items-center justify-center gap-2 rounded-2xl bg-white py-4 text-base font-bold text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] sm:py-3.5"
@@ -149,6 +149,17 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
           {t.sharePageCtaPrimary}
           <span className="text-xl">→</span>
         </a>
+        <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
+          <p className="text-sm font-medium text-zinc-200">{t.sharePageRecruiterCta}</p>
+          <a
+            href={process.env.NEXT_PUBLIC_CONTACT_FORM_URL || process.env.NEXT_PUBLIC_CONTACT_GOOGLE_FORM || "/contact"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
+          >
+            {t.ctaEnterpriseTrial}
+          </a>
+        </div>
         <p className="mt-4 text-center">
           <a href="/" className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors">
             {t.sharePageBack}

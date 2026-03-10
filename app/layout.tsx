@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="ja">
         <body className="antialiased bg-[#050505] text-zinc-100">
           <header className="sticky top-0 z-50 flex items-center justify-between border-b border-white/[0.06] bg-[#050505]/95 px-3 py-2.5 sm:px-4 sm:py-3 backdrop-blur-xl">
-            <p className="text-xs sm:text-sm font-bold text-amber-400/90 tracking-wide">30秒でAI年収査定</p>
+            <p className="text-xs sm:text-sm font-bold text-amber-400/90 tracking-wide">エンジニア採用AI技術アセスメント</p>
             <HeaderButtons />
           </header>
           <main>{children}</main>
