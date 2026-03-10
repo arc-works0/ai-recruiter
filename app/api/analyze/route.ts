@@ -5,9 +5,15 @@ export const runtime = "nodejs";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+export type SummaryTriple = {
+  summaryStrengths: string;
+  summaryMarketValue: string;
+  summaryOutlook: string;
+};
+
 const analysisCache = new Map<
   string,
-  { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string }
+  { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple
 >();
 
 function getAnalysisCache(username: string) {
@@ -16,7 +22,7 @@ function getAnalysisCache(username: string) {
 
 function setAnalysisCache(
   username: string,
-  data: { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string }
+  data: { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple
 ) {
   analysisCache.set(username, data);
   if (analysisCache.size > 500) {
@@ -130,6 +136,12 @@ export type CertificationMeta = {
 
 const VALID_TIERS = ["S+", "S", "A", "B", "C", "D", "E"] as const;
 
+const defaultSummary: SummaryTriple = {
+  summaryStrengths: "",
+  summaryMarketValue: "",
+  summaryOutlook: "",
+};
+
 function parseScoresFromContent(content: string): {
   markdown: string;
   scores: RadarScores;
@@ -138,7 +150,7 @@ function parseScoresFromContent(content: string): {
   rank: string;
   tier: string;
   tierFeedback: string;
-} {
+} & SummaryTriple {
   const jsonBlock = content.match(/```json\s*([\s\S]*?)\s*```/);
   const defaultMeta = {
     jobTitle: "フルスタックの設計士",
@@ -161,6 +173,11 @@ function parseScoresFromContent(content: string): {
         typeof parsed.tier === "string" && VALID_TIERS.includes(parsed.tier as (typeof VALID_TIERS)[number])
           ? parsed.tier
           : defaultMeta.tier;
+      const summary: SummaryTriple = {
+        summaryStrengths: typeof parsed.summaryStrengths === "string" ? parsed.summaryStrengths.trim() : defaultSummary.summaryStrengths,
+        summaryMarketValue: typeof parsed.summaryMarketValue === "string" ? parsed.summaryMarketValue.trim() : defaultSummary.summaryMarketValue,
+        summaryOutlook: typeof parsed.summaryOutlook === "string" ? parsed.summaryOutlook.trim() : defaultSummary.summaryOutlook,
+      };
       return {
         markdown,
         scores,
@@ -172,12 +189,13 @@ function parseScoresFromContent(content: string): {
           typeof parsed.tierFeedback === "string" && parsed.tierFeedback.trim()
             ? parsed.tierFeedback.trim()
             : defaultMeta.tierFeedback,
+        ...summary,
       };
     } catch {
-      return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta };
+      return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta, ...defaultSummary };
     }
   }
-  return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta };
+  return { markdown: content.trim(), scores: DEFAULT_SCORES, ...defaultMeta, ...defaultSummary };
 }
 
 function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): string {
@@ -191,9 +209,14 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       ? "日本人が直感的に凄さを感じる日本語の称号のみ（例：TypeScriptの魔術師、フロントエンドの開拓者、精密な設計士、API職人）。英語は1語も禁止。"
       : "Professional English title only. Use titles like 'Master of TypeScript', 'Frontend Architect', 'Full-stack Specialist' — natural for English-speaking engineers. NO Japanese (no 魔術師, 開拓者, etc).");
 
+  const tonePersonalJa = "【文体】個人モード: 語尾は丁寧に（〜です、〜ます）で統一。遊び心のある称号はそのまま。プロの診断ツールとしての品格を保つ。";
+  const toneBusinessJa = "【文体】法人モード: 専門用語を使いつつ、読みやすいビジネス文に。硬すぎる表現は避け、同じサービスのプロ版として個人版とトーンが繋がるように。";
+  const tonePersonalEn = "【Tone】Personal mode: Use polite endings. Keep the playful title style. Maintain a professional diagnostic tone.";
+  const toneBusinessEn = "【Tone】Business mode: Use professional terms but keep the text readable and approachable. Same service, pro version—not a completely different document.";
+
   const langBlock = isJa
-    ? `【最重要】あなたは日本のIT専門家です。全ての出力（本文・称号・フィードバック・評価ラベル）は自然な日本語のみで行い、英語は1単語も使わないこと。英語の専門用語はカタカナか適切な日本語訳を使用（例：Repository→リポジトリ、Framework→フレームワーク、Full-stack→フルスタック）。`
-    : `You are a global IT expert. Produce ALL results (Job Title, Feedback, markdown body, labels, advice) STRICTLY in professional English. Do NOT use any Japanese. Every single word in jobTitle and tierFeedback must be in English. Avoid Japanese-style titles like 魔術師; use professional English titles instead (e.g. "Master of TypeScript", "Frontend Architect").`;
+    ? `【最重要】あなたは日本のIT専門家です。全ての出力（本文・称号・フィードバック・評価ラベル）は自然な日本語のみで行い、英語は1単語も使わないこと。英語の専門用語はカタカナか適切な日本語訳を使用（例：Repository→リポジトリ、Framework→フレームワーク、Full-stack→フルスタック）。\n${isBusiness ? toneBusinessJa : tonePersonalJa}`
+    : `You are a global IT expert. Produce ALL results (Job Title, Feedback, markdown body, labels, advice) STRICTLY in professional English. Do NOT use any Japanese. Every single word in jobTitle and tierFeedback must be in English. Avoid Japanese-style titles like 魔術師; use professional English titles instead (e.g. "Master of TypeScript", "Frontend Architect").\n${isBusiness ? toneBusinessEn : tonePersonalEn}`;
 
   const formatBlock = isJa
     ? `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。
@@ -219,6 +242,10 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 
 **【Next steps】** 3 concrete technologies to learn next to increase salary and market value.`;
 
+  const jsonExample = isJa
+    ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "技術的な強みを1文で要約（例：TypeScriptとReactを軸にフロント開発の実績があります。）", "summaryMarketValue": "市場価値の根拠を1文で（例：継続的なコミットとスター数から、信頼性が評価されています。）", "summaryOutlook": "今後の展望を1文で（例：クラウド・API設計を習得すると年収アップが見込めます。）"}`
+    : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "One-sentence summary of technical strengths.", "summaryMarketValue": "One-sentence basis for market value.", "summaryOutlook": "One-sentence future outlook."}`;
+
   return `You are an expert in engineer market value certification. Provide data-driven, credible assessments.
 
 ${langBlock}
@@ -233,12 +260,14 @@ Output format:
 ${formatBlock}
 
 2) Append exactly one JSON block. jobTitle and tierFeedback: ${isJa ? "必ず日本語のみ。英語禁止。" : "English only."}
+${isJa ? "JSONには必ず summaryStrengths, summaryMarketValue, summaryOutlook を1文ずつ含めること（スマホで箇条書き表示する要約用）。" : "Include summaryStrengths, summaryMarketValue, summaryOutlook (one sentence each) for bullet display."}
 \`\`\`json
-{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "${isBusiness ? (isJa ? "シニアエンジニア（トップ5％）" : "Senior Engineer (Top 5%)") : (isJa ? "TypeScriptの魔術師" : "Master of TypeScript Architecture")}", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "${isJa ? "実力はある。あとは星1つ、目に見える成果を増やせばSへ届く。" : "Solid foundation. Add visibility and measurable impact to reach S tier."}"}
+${jsonExample}
 \`\`\`
 - technical, contribution, sustainability, market: 0–100 integers
 - salaryDisplay: salary string (3–15M JPY)
-- rank, tier: S+ / S / A / B / C / D / E`;
+- rank, tier: S+ / S / A / B / C / D / E
+- summaryStrengths, summaryMarketValue, summaryOutlook: 各1文の要約（必須）`;
 }
 
 export async function POST(req: NextRequest) {
@@ -321,7 +350,7 @@ ${githubData.topRepos
 `.trim();
 
     const cacheKey = `${username.toLowerCase()}_${locale}_${mode}`;
-    type Cached = { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string };
+    type Cached = { result: string; scores: RadarScores; jobTitle: string; salaryDisplay: string; rank: string; tier: string; tierFeedback: string } & SummaryTriple;
     const cached = getAnalysisCache(cacheKey);
     const githubStats = {
       totalStars: githubData.totalStars,
@@ -329,7 +358,7 @@ ${githubData.topRepos
       topLanguages: githubData.topLanguages,
     };
     if (cached) {
-      return NextResponse.json({ ...cached, githubStats });
+      return NextResponse.json({ ...defaultSummary, ...cached, githubStats });
     }
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -357,7 +386,8 @@ ${githubData.topRepos
       );
     }
 
-    const { markdown, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback } = parseScoresFromContent(content);
+    const parsed = parseScoresFromContent(content);
+    const { markdown, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, summaryStrengths, summaryMarketValue, summaryOutlook } = parsed;
     setAnalysisCache(cacheKey, {
       result: markdown,
       scores,
@@ -366,6 +396,9 @@ ${githubData.topRepos
       rank,
       tier,
       tierFeedback,
+      summaryStrengths,
+      summaryMarketValue,
+      summaryOutlook,
     });
     return NextResponse.json({
       result: markdown,
@@ -375,6 +408,9 @@ ${githubData.topRepos
       rank,
       tier,
       tierFeedback,
+      summaryStrengths,
+      summaryMarketValue,
+      summaryOutlook,
       githubStats,
     });
   } catch (error: unknown) {

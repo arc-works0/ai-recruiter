@@ -50,9 +50,9 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
   const tierLabel = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : "";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#08080a] font-sans text-zinc-100">
-      <div className="pointer-events-none fixed inset-0 bg-mesh" aria-hidden />
-      <div className="meteors-layer" aria-hidden>
+    <main className="relative min-h-screen overflow-hidden font-sans text-zinc-100 animate-page-in bg-[#050505]">
+      <div className="pointer-events-none fixed inset-0 bg-mesh bg-[#050505] modal-bg" aria-hidden />
+      <div className="meteors-layer modal-bg" aria-hidden>
         {[...Array(7)].map((_, i) => (
           <div key={i} className="meteor" />
         ))}
@@ -62,7 +62,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
         <button
           type="button"
           onClick={() => setLocale("ja")}
-          className={`rounded-l-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "ja" ? "bg-indigo-500/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+          className={`rounded-l-xl px-3 py-2.5 text-xs font-semibold transition-colors min-h-[44px] sm:min-h-0 sm:py-2 ${locale === "ja" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
           aria-label={t.langJa}
         >
           JA
@@ -70,20 +70,21 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
         <button
           type="button"
           onClick={() => setLocale("en")}
-          className={`rounded-r-xl px-3 py-2 text-xs font-semibold transition-colors ${locale === "en" ? "bg-indigo-500/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+          className={`rounded-r-xl px-3 py-2.5 text-xs font-semibold transition-colors min-h-[44px] sm:min-h-0 sm:py-2 ${locale === "en" ? "bg-amber-600/80 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
           aria-label={t.langEn}
         >
           EN
         </button>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-lg px-4 py-20">
-        <div className="glass-panel-strong card-gradient-border rounded-2xl overflow-hidden p-8 shadow-2xl" style={{ boxShadow: "0 0 0 1px rgba(99,102,241,0.2), 0 32px 64px -24px rgba(0,0,0,0.5)" }}>
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
+      <div className="relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
+        {/* シェアされた結果をまず表示 */}
+        <div className="refined-card rounded-2xl border border-white/[0.08] overflow-hidden p-4 sm:p-6 shadow-xl">
+          <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-400/90">
             {t.title}
           </p>
           {jobTitle && (
-            <p className="mt-3 text-center text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300">
+            <p className="mt-3 text-center text-xl sm:text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-100 to-indigo-300">
               {decode(jobTitle)}
             </p>
           )}
@@ -118,30 +119,41 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
           {tierFeedback && (
             <p className="mt-3 text-center text-sm italic text-zinc-300">&ldquo;{decode(tierFeedback)}&rdquo;</p>
           )}
-          <h1 className="mt-4 text-center text-2xl font-semibold text-white">
+          <h1 className="mt-4 text-center text-lg font-semibold text-white">
             {t.sharePageTitle}
           </h1>
-          <div className="mx-auto mt-8 h-[320px] w-full">
+          <div className="mx-auto mt-6 h-[240px] w-full sm:h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={data}>
-                <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 12 }} />
-                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
-                <Radar name={t.radarScore} dataKey="value" stroke="#8b5cf6" fill="#a78bfa" fillOpacity={0.4} strokeWidth={2} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <defs>
+                  <linearGradient id="radarGradShare" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#d97706" stopOpacity={0.85} />
+                    <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.6} />
+                  </linearGradient>
+                </defs>
+                <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 11 }} />
+                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 9 }} />
+                <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" fill="url(#radarGradShare)" fillOpacity={1} strokeWidth={2} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-6 text-center text-sm text-zinc-400">
-            {t.sharePageCta}
-          </p>
-          <a
-            href="/"
-            className="mt-4 block w-full rounded-xl bg-white py-3 text-center text-sm font-medium text-black transition hover:bg-zinc-100"
-          >
+        </div>
+
+        {/* その直下に「自分も今すぐ無料で診断する」を大きく表示 */}
+        <a
+          href="/"
+          className="mt-6 flex w-full min-h-14 sm:min-h-[60px] items-center justify-center gap-2 rounded-2xl bg-white py-4 text-base font-bold text-black shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:bg-zinc-100 hover:shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:translate-y-[-1px] active:translate-y-0 active:scale-[0.995] sm:py-3.5"
+        >
+          {t.sharePageCtaPrimary}
+          <span className="text-xl">→</span>
+        </a>
+        <p className="mt-4 text-center">
+          <a href="/" className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors">
             {t.sharePageBack}
           </a>
-        </div>
+        </p>
       </div>
     </main>
   );

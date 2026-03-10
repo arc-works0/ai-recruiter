@@ -147,6 +147,9 @@ export default function Home() {
   const [rank, setRank] = useState("");
   const [tier, setTier] = useState("");
   const [tierFeedback, setTierFeedback] = useState("");
+  const [summaryStrengths, setSummaryStrengths] = useState("");
+  const [summaryMarketValue, setSummaryMarketValue] = useState("");
+  const [summaryOutlook, setSummaryOutlook] = useState("");
   const [githubStats, setGithubStats] = useState<{ totalStars: number; publicRepos: number; topLanguages: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -218,6 +221,9 @@ export default function Home() {
         setRank("");
         setTier("");
         setTierFeedback("");
+        setSummaryStrengths("");
+        setSummaryMarketValue("");
+        setSummaryOutlook("");
         setGithubStats(null);
         setError(data.error || t.errorAnalyzeFailed);
         return;
@@ -229,6 +235,9 @@ export default function Home() {
       setRank(data.rank ?? "");
       setTier(data.tier ?? "");
       setTierFeedback(data.tierFeedback ?? "");
+      setSummaryStrengths(data.summaryStrengths ?? "");
+      setSummaryMarketValue(data.summaryMarketValue ?? "");
+      setSummaryOutlook(data.summaryOutlook ?? "");
       setGithubStats(data.githubStats ?? null);
       const newCount = usageCount + 1;
       setUsageCount(newCount);
@@ -243,10 +252,13 @@ export default function Home() {
       setJobTitle("");
       setSalaryDisplay("");
       setRank("");
-        setTier("");
-        setTierFeedback("");
-        setGithubStats(null);
-        setError(t.errorNetwork);
+      setTier("");
+      setTierFeedback("");
+      setSummaryStrengths("");
+      setSummaryMarketValue("");
+      setSummaryOutlook("");
+      setGithubStats(null);
+      setError(t.errorNetwork);
     } finally {
       setLoading(false);
     }
@@ -443,11 +455,19 @@ export default function Home() {
                         ))}
                       </div>
                     )}
-                    {(tierFeedback || result) && (
+                    {(summaryStrengths || summaryMarketValue || summaryOutlook || tierFeedback || result) && (
                       <div className="mx-auto mt-6 max-w-lg print:mt-3 print:max-w-full">
-                        <p className="text-center text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
-                          {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
-                        </p>
+                        {(summaryStrengths || summaryMarketValue || summaryOutlook) ? (
+                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
+                            {summaryStrengths && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelStrengths}: </span>{summaryStrengths}</li>}
+                            {summaryMarketValue && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelMarketValue}: </span>{summaryMarketValue}</li>}
+                            {summaryOutlook && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelOutlook}: </span>{summaryOutlook}</li>}
+                          </ul>
+                        ) : (
+                          <p className="text-center text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
+                            {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
+                          </p>
+                        )}
                       </div>
                     )}
                     {scores && (
@@ -649,10 +669,42 @@ export default function Home() {
               </GlassCard>
             )}
 
-            {mode === "personal" && (
+            {mode === "personal" && result && (
             <GlassCard className="refined-card animate-fade-in-up stagger-4 rounded-2xl overflow-hidden">
               <div className="rounded-2xl overflow-hidden p-4 sm:p-6">
-                <SimpleMarkdown content={result} />
+                {(summaryStrengths || summaryMarketValue || summaryOutlook) ? (
+                  <ul className="space-y-3 text-zinc-200">
+                    {summaryStrengths && (
+                      <li className="flex gap-2">
+                        <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-amber-400/90" aria-hidden />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-400/90">{t.summaryLabelStrengths}</p>
+                          <p className="mt-0.5 text-sm leading-relaxed">{summaryStrengths}</p>
+                        </div>
+                      </li>
+                    )}
+                    {summaryMarketValue && (
+                      <li className="flex gap-2">
+                        <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-indigo-400/90" aria-hidden />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90">{t.summaryLabelMarketValue}</p>
+                          <p className="mt-0.5 text-sm leading-relaxed">{summaryMarketValue}</p>
+                        </div>
+                      </li>
+                    )}
+                    {summaryOutlook && (
+                      <li className="flex gap-2">
+                        <span className="shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400/90" aria-hidden />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400/90">{t.summaryLabelOutlook}</p>
+                          <p className="mt-0.5 text-sm leading-relaxed">{summaryOutlook}</p>
+                        </div>
+                      </li>
+                    )}
+                  </ul>
+                ) : (
+                  <SimpleMarkdown content={result} />
+                )}
               </div>
             </GlassCard>
             )}
@@ -692,24 +744,26 @@ export default function Home() {
             </div>
 
             {limitExceededOpen && (
-              <div className="modal-lock-overlay" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
+              <div className="modal-lock-overlay limit-modal-premium" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
                 <div className="absolute inset-0" onClick={() => setLimitExceededOpen(false)} aria-hidden />
                 <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 text-center sm:min-h-0">
-                  <div className="w-full max-w-sm space-y-8">
-                    <div className="space-y-3">
+                  <div className="limit-modal-card w-full max-w-md space-y-8 rounded-3xl border border-amber-500/20 bg-[#0a0a0c]/98 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
+                    <div className="space-y-4">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-400/90">
                         {t.limitInvitationLabel}
                       </p>
                       <h2 id="limit-modal-title" className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                         {t.limitExceededTitle}
                       </h2>
-                      <p className="text-base font-medium text-zinc-400">
+                      <p className="text-left text-base leading-relaxed text-zinc-400 sm:text-center">
                         {t.limitExceededMessage}
                       </p>
                     </div>
                     <a
                       href={businessStep1Url}
-                      className="golden-vip-button flex w-full items-center justify-center gap-3 rounded-2xl px-8 py-5 text-lg font-bold text-white transition hover:scale-[1.02] active:scale-[0.98]"
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-16 items-center justify-center gap-3 rounded-2xl px-8 py-5 text-lg font-bold text-white transition hover:scale-[1.02] active:scale-[0.98] sm:min-h-[72px] sm:text-xl"
                     >
                       {t.limitExceededCta}
                       <span className="text-2xl">→</span>
