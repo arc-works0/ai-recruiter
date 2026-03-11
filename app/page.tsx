@@ -608,17 +608,15 @@ export default function Home() {
                       {t.shareBragCta}
                     </button>
                   </div>
-                  <a
-                    href={businessStep1Url}
-                    target="_blank"
-                    rel="noopener noreferrer sponsored"
+                  <Link
+                    href={contactFormUrl}
                     className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
                   >
                     <span className="text-lg font-bold text-white drop-shadow-sm">
                       {t.geeklyMainCta}
                     </span>
                     <span className="text-2xl">→</span>
-                  </a>
+                  </Link>
                 </div>
               </GlassCard>
               {/* 2. 称号＋グラフ */}
