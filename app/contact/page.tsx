@@ -15,6 +15,10 @@ export default function ContactPage() {
         subtitle: "大規模利用・API連携・導入相談は以下のフォームにご記入のうえ、送信内容をメールでお送りください。",
         purposeLabel: "導入目的",
         purposeOptions: ["書類選考の効率化", "既存社員の評価", "その他"] as const,
+        companyLabel: "貴社名",
+        companyPlaceholder: "株式会社サンプル",
+        roleDeptLabel: "役職/部署名",
+        roleDeptPlaceholder: "例：人事部 採用担当",
         nameLabel: "お名前",
         namePlaceholder: "山田 太郎",
         emailLabel: "メールアドレス",
@@ -33,6 +37,10 @@ export default function ContactPage() {
         subtitle: "For enterprise, API, or bulk use, please fill out the form and send the content via email.",
         purposeLabel: "Purpose",
         purposeOptions: ["Document screening efficiency", "Existing staff evaluation", "Other"] as const,
+        companyLabel: "Company name",
+        companyPlaceholder: "Acme Inc.",
+        roleDeptLabel: "Title / Department",
+        roleDeptPlaceholder: "e.g. HR, Recruitment",
         nameLabel: "Name",
         namePlaceholder: "John Doe",
         emailLabel: "Email",
@@ -47,6 +55,8 @@ export default function ContactPage() {
         composedDesc: "Click \"Send via email\" to open your mail client. BCC yourself or forward to your contact.",
       };
 
+  const [companyName, setCompanyName] = useState("");
+  const [roleDept, setRoleDept] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -57,6 +67,8 @@ export default function ContactPage() {
   const composedText = [
     `【${t.title}】`,
     "",
+    ...(t.companyLabel ? [`${t.companyLabel}: ${companyName || "—"}`, ""] : []),
+    ...(t.roleDeptLabel ? [`${t.roleDeptLabel}: ${roleDept || "—"}`, ""] : []),
     `${t.nameLabel}: ${name || "—"}`,
     `${t.emailLabel}: ${email || "—"}`,
     ...(t.purposeLabel ? ["", `${t.purposeLabel}: ${purpose || "—"}`] : []),
@@ -92,7 +104,35 @@ export default function ContactPage() {
 
         {!showComposed ? (
           <div className="mt-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl sm:p-8">
-            <div className="space-y-5">
+            <form onSubmit={(e) => { e.preventDefault(); setShowComposed(true); }} className="space-y-5">
+              <div>
+                <label htmlFor="contact-company" className="block text-xs font-medium text-zinc-400">
+                  {t.companyLabel} <span className="text-rose-400/80">*</span>
+                </label>
+                <input
+                  id="contact-company"
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  placeholder={t.companyPlaceholder}
+                  required
+                  className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-white/[0.15] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-role-dept" className="block text-xs font-medium text-zinc-400">
+                  {t.roleDeptLabel} <span className="text-rose-400/80">*</span>
+                </label>
+                <input
+                  id="contact-role-dept"
+                  type="text"
+                  value={roleDept}
+                  onChange={(e) => setRoleDept(e.target.value)}
+                  placeholder={t.roleDeptPlaceholder}
+                  required
+                  className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-white/[0.15] focus:outline-none"
+                />
+              </div>
               <div>
                 <label htmlFor="contact-name" className="block text-xs font-medium text-zinc-400">
                   {t.nameLabel}
@@ -151,8 +191,7 @@ export default function ContactPage() {
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <button
-                type="button"
-                onClick={() => setShowComposed(true)}
+                type="submit"
                 className="rounded-xl bg-white py-3 px-6 text-sm font-semibold text-black transition hover:bg-zinc-100"
               >
                 {t.submit}
@@ -164,6 +203,7 @@ export default function ContactPage() {
                 {t.back}
               </Link>
             </div>
+            </form>
           </div>
         ) : (
           <div className="mt-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl sm:p-8">

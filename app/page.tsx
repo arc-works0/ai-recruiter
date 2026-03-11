@@ -455,8 +455,9 @@ export default function Home() {
             <div className="space-y-5 sm:space-y-6">
             {mode === "business" && jobTitle && (
               <div className="print-cert-single">
-                <GlassCard className="animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
-                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:max-h-[100%] print:overflow-hidden">
+                <GlassCard className="business-report-card animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
+                  <div className="business-report-watermark" aria-hidden>Confidential / AI Assessment Report</div>
+                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:max-h-[100%] print:overflow-hidden relative z-[1]">
                     <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[9px]">
                       {t.certTitle}
                     </p>
@@ -482,9 +483,9 @@ export default function Home() {
                     {scores && (
                       <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-3 print:gap-2 print:p-2 print:rounded">
                         {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
-                          <div key={i} className="flex min-w-0 flex-col rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
-                            <p className="min-h-[2.5em] min-w-0 break-words text-[10px] font-semibold leading-tight tracking-wider text-zinc-500 sm:text-[10px] print:min-h-0 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
-                            <p className="mt-1 text-2xl font-bold text-white print:mt-0 print:text-lg print:text-slate-900">{val}</p>
+                          <div key={i} className="score-card-cell flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
+                            <p className="score-card-label min-h-[2.25rem] min-w-0 max-w-full overflow-hidden break-words px-0.5 text-xs font-semibold leading-snug tracking-wide text-zinc-500 sm:min-h-[2rem] sm:text-sm sm:leading-snug print:min-h-0 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
+                            <p className="mt-1.5 text-xl font-bold text-white sm:mt-2 sm:text-2xl print:mt-0 print:text-lg print:text-slate-900">{val}</p>
                           </div>
                         ))}
                       </div>
@@ -826,7 +827,7 @@ export default function Home() {
               <div className="modal-lock-overlay limit-modal-premium" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
                 <div className="absolute inset-0" onClick={() => setLimitExceededOpen(false)} aria-hidden />
                 <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 text-center sm:min-h-0">
-                  <div className="limit-modal-card w-full max-w-md space-y-8 rounded-3xl border border-amber-500/20 bg-[#0a0a0c]/98 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
+                  <div className="limit-modal-card w-full max-w-md space-y-6 rounded-3xl border border-amber-500/20 bg-[#0a0a0c]/98 p-8 shadow-2xl backdrop-blur-xl sm:space-y-8 sm:p-10">
                     <div className="space-y-4">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-400/90">
                         {t.limitInvitationLabel}
@@ -838,13 +839,22 @@ export default function Home() {
                         {t.limitExceededMessage}
                       </p>
                     </div>
-                    <Link
-                      href={contactFormUrl}
-                      className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-16 items-center justify-center gap-3 rounded-2xl px-8 py-5 text-lg font-bold text-white transition hover:scale-[1.02] active:scale-[0.98] sm:min-h-[72px] sm:text-xl"
-                    >
-                      {t.limitExceededCta}
-                      <span className="text-2xl">→</span>
-                    </Link>
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                      <Link
+                        href={contactFormUrl}
+                        className="limit-modal-enterprise-cta flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 px-6 py-4 text-base font-bold text-black shadow-[0_4px_24px_rgba(251,191,36,0.5)] transition hover:from-amber-400 hover:via-yellow-400 hover:to-amber-300 hover:shadow-[0_6px_28px_rgba(251,191,36,0.55)] active:scale-[0.99] sm:min-h-16 sm:text-lg"
+                      >
+                        {t.limitExceededEnterpriseCta}
+                        <span className="text-xl">→</span>
+                      </Link>
+                      <Link
+                        href={contactFormUrl}
+                        className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white transition hover:scale-[1.01] active:scale-[0.99] sm:min-h-[52px]"
+                      >
+                        {t.limitExceededCta}
+                        <span className="text-lg">→</span>
+                      </Link>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setLimitExceededOpen(false)}
