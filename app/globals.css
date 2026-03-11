@@ -128,6 +128,18 @@ body {
   overflow: visible;
 }
 
+/* レーダーチャート：スマホで見切れないよう余白を確保し、画面幅に合わせて縮小 */
+.radar-chart-wrapper {
+  overflow: visible;
+  box-sizing: border-box;
+}
+@media (max-width: 640px) {
+  .radar-chart-wrapper {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 /* スコアカードラベル：枠からはみ出さず1〜2行で収める */
 .score-card-label {
   display: -webkit-box;

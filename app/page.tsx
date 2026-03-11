@@ -526,23 +526,25 @@ export default function Home() {
                         <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-1 print:text-[8px]">
                           {t.businessRadarHeading}
                         </p>
-                        <div className="print-radar-bg mx-auto h-[200px] w-[200px] sm:h-[280px] sm:w-full max-w-[320px]">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart
-                              margin={{ top: 24, right: 28, bottom: 24, left: 28 }}
-                              data={RADAR_KEYS.map((key, i) => ({
-                                subject: t.businessRadarLabels[i],
-                                value: scores[key],
-                                fullMark: 100,
-                              }))}
-                            >
-                              <PolarGrid stroke="rgba(255,255,255,0.12)" />
-                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 9 }} />
-                              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
+                        <div className="print-radar-bg radar-chart-wrapper mx-auto flex min-w-0 max-w-full justify-center px-4 py-4 sm:px-6 sm:py-0">
+                          <div className="h-[200px] w-full min-w-0 max-w-[200px] sm:h-[280px] sm:max-w-[320px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <RadarChart
+                                margin={{ top: 24, right: 24, bottom: 24, left: 24 }}
+                                data={RADAR_KEYS.map((key, i) => ({
+                                  subject: t.businessRadarLabels[i],
+                                  value: scores[key],
+                                  fullMark: 100,
+                                }))}
+                              >
+                                <PolarGrid stroke="rgba(255,255,255,0.12)" />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: isMobile ? 11 : 10 }} />
+                                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: isMobile ? 10 : 9 }} />
                               <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
-                              <Legend wrapperStyle={{ fontSize: 10 }} />
-                            </RadarChart>
-                          </ResponsiveContainer>
+                                <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 9 }} />
+                              </RadarChart>
+                            </ResponsiveContainer>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -643,28 +645,30 @@ export default function Home() {
                       )}
                     </div>
                     {scores && (
-                      <div className="order-1 sm:order-2 radar-reveal mx-auto w-full max-w-[200px] sm:max-w-[180px] h-[180px] sm:h-[160px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RadarChart
-                            margin={{ top: 20, right: 24, bottom: 20, left: 24 }}
-                            data={RADAR_KEYS.map((key, i) => ({
-                              subject: t.radarLabels[i],
-                              value: scores[key],
-                              fullMark: 100,
-                            }))}
-                          >
-                            <defs>
-                              <linearGradient id="radarGradPersonal" x1="0" y1="0" x2="1" y2="1">
-                                <stop offset="0%" stopColor="#d97706" stopOpacity={0.85} />
-                                <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.6} />
-                              </linearGradient>
-                            </defs>
-                            <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
-                            <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 9 }} />
-                            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 9 }} />
+                      <div className="order-1 sm:order-2 radar-reveal radar-chart-wrapper mx-auto flex h-[200px] w-full min-w-0 max-w-[220px] flex-col justify-center px-4 py-4 sm:h-[180px] sm:max-w-[200px] sm:px-0 sm:py-0">
+                        <div className="h-full w-full min-w-0">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart
+                              margin={{ top: 20, right: 22, bottom: 20, left: 22 }}
+                              data={RADAR_KEYS.map((key, i) => ({
+                                subject: t.radarLabels[i],
+                                value: scores[key],
+                                fullMark: 100,
+                              }))}
+                            >
+                              <defs>
+                                <linearGradient id="radarGradPersonal" x1="0" y1="0" x2="1" y2="1">
+                                  <stop offset="0%" stopColor="#d97706" stopOpacity={0.85} />
+                                  <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.6} />
+                                </linearGradient>
+                              </defs>
+                              <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
+                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: isMobile ? 11 : 10 }} />
+                              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: isMobile ? 10 : 9 }} />
                             <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" strokeWidth={2} fill="url(#radarGradPersonal)" fillOpacity={1} />
-                          </RadarChart>
-                        </ResponsiveContainer>
+                            </RadarChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
                     )}
                   </div>
