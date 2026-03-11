@@ -41,17 +41,30 @@ export async function GET() {
         >
           エンジニア採用AI査定
         </p>
-        <p
+        <div
           style={{
-            fontSize: 32,
-            fontWeight: 600,
-            color: "rgba(251, 191, 36, 0.95)",
             marginTop: 24,
-            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "12px 28px",
+            borderRadius: 12,
+            border: "2px solid rgba(251, 191, 36, 0.7)",
+            background: "linear-gradient(135deg, rgba(217, 119, 6, 0.35) 0%, rgba(251, 191, 36, 0.2) 100%)",
+            boxShadow: "0 0 24px rgba(217, 119, 6, 0.25)",
           }}
         >
-          法人向けプラン提供中
-        </p>
+          <span
+            style={{
+              fontSize: 28,
+              fontWeight: 700,
+              color: "rgba(251, 191, 36, 1)",
+              letterSpacing: "0.05em",
+            }}
+          >
+            法人向けプラン受付中
+          </span>
+        </div>
         <p
           style={{
             fontSize: 22,

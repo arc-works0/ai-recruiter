@@ -275,7 +275,7 @@ export default function Home() {
     }
   };
 
-  const contactFormUrl = process.env.NEXT_PUBLIC_CONTACT_FORM_URL || process.env.NEXT_PUBLIC_CONTACT_GOOGLE_FORM || "/contact";
+  const contactFormUrl = "/contact";
   const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
   const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
   const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
@@ -419,14 +419,12 @@ export default function Home() {
           <p className="mt-2 text-sm text-zinc-400 sm:text-base">
             {locale === "ja" ? "GitHubから技術力と自社適性をAIが即座に可視化" : "AI visualizes technical skills and fit from GitHub instantly."}
           </p>
-            <a
+            <Link
             href={contactFormUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-8 py-3 text-sm font-bold text-black shadow-[0_4px_24px_rgba(217,119,6,0.5)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_8px_32px_rgba(217,119,6,0.55)] active:scale-[0.98]"
           >
             {t.ctaEnterpriseTrial}
-          </a>
+          </Link>
         </section>
         <GlassCard className="refined-card rounded-2xl p-4 transition-all duration-300 sm:p-6">
           <div className="flex flex-col gap-4 relative">
@@ -810,14 +808,12 @@ export default function Home() {
                     t.pdfExport
                   )}
                 </button>
-                <a
+                <Link
                   href={contactFormUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-6 py-4 text-center text-sm font-bold text-black shadow-[0_4px_20px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(217,119,6,0.5)] sm:min-w-0 sm:min-h-12 sm:py-3.5"
                 >
                   {t.ctaEnterpriseTrial}
-                </a>
+                </Link>
               </div>
               <p className="text-center text-xs text-zinc-500">{t.pdfNote}</p>
             </div>
@@ -841,15 +837,13 @@ export default function Home() {
                         {t.limitExceededMessage}
                       </p>
                     </div>
-                    <a
+                    <Link
                       href={contactFormUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-16 items-center justify-center gap-3 rounded-2xl px-8 py-5 text-lg font-bold text-white transition hover:scale-[1.02] active:scale-[0.98] sm:min-h-[72px] sm:text-xl"
                     >
                       {t.limitExceededCta}
                       <span className="text-2xl">→</span>
-                    </a>
+                    </Link>
                     <button
                       type="button"
                       onClick={() => setLimitExceededOpen(false)}

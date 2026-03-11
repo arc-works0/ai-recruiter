@@ -152,7 +152,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
         <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
           <p className="text-sm font-medium text-zinc-200">{t.sharePageRecruiterCta}</p>
           <a
-            href={process.env.NEXT_PUBLIC_CONTACT_FORM_URL || process.env.NEXT_PUBLIC_CONTACT_GOOGLE_FORM || "/contact"}
+            href="/contact"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
