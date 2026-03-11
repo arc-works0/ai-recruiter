@@ -828,7 +828,7 @@ export default function Home() {
             {limitExceededOpen && (
               <div className="modal-lock-overlay limit-modal-premium" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
                 <div className="absolute inset-0" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 pt-24 pb-8 text-center sm:min-h-0 sm:pt-6 sm:pb-6">
+                <div className="relative z-10 flex w-full flex-shrink-0 flex-grow-0 flex-col items-center justify-center px-6 py-6 text-center">
                   <div className="limit-modal-card w-full max-w-md space-y-6 rounded-3xl border border-amber-500/20 bg-[#0a0a0c]/98 p-8 shadow-2xl backdrop-blur-xl sm:space-y-8 sm:p-10">
                     <div className="space-y-4">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-400/90">
@@ -968,15 +968,17 @@ export default function Home() {
               LinkedIn
             </span>
           </div>
-          <p className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-zinc-600">
-            <Link href="/terms" className="underline-offset-2 hover:text-zinc-400 hover:underline">
-              {locale === "ja" ? "利用規約" : "Terms of Use"}
-            </Link>
-            <span className="text-white/20">|</span>
-            <Link href="/privacy" className="underline-offset-2 hover:text-zinc-400 hover:underline">
-              {locale === "ja" ? "プライバシーポリシー" : "Privacy Policy"}
-            </Link>
-          </p>
+          <div className="footer-legal mt-8 pt-6 border-t border-white/[0.06]">
+            <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-zinc-500">
+              <Link href="/terms" className="underline-offset-2 hover:text-zinc-400 hover:underline">
+                {locale === "ja" ? "利用規約" : "Terms of Use"}
+              </Link>
+              <span className="text-white/20">|</span>
+              <Link href="/privacy" className="underline-offset-2 hover:text-zinc-400 hover:underline">
+                {locale === "ja" ? "プライバシーポリシー" : "Privacy Policy"}
+              </Link>
+            </p>
+          </div>
         </footer>
       </div>
     </main>

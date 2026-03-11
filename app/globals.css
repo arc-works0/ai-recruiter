@@ -135,8 +135,11 @@ body {
 }
 @media (max-width: 640px) {
   .radar-chart-wrapper {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 1.25rem 1rem;
+    min-height: 0;
+  }
+  .radar-chart-inner {
+    margin: 0 auto;
   }
 }
 
@@ -213,8 +216,8 @@ body {
 /* 4回目モーダル — 収益特化・高級感（全画面・背景を完全に隠す） */
 .modal-lock-overlay {
   background: rgba(5, 5, 5, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -738,6 +741,8 @@ body {
   [data-print-report] .print-radar-bg text {
     fill: #333333 !important;
   }
+  [data-print-report] .print-cert-single,
+  [data-print-report] .achievement-id-card,
   [data-print-report] .print-radar-section,
   [data-print-report] .print-skill-scores {
     break-inside: avoid !important;
