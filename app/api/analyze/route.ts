@@ -3,6 +3,7 @@ import OpenAI from "openai";
 
 export const runtime = "nodejs";
 
+// 必ずVercelの環境変数で設定すること。直書き禁止。
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 export type SummaryTriple = {
