@@ -243,7 +243,7 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 
 **【強み・採用メリット】** 候補者が自社にもたらす具体的利益を2〜3文で。技術・経験・貢献から見える採用メリットを明示。
 
-**【技術的懸念点・面接での確認事項】** コードから見えるリスクや、面接で問うべき確認事項を2〜3文で。
+**【法人向け】この候補者の懸念点・面接での質問推奨例** コードから見えるリスク・懸念点を1〜2文で述べたうえで、面接で推奨する具体的な質問例を2〜3個記載すること（必須）。
 
 **【技術の深さ】** どの言語・フレームワークをどの程度使いこなしているか。**【保守性・可読性】** 開発頻度・継続性から見える信頼性。**【今後の展望】** 次に学ぶべき技術を具体的に。`
       : `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。
@@ -266,7 +266,7 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 
 **【Strengths & hiring benefits】** 2–3 sentences on concrete benefits the candidate brings to the company (from code and activity).
 
-**【Technical concerns & interview checklist】** 2–3 sentences on risks visible from code and what to verify in the interview.
+**【For Business】Candidate concerns & recommended interview questions** 1–2 sentences on risks/concerns from code, then 2–3 concrete recommended interview questions (required).
 
 **【Technical depth】** Languages/frameworks proficiency. **【Maintainability & readability】** Reliability from activity. **【Next steps】** Concrete technologies to learn.`
       : `1) Markdown in English only (tables, bold, formal style). All text must be in professional English. No Japanese.
@@ -283,8 +283,8 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 
   const jsonExample = isBusiness
     ? (isJa
-      ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "...", "summaryMarketValue": "...", "summaryOutlook": "...", "candidateStrengths": "強み・採用メリット（自社にもたらす具体的利益を2〜3文）。", "interviewConcerns": "技術的懸念点・面接での確認事項（コードから見えるリスクと面接で問うべき内容を2〜3文）。"}`
-      : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "...", "summaryMarketValue": "...", "summaryOutlook": "...", "candidateStrengths": "2-3 sentences on strengths and concrete hiring benefits.", "interviewConcerns": "2-3 sentences on technical concerns and interview checklist."}`)
+      ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "...", "summaryMarketValue": "...", "summaryOutlook": "...", "candidateStrengths": "強み・採用メリット（自社にもたらす具体的利益を2〜3文）。", "interviewConcerns": "【法人向け】懸念点（1〜2文）と面接での質問推奨例（2〜3個の具体的な質問文）。"}`
+      : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "...", "summaryMarketValue": "...", "summaryOutlook": "...", "candidateStrengths": "2-3 sentences on strengths and concrete hiring benefits.", "interviewConcerns": "Concerns (1-2 sentences) and 2-3 concrete recommended interview questions."}`)
     : (isJa
       ? `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "技術的な強みを1文で要約（例：TypeScriptとReactを軸にフロント開発の実績があります。）", "summaryMarketValue": "市場価値の根拠を1文で（例：継続的なコミットとスター数から、信頼性が評価されています。）", "summaryOutlook": "今後の展望を1文で（例：クラウド・API設計を習得すると年収アップが見込めます。）"}`
       : `{"technical": 70, "contribution": 65, "sustainability": 75, "market": 70, "jobTitle": "...", "salaryDisplay": "5,200,000円", "rank": "B", "tier": "B", "tierFeedback": "...", "summaryStrengths": "One-sentence summary of technical strengths.", "summaryMarketValue": "One-sentence basis for market value.", "summaryOutlook": "One-sentence future outlook."}`);
@@ -304,7 +304,7 @@ ${formatBlock}
 
 2) Append exactly one JSON block. jobTitle and tierFeedback: ${isJa ? "必ず日本語のみ。英語禁止。" : "English only."}
 ${isJa ? "JSONには必ず summaryStrengths, summaryMarketValue, summaryOutlook を1文ずつ含めること（スマホで箇条書き表示する要約用）。" : "Include summaryStrengths, summaryMarketValue, summaryOutlook (one sentence each) for bullet display."}
-${isBusiness ? (isJa ? "法人モードでは candidateStrengths（強み・採用メリット＝自社にもたらす具体的利益・2〜3文）と interviewConcerns（技術的懸念点・面接での確認事項＝コードから見えるリスクと面接で問うべき内容・2〜3文）を必ず含めること。" : "In business mode include candidateStrengths (strengths & hiring benefits) and interviewConcerns (technical concerns & interview checklist), 2-3 sentences each.") : ""}
+${isBusiness ? (isJa ? "法人モードでは candidateStrengths（強み・採用メリット）と interviewConcerns（【法人向け】この候補者の懸念点・面接での質問推奨例＝懸念点1〜2文＋推奨する具体的な面接質問2〜3個）を必ず含めること。" : "In business mode include candidateStrengths and interviewConcerns (candidate concerns + 2-3 recommended interview questions). Both required.") : ""}
 \`\`\`json
 ${jsonExample}
 \`\`\`
@@ -312,7 +312,7 @@ ${jsonExample}
 - salaryDisplay: salary string (3–15M JPY)
 - rank, tier: S+ / S / A / B / C / D / E
 - summaryStrengths, summaryMarketValue, summaryOutlook: 各1文の要約（必須）
-${isBusiness ? "- candidateStrengths, interviewConcerns: 法人時は必須（各2〜3文）" : ""}`;
+${isBusiness ? "- candidateStrengths, interviewConcerns: 法人時は必須。interviewConcerns には懸念点と面接での質問推奨例の両方を含めること。" : ""}`;
 }
 
 export async function POST(req: NextRequest) {

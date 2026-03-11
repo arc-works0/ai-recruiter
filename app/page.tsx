@@ -414,11 +414,8 @@ export default function Home() {
       <div className="relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
         <section className="mb-8 sm:mb-10 text-center">
           <h1 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl tracking-tight">
-            {locale === "ja" ? "エンジニア採用の書類選考を1分に短縮。" : "Shorten document screening to 1 minute."}
+            {locale === "ja" ? "エンジニア採用の書類選考を1分に短縮。GitHubから技術力と自社適性をAIが即座に可視化" : "Shorten document screening to 1 minute. AI visualizes technical skills and company fit from GitHub instantly."}
           </h1>
-          <p className="mt-2 text-sm text-zinc-400 sm:text-base">
-            {locale === "ja" ? "GitHubから技術力と自社適性をAIが即座に可視化" : "AI visualizes technical skills and fit from GitHub instantly."}
-          </p>
             <Link
             href={contactFormUrl}
             className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-8 py-3 text-sm font-bold text-black shadow-[0_4px_24px_rgba(217,119,6,0.5)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_8px_32px_rgba(217,119,6,0.55)] active:scale-[0.98]"
@@ -474,18 +471,19 @@ export default function Home() {
                       )}
                       {(tier || rank) && tierCfg && (
                         <span
-                          className="rounded-lg border border-amber-500/40 bg-amber-500/20 px-3 py-1.5 text-sm font-bold text-amber-200 print:border-amber-400/60 print:bg-amber-400/20 print:text-amber-900"
-                          style={{ boxShadow: `0 0 12px ${tierCfg.color}30` }}
+                          className="inline-flex items-center gap-1.5 rounded-md border-2 border-amber-400/50 bg-amber-500/25 px-3.5 py-2 text-sm font-extrabold tracking-wider text-amber-100 shadow-[0_0_0_1px_rgba(251,191,36,0.2),0_2px_8px_rgba(0,0,0,0.2)] print:border-amber-400/60 print:bg-amber-400/20 print:text-amber-900"
+                          style={{ boxShadow: `0 0 12px ${tierCfg.color}30, 0 0 0 1px ${tierCfg.color}20` }}
                         >
-                          {t.marketValueRankLabel} {tier || rank}
+                          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-300/90">{t.marketValueRankLabel}</span>
+                          <span className="rounded bg-white/10 px-1.5 py-0.5 font-black tabular-nums">{tier || rank}</span>
                         </span>
                       )}
                     </div>
                     {scores && (
-                      <div className="print-skill-scores mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 print:mt-3 print:gap-2 print:p-2 print:rounded">
+                      <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-3 print:gap-2 print:p-2 print:rounded">
                         {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
-                          <div key={i} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-center print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
+                          <div key={i} className="flex min-w-0 flex-col rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
+                            <p className="min-h-[2.5em] min-w-0 break-words text-[10px] font-semibold leading-tight tracking-wider text-zinc-500 sm:text-[10px] print:min-h-0 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
                             <p className="mt-1 text-2xl font-bold text-white print:mt-0 print:text-lg print:text-slate-900">{val}</p>
                           </div>
                         ))}
@@ -516,7 +514,7 @@ export default function Home() {
                         )}
                         {interviewConcerns && (
                           <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80">
-                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90 print:text-slate-600">{t.interviewConcernsLabel}</p>
+                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90 print:text-slate-600">{t.businessInterviewConcernsLabel}</p>
                             <p className="text-sm leading-relaxed text-zinc-200 print:text-slate-700">{interviewConcerns}</p>
                           </div>
                         )}
@@ -530,6 +528,7 @@ export default function Home() {
                         <div className="print-radar-bg mx-auto h-[200px] w-[200px] sm:h-[280px] sm:w-full max-w-[320px]">
                           <ResponsiveContainer width="100%" height="100%">
                             <RadarChart
+                              margin={{ top: 24, right: 28, bottom: 24, left: 28 }}
                               data={RADAR_KEYS.map((key, i) => ({
                                 subject: t.businessRadarLabels[i],
                                 value: scores[key],
@@ -537,7 +536,7 @@ export default function Home() {
                               }))}
                             >
                               <PolarGrid stroke="rgba(255,255,255,0.12)" />
-                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 11 }} />
+                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: 9 }} />
                               <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: 10 }} />
                               <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
                               <Legend wrapperStyle={{ fontSize: 10 }} />
@@ -635,8 +634,9 @@ export default function Home() {
                       </p>
                       {rank && (
                         <div className="mt-3 flex flex-wrap justify-center sm:justify-start gap-2">
-                          <span className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-sm font-bold text-indigo-200">
-                            {t.rankLabel} {rank}
+                          <span className="inline-flex items-center gap-1.5 rounded-md border-2 border-indigo-400/40 bg-indigo-500/20 px-3.5 py-2 text-sm font-extrabold tracking-wider text-indigo-100 shadow-[0_0_0_1px_rgba(99,102,241,0.2),0_2px_8px_rgba(0,0,0,0.2)]">
+                            <span className="text-[10px] font-semibold uppercase tracking-widest text-indigo-300/90">{t.rankLabel}</span>
+                            <span className="rounded bg-white/10 px-1.5 py-0.5 font-black tabular-nums">{rank}</span>
                           </span>
                         </div>
                       )}
@@ -645,6 +645,7 @@ export default function Home() {
                       <div className="order-1 sm:order-2 radar-reveal mx-auto w-full max-w-[200px] sm:max-w-[180px] h-[180px] sm:h-[160px]">
                         <ResponsiveContainer width="100%" height="100%">
                           <RadarChart
+                            margin={{ top: 20, right: 24, bottom: 20, left: 24 }}
                             data={RADAR_KEYS.map((key, i) => ({
                               subject: t.radarLabels[i],
                               value: scores[key],
@@ -658,7 +659,7 @@ export default function Home() {
                               </linearGradient>
                             </defs>
                             <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
-                            <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                            <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 9 }} />
                             <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 9 }} />
                             <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" strokeWidth={2} fill="url(#radarGradPersonal)" fillOpacity={1} />
                           </RadarChart>
@@ -706,16 +707,16 @@ export default function Home() {
                   </p>
                   <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
                     <div
-                      className="flex items-center gap-2 rounded-xl px-5 py-3 text-lg font-black"
+                      className="flex items-center gap-2.5 rounded-xl border-2 border-white/20 px-5 py-3.5 text-lg font-black shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_4px_16px_rgba(0,0,0,0.25)]"
                       style={{
                         background: tierCfg.gradient,
                         color: "#030303",
-                        boxShadow: `0 0 24px ${tierCfg.color}40`,
+                        boxShadow: `0 0 24px ${tierCfg.color}40, 0 0 0 1px rgba(255,255,255,0.08)`,
                       }}
                     >
-                      <span className="opacity-90">{tierCfg.badgeSymbol}</span>
-                      <span>{t.tierDisplay} {tier}</span>
-                      <span className="text-sm font-bold opacity-90">（{tierLabel}）</span>
+                      <span className="text-2xl opacity-95">{tierCfg.badgeSymbol}</span>
+                      <span className="tracking-tight">{t.tierDisplay} {tier}</span>
+                      <span className="rounded bg-black/10 px-2 py-0.5 text-sm font-bold">（{tierLabel}）</span>
                     </div>
                   </div>
                   {["D", "E"].includes(tier) && (

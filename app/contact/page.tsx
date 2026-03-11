@@ -11,8 +11,10 @@ export default function ContactPage() {
 
   const t = locale === "ja"
     ? {
-        title: "お問い合わせ",
+        title: "【法人様専用】無料トライアル・導入相談窓口",
         subtitle: "大規模利用・API連携・導入相談は以下のフォームにご記入のうえ、送信内容をメールでお送りください。",
+        purposeLabel: "導入目的",
+        purposeOptions: ["書類選考の効率化", "既存社員の評価", "その他"] as const,
         nameLabel: "お名前",
         namePlaceholder: "山田 太郎",
         emailLabel: "メールアドレス",
@@ -27,8 +29,10 @@ export default function ContactPage() {
         composedDesc: "「メールで送る」を押すとメールソフトが開きます。宛先はご自身のメールアドレスをBCCに追加するか、担当者へ転送してください。",
       }
     : {
-        title: "Contact",
+        title: "[For Business] Free trial & consultation",
         subtitle: "For enterprise, API, or bulk use, please fill out the form and send the content via email.",
+        purposeLabel: "Purpose",
+        purposeOptions: ["Document screening efficiency", "Existing staff evaluation", "Other"] as const,
         nameLabel: "Name",
         namePlaceholder: "John Doe",
         emailLabel: "Email",
@@ -45,6 +49,7 @@ export default function ContactPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [purpose, setPurpose] = useState("");
   const [message, setMessage] = useState("");
   const [showComposed, setShowComposed] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -54,6 +59,7 @@ export default function ContactPage() {
     "",
     `${t.nameLabel}: ${name || "—"}`,
     `${t.emailLabel}: ${email || "—"}`,
+    ...(t.purposeLabel ? ["", `${t.purposeLabel}: ${purpose || "—"}`] : []),
     "",
     `${t.messageLabel}:`,
     message || "—",
@@ -112,6 +118,22 @@ export default function ContactPage() {
                   placeholder={t.emailPlaceholder}
                   className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-white/[0.15] focus:outline-none"
                 />
+              </div>
+              <div>
+                <label htmlFor="contact-purpose" className="block text-xs font-medium text-zinc-400">
+                  {t.purposeLabel}
+                </label>
+                <select
+                  id="contact-purpose"
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white focus:border-white/[0.15] focus:outline-none [&>option]:bg-[#0a0a0c]"
+                >
+                  <option value="">—</option>
+                  {t.purposeOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label htmlFor="contact-message" className="block text-xs font-medium text-zinc-400">

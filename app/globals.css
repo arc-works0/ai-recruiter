@@ -120,6 +120,12 @@ body {
 
 .radar-reveal {
   animation: radar-reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  overflow: visible;
+}
+
+/* レーダー軸ラベルがPCで欠けないよう余白を確保 */
+.print-radar-bg {
+  overflow: visible;
 }
 
 /* Share ボタン — キラキラパーティクル風 */
