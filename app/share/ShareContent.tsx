@@ -13,8 +13,8 @@ import {
 import { getTierConfig } from "../../lib/tiers";
 import { translations, getLocaleFromBrowser, type Locale } from "../../lib/i18n";
 
-const LABELS_EN = ["Tech Depth", "Code Quality", "Learning", "Market Fit"];
-const LABELS_JA = ["技術深化", "コード品質", "学習意欲", "市場価値"];
+const LABELS_EN = ["Tech Depth", "Code Quality", "Learning", "Demand Fit"];
+const LABELS_JA = ["技術深化", "コード品質", "学習意欲", "需要適合"];
 const KEYS = ["technical", "contribution", "sustainability", "market"] as const;
 
 function decode(s: string): string {

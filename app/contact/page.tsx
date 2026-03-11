@@ -25,7 +25,8 @@ export default function ContactPage() {
         emailPlaceholder: "example@company.co.jp",
         messageLabel: "お問い合わせ内容",
         messagePlaceholder: "ご用件・ご要望をご記入ください。",
-        submit: "送信内容を表示",
+        submit: "無料で法人トライアルを申し込む",
+        sslNotice: "送信されたデータはSSLで暗号化され、安全に保護されます",
         copy: "内容をコピー",
         sendMail: "メールで送る",
         back: "トップへ戻る",
@@ -47,7 +48,8 @@ export default function ContactPage() {
         emailPlaceholder: "you@company.com",
         messageLabel: "Message",
         messagePlaceholder: "Your inquiry or request.",
-        submit: "Show content",
+        submit: "Apply for free business trial",
+        sslNotice: "Your data is encrypted with SSL and protected securely",
         copy: "Copy to clipboard",
         sendMail: "Send via email",
         back: "Back to top",
@@ -191,7 +193,7 @@ export default function ContactPage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <button
                 type="submit"
-                className="rounded-xl bg-white py-3 px-6 text-sm font-semibold text-black transition hover:bg-zinc-100"
+                className="rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 py-3.5 px-8 text-sm font-bold text-black shadow-[0_4px_20px_rgba(251,191,36,0.4)] transition hover:from-amber-400 hover:via-yellow-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(251,191,36,0.5)] active:scale-[0.99]"
               >
                 {t.submit}
               </button>
@@ -202,6 +204,12 @@ export default function ContactPage() {
                 {t.back}
               </Link>
             </div>
+            <p className="mt-5 flex items-center justify-center gap-2 text-[11px] text-zinc-500">
+              <svg className="h-4 w-4 shrink-0 text-emerald-500/80" aria-hidden fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              {t.sslNotice}
+            </p>
             </form>
           </div>
         ) : (

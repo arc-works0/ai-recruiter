@@ -527,7 +527,7 @@ export default function Home() {
                           {t.businessRadarHeading}
                         </p>
                         <div className="print-radar-bg radar-chart-wrapper mx-auto flex min-w-0 max-w-full justify-center px-4 py-4 sm:px-6 sm:py-0">
-                          <div className="h-[200px] w-full min-w-0 max-w-[200px] sm:h-[280px] sm:max-w-[320px]">
+                          <div className={`radar-chart-inner h-[200px] w-full min-w-0 max-w-[200px] sm:h-[280px] sm:max-w-[320px] ${isMobile ? "scale-[0.8] origin-center" : ""}`}>
                             <ResponsiveContainer width="100%" height="100%">
                               <RadarChart
                                 margin={{ top: 24, right: 24, bottom: 24, left: 24 }}
@@ -538,8 +538,8 @@ export default function Home() {
                                 }))}
                               >
                                 <PolarGrid stroke="rgba(255,255,255,0.12)" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: isMobile ? 11 : 10 }} />
-                                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: isMobile ? 10 : 9 }} />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: isMobile ? 11 : 14 }} />
+                                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: isMobile ? 10 : 12 }} />
                               <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
                                 <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 9 }} />
                               </RadarChart>
@@ -643,8 +643,8 @@ export default function Home() {
                       )}
                     </div>
                     {scores && (
-                      <div className="order-1 sm:order-2 radar-reveal radar-chart-wrapper mx-auto flex h-[200px] w-full min-w-0 max-w-[220px] flex-col justify-center px-4 py-4 sm:h-[180px] sm:max-w-[200px] sm:px-0 sm:py-0">
-                        <div className="h-full w-full min-w-0">
+                      <div className="order-1 sm:order-2 radar-reveal radar-chart-wrapper mx-auto flex h-[220px] w-full min-w-0 max-w-[260px] flex-col justify-center px-4 py-4 sm:h-[180px] sm:max-w-[200px] sm:px-0 sm:py-0">
+                        <div className={`radar-chart-inner h-full w-full min-w-0 ${isMobile ? "scale-[0.8] origin-center" : ""}`}>
                           <ResponsiveContainer width="100%" height="100%">
                             <RadarChart
                               margin={{ top: 20, right: 22, bottom: 20, left: 22 }}
@@ -661,8 +661,8 @@ export default function Home() {
                                 </linearGradient>
                               </defs>
                               <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
-                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: isMobile ? 11 : 10 }} />
-                              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: isMobile ? 10 : 9 }} />
+                              <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: isMobile ? 11 : 14 }} />
+                              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: isMobile ? 10 : 12 }} />
                             <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" strokeWidth={2} fill="url(#radarGradPersonal)" fillOpacity={1} />
                             </RadarChart>
                           </ResponsiveContainer>
@@ -828,7 +828,7 @@ export default function Home() {
             {limitExceededOpen && (
               <div className="modal-lock-overlay limit-modal-premium" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
                 <div className="absolute inset-0" onClick={() => setLimitExceededOpen(false)} aria-hidden />
-                <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 text-center sm:min-h-0">
+                <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 pt-24 pb-8 text-center sm:min-h-0 sm:pt-6 sm:pb-6">
                   <div className="limit-modal-card w-full max-w-md space-y-6 rounded-3xl border border-amber-500/20 bg-[#0a0a0c]/98 p-8 shadow-2xl backdrop-blur-xl sm:space-y-8 sm:p-10">
                     <div className="space-y-4">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-400/90">
@@ -957,8 +957,25 @@ export default function Home() {
             {t.footerTrust}
             <span className="block mt-1 text-zinc-600">{t.footerTrustEn}</span>
           </p>
-          <p className="mt-4 text-[10px] text-zinc-600">
-            {t.footerPartners}
+          <div className="footer-partners mt-4 flex flex-wrap items-center justify-center gap-4">
+            <span className="footer-partner-item rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[10px] font-medium text-zinc-500 transition-all duration-200 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400 hover:grayscale-0">
+              Geekly
+            </span>
+            <span className="footer-partner-item rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[10px] font-medium text-zinc-500 transition-all duration-200 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400 hover:grayscale-0">
+              doda
+            </span>
+            <span className="footer-partner-item rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[10px] font-medium text-zinc-500 transition-all duration-200 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400 hover:grayscale-0">
+              LinkedIn
+            </span>
+          </div>
+          <p className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-zinc-600">
+            <Link href="/terms" className="underline-offset-2 hover:text-zinc-400 hover:underline">
+              {locale === "ja" ? "利用規約" : "Terms of Use"}
+            </Link>
+            <span className="text-white/20">|</span>
+            <Link href="/privacy" className="underline-offset-2 hover:text-zinc-400 hover:underline">
+              {locale === "ja" ? "プライバシーポリシー" : "Privacy Policy"}
+            </Link>
           </p>
         </footer>
       </div>
