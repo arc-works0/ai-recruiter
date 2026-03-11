@@ -188,7 +188,6 @@ export default function ContactPage() {
                   className="mt-1.5 w-full resize-y rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-white/[0.15] focus:outline-none"
                 />
               </div>
-            </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <button
                 type="submit"
