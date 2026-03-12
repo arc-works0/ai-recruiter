@@ -360,8 +360,10 @@ export default function Home() {
           void el.offsetHeight; /* リフロー強制 */
         }
         setTimeout(() => {
+          const _forceReflow = document.body.offsetHeight;
+          void _forceReflow;
           window.print();
-        }, 800);
+        }, 1200);
       });
     });
   }, [mode, locale, pdfExporting, isMobile]);
