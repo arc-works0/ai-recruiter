@@ -673,8 +673,11 @@ body {
   [data-print-report] * {
     visibility: visible;
   }
-  /* 報告セクション以外をレイアウトから外して白紙ページを防止 */
-  main > *:not([data-print-report]) {
+  /* 印刷時は報告セクションのみ表示（報告の親は隠さない） */
+  main > *:not(.print-content-wrapper) {
+    display: none !important;
+  }
+  .print-content-wrapper > *:not([data-print-report]) {
     display: none !important;
   }
   [data-print-report] .no-print {
@@ -698,6 +701,8 @@ body {
     line-height: 1.35 !important;
     overflow: visible !important;
     box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   [data-print-report] .space-y-5 > * + *,
   [data-print-report] .space-y-6 > * + * {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { getLocaleFromBrowser, type Locale } from "../../lib/i18n";
 import { useEffect } from "react";
 
@@ -190,19 +189,13 @@ export default function ContactPage() {
                   className="mt-1.5 w-full resize-y rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-white/[0.15] focus:outline-none"
                 />
               </div>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <div className="mt-8 flex justify-center">
               <button
                 type="submit"
                 className="rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 py-3.5 px-8 text-sm font-bold text-black shadow-[0_4px_20px_rgba(251,191,36,0.4)] transition hover:from-amber-400 hover:via-yellow-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(251,191,36,0.5)] active:scale-[0.99]"
               >
                 {t.submit}
               </button>
-              <Link
-                href="/contact#contact-form"
-                className="rounded-xl border border-white/[0.12] bg-white/[0.04] py-3 px-6 text-center text-sm font-medium text-white transition hover:bg-white/[0.08]"
-              >
-                {t.contactCta}
-              </Link>
             </div>
             <p className="mt-5 flex items-center justify-center gap-2 text-[11px] text-zinc-500">
               <svg className="h-4 w-4 shrink-0 text-emerald-500/80" aria-hidden fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -240,11 +233,6 @@ export default function ContactPage() {
               >
                 {locale === "ja" ? "編集に戻る" : "Back to edit"}
               </button>
-            </div>
-            <div className="mt-6">
-              <Link href="/contact#contact-form" className="text-sm text-zinc-500 hover:text-zinc-300">
-                {t.contactCta}
-              </Link>
             </div>
           </div>
         )}

@@ -411,7 +411,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
+      <div className="print-content-wrapper relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
         <section className="mb-8 sm:mb-10 text-center">
           <h1 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl tracking-tight">
             {locale === "ja" ? "エンジニア採用の書類選考を1分に短縮。GitHubから技術力と自社適性をAIが即座に可視化" : "Shorten document screening to 1 minute. AI visualizes technical skills and company fit from GitHub instantly."}
