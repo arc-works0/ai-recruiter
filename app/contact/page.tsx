@@ -29,7 +29,7 @@ export default function ContactPage() {
         sslNotice: "入力されたデータはSSL暗号化により保護されます",
         copy: "内容をコピー",
         sendMail: "メールで送る",
-        back: "トップへ戻る",
+        contactCta: "お問い合わせ",
         composedTitle: "以下の内容でメールをお送りください",
         composedDesc: "「メールで送る」を押すとメールソフトが開きます。宛先はご自身のメールアドレスをBCCに追加するか、担当者へ転送してください。",
       }
@@ -52,7 +52,7 @@ export default function ContactPage() {
         sslNotice: "Your entered data is protected by SSL encryption.",
         copy: "Copy to clipboard",
         sendMail: "Send via email",
-        back: "Back to top",
+        contactCta: "Contact",
         composedTitle: "Send the following via email",
         composedDesc: "Click \"Send via email\" to open your mail client. BCC yourself or forward to your contact.",
       };
@@ -106,7 +106,7 @@ export default function ContactPage() {
 
         {!showComposed ? (
           <div className="mt-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl sm:p-8">
-            <form onSubmit={(e) => { e.preventDefault(); setShowComposed(true); }} className="space-y-5">
+            <form id="contact-form" onSubmit={(e) => { e.preventDefault(); setShowComposed(true); }} className="space-y-5">
               <div>
                 <label htmlFor="contact-company" className="block text-xs font-medium text-zinc-400">
                   {t.companyLabel} <span className="text-rose-400/80">*</span>
@@ -198,10 +198,10 @@ export default function ContactPage() {
                 {t.submit}
               </button>
               <Link
-                href="/"
+                href="/contact#contact-form"
                 className="rounded-xl border border-white/[0.12] bg-white/[0.04] py-3 px-6 text-center text-sm font-medium text-white transition hover:bg-white/[0.08]"
               >
-                {t.back}
+                {t.contactCta}
               </Link>
             </div>
             <p className="mt-5 flex items-center justify-center gap-2 text-[11px] text-zinc-500">
@@ -242,8 +242,8 @@ export default function ContactPage() {
               </button>
             </div>
             <div className="mt-6">
-              <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
-                ← {t.back}
+              <Link href="/contact#contact-form" className="text-sm text-zinc-500 hover:text-zinc-300">
+                {t.contactCta}
               </Link>
             </div>
           </div>

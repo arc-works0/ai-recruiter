@@ -644,10 +644,10 @@ body {
   transform: scale(0.98);
 }
 
-/* Print — 究極の1枚完結・プレミアム鑑定書 */
+/* Print — A4 1枚完結・プレミアム鑑定書（白紙2枚目・見切れ防止） */
 @page {
   size: A4;
-  margin: 6mm;
+  margin: 5mm;
 }
 
 @media print {
@@ -662,7 +662,6 @@ body {
     overflow: visible !important;
     min-height: auto !important;
     max-height: none !important;
-    overflow-x: hidden !important;
     background: #ffffff !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -679,24 +678,32 @@ body {
     visibility: hidden !important;
   }
   [data-print-report] {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    padding: 6mm !important;
-    margin: 0 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: auto !important;
+    max-height: none !important;
+    height: auto !important;
+    padding: 5mm !important;
+    margin: 0 auto !important;
     background: #ffffff !important;
     color: #0f172a !important;
     box-shadow: none !important;
     font-size: 8px !important;
     line-height: 1.35 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    zoom: 0.68;
+  }
+  [data-print-report] .space-y-5 > * + *,
+  [data-print-report] .space-y-6 > * + * {
+    margin-top: 2px !important;
   }
   [data-print-report] .print-cert-single {
-    max-height: 100% !important;
-    overflow: hidden !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
   [data-print-report] .glass-panel-strong,
   [data-print-report] .glass-panel,
