@@ -361,7 +361,7 @@ export default function Home() {
         }
         setTimeout(() => {
           window.print();
-        }, 250);
+        }, 800);
       });
     });
   }, [mode, locale, pdfExporting, isMobile]);

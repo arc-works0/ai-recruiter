@@ -644,57 +644,56 @@ body {
   transform: scale(0.98);
 }
 
-/* Print — A4 1枚完結・プレミアム鑑定書（白紙解消・表示・カラー強制） */
+/* Print — 足し算で構築：強制表示のみ・2枚目白紙防止 */
 @page {
   size: A4;
-  margin: 5mm;
+  margin: 0;
 }
 
 @media print {
-  .no-print {
-    display: none !important;
-  }
-  /* ルート：色・背景を印刷に反映 */
+  /* 1. ページ全体とメインコンテナを強制表示 */
   html,
-  body {
+  body,
+  main,
+  main > main {
+    display: block !important;
+    height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
-    height: auto !important;
-    min-height: 100vh !important;
     overflow: visible !important;
     background: #ffffff !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
-  /* 印刷時はヘッダーを非表示。layout の main > page の main があるので内側 main を表示 */
-  body > header {
+  /* 2. 印刷対象 [data-print-report] 以外をすべて物理的に消す */
+  body > *:not(main),
+  header,
+  footer,
+  nav,
+  button,
+  .no-print,
+  .meteors-layer,
+  .scan-overlay,
+  .mode-tabs,
+  .fixed,
+  .modal-bg {
     display: none !important;
   }
-  main > main {
-    display: block !important;
-    visibility: visible !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
+  /* main 内は報告セクションのみ表示（layout の main > page の main > .print-content-wrapper > section） */
   main > main > *:not(.print-content-wrapper) {
     display: none !important;
   }
   .print-content-wrapper > *:not([data-print-report]) {
     display: none !important;
   }
-  /* ① 鑑定結果メインコンテナ：強制表示・親の隠しを上書き */
+  /* 3. 鑑定結果セクションの強制レンダリング */
   section[data-print-report] {
     display: block !important;
     visibility: visible !important;
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
     width: 100% !important;
-    max-width: 100% !important;
-    min-height: 1px !important;
-    height: auto !important;
-    overflow: visible !important;
     padding: 8mm !important;
     margin: 0 !important;
     background: #ffffff !important;
@@ -702,11 +701,12 @@ body {
     font-size: 8px !important;
     line-height: 1.35 !important;
     box-sizing: border-box !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
-  /* 報告内はすべて表示・高さ0防止 */
+  /* 4. 足し算：報告内の表示・色・レイアウト */
   [data-print-report] .no-print {
     display: none !important;
   }
@@ -715,104 +715,40 @@ body {
     visibility: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
-  [data-print-report] > *,
-  [data-print-report] .print-cert-single,
-  [data-print-report] .print-radar-section,
-  [data-print-report] .print-skill-scores,
-  [data-print-report] .print-radar-bg,
-  [data-print-report] .radar-chart-wrapper,
-  [data-print-report] .radar-chart-inner {
-    display: block !important;
-    visibility: visible !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  /* ② レーダー用コンテナ：高さ固定で0レンダリング防止 */
-  [data-print-report] .print-radar-bg .radar-chart-inner,
-  [data-print-report] .print-radar-bg [class*="recharts"] {
-    display: block !important;
-    visibility: visible !important;
-    width: 200px !important;
-    height: 200px !important;
-    min-width: 200px !important;
-    min-height: 200px !important;
-    overflow: visible !important;
-  }
-  [data-print-report] .print-radar-bg svg {
-    display: block !important;
-    visibility: visible !important;
-    overflow: visible !important;
-  }
-  /* main / ラッパー：高さ保持 */
-  main,
-  .print-content-wrapper {
-    display: block !important;
-    visibility: visible !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  [data-print-report] .space-y-5 > * + *,
-  [data-print-report] .space-y-6 > * + * {
-    margin-top: 2px !important;
-  }
-  [data-print-report] .print-cert-single {
-    max-height: none !important;
-    overflow: visible !important;
-  }
-  [data-print-report] .space-y-5 > * + *,
-  [data-print-report] .space-y-6 > * + * {
-    margin-top: 2px !important;
-  }
-  [data-print-report] .print-cert-single {
-    max-height: none !important;
-    overflow: visible !important;
+  [data-print-report] * {
+    color: #0f172a !important;
   }
   [data-print-report] .glass-panel-strong,
   [data-print-report] .glass-panel,
   [data-print-report] .glass-card-interactive {
     background: #ffffff !important;
     border: 1px solid #d1d5db !important;
-    box-shadow: none !important;
-    break-inside: avoid;
     padding: 4px 8px !important;
-    margin-bottom: 2px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
   [data-print-report] .card-gradient-border::before {
     display: none;
   }
   [data-print-report] table {
-    break-inside: avoid;
+    break-inside: avoid !important;
     font-size: 8px !important;
   }
-  [data-print-report] h1, [data-print-report] h2, [data-print-report] h3 {
-    break-after: avoid;
+  [data-print-report] h1,
+  [data-print-report] h2,
+  [data-print-report] h3 {
+    break-after: avoid !important;
     font-size: 11px !important;
     margin: 2px 0 !important;
     color: #0f172a !important;
   }
+  [data-print-report] .space-y-5 > * + *,
+  [data-print-report] .space-y-6 > * + * {
+    margin-top: 2px !important;
+  }
   [data-print-report] .space-y-8 > * + * {
     margin-top: 4px !important;
-  }
-  [data-print-report] * {
-    color: #0f172a !important;
-  }
-  [data-print-report] .print-radar-bg,
-  [data-print-report] .print-radar-bg *,
-  [data-print-report] [class*="h-\[280px\]"],
-  [data-print-report] [class*="h-[320px]"] {
-    background: #ffffff !important;
-  }
-  [data-print-report] .print-radar-bg svg,
-  [data-print-report] .print-radar-bg line,
-  [data-print-report] .print-radar-bg path {
-    stroke: #333333 !important;
-  }
-  [data-print-report] .print-radar-bg text {
-    fill: #333333 !important;
   }
   [data-print-report] .print-cert-single,
   [data-print-report] .achievement-id-card,
@@ -820,45 +756,52 @@ body {
   [data-print-report] .print-skill-scores {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    opacity: 1 !important;
-    visibility: visible !important;
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  [data-print-report] .print-radar-bg,
+  [data-print-report] .print-radar-bg *,
+  [data-print-report] .print-radar-bg svg,
+  [data-print-report] .print-radar-bg line,
+  [data-print-report] .print-radar-bg path {
+    background: #ffffff !important;
+    stroke: #333333 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  [data-print-report] .print-radar-bg text {
+    fill: #333333 !important;
+  }
+  [data-print-report] .print-radar-bg,
+  [data-print-report] .print-radar-bg [class*="h-"],
+  [data-print-report] .print-radar-bg [class*="recharts"] {
+    width: 200px !important;
+    height: 200px !important;
+    min-width: 200px !important;
+    min-height: 200px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    visibility: visible !important;
   }
   [data-print-report] .print-skill-scores > div {
     border: 1px solid #e2e8f0 !important;
     background: #f8fafc !important;
   }
-  [data-print-report] .print-radar-bg,
-  [data-print-report] .print-radar-bg [class*="h-\[200px\]"],
-  [data-print-report] .print-radar-bg [class*="h-\[280px\]"],
-  [data-print-report] .print-radar-bg [class*="h-[320px]"] {
-    width: 200px !important;
-    height: 200px !important;
-    max-width: 200px !important;
-    max-height: 200px !important;
-    margin: 0 auto !important;
-  }
-  [data-print-report] p, [data-print-report] li {
+  [data-print-report] p,
+  [data-print-report] li {
     margin: 2px 0 !important;
     color: #1e293b !important;
   }
-  [data-print-report] .print-advice-section {
-    font-size: 8px !important;
-    line-height: 1.4 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+  [data-print-report] .print-advice-section,
+  [data-print-report] .print-cert-footer {
     display: block !important;
+    visibility: visible !important;
+    font-size: 8px !important;
   }
   [data-print-report] .print-cert-footer {
     color: #94a3b8 !important;
-    white-space: nowrap !important;
     font-size: 7px !important;
     letter-spacing: 0.15em !important;
-  }
-  .meteors-layer,
-  .scan-overlay,
-  .mode-tabs,
-  .fixed {
-    display: none !important;
   }
 }
