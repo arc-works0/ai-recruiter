@@ -644,28 +644,32 @@ body {
   transform: scale(0.98);
 }
 
-/* Print — 足し算で構築：強制表示のみ・2枚目白紙防止 */
+/* Print — A4 物理固定・1枚強制・重なり根絶 */
 @page {
   size: A4;
   margin: 0;
 }
 
 @media print {
-  /* 1. ページ全体とメインコンテナを強制表示 */
+  /* 強制1ページ設定 */
   html,
-  body,
-  main,
-  main > main {
-    display: block !important;
-    height: auto !important;
+  body {
+    height: 100% !important;
+    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
     background: #ffffff !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* 2. 印刷対象 [data-print-report] 以外をすべて物理的に消す */
+  main,
+  main > main {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  /* 印刷対象以外を消す */
   body > *:not(main),
   header,
   footer,
@@ -679,53 +683,39 @@ body {
   .modal-bg {
     display: none !important;
   }
-  /* main 内は報告セクションのみ表示（layout の main > page の main > .print-content-wrapper > section） */
-  main > main > *:not(.print-content-wrapper) {
-    display: none !important;
-  }
+  main > main > *:not(.print-content-wrapper),
   .print-content-wrapper > *:not([data-print-report]) {
     display: none !important;
   }
-  /* 3. 鑑定結果セクション（標準フロー・中央寄せ・1枚に収める） */
+  /* 3枚化の元凶：Confidential を完全に消去 */
+  .business-report-watermark {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  /* 1. 印刷エリアを A4 に物理固定 */
   section[data-print-report] {
-    display: block !important;
-    visibility: visible !important;
-    position: relative !important;
+    width: 175mm !important;
+    height: 260mm !important;
     margin: 0 auto !important;
-    float: none !important;
-    width: 170mm !important;
-    max-width: 170mm !important;
-    max-height: 290mm !important;
-    padding: 8mm !important;
+    padding: 10mm !important;
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
     background: #ffffff !important;
     color: #0f172a !important;
     font-size: 8px !important;
     line-height: 1.35 !important;
-    box-sizing: border-box !important;
     page-break-inside: avoid !important;
-    page-break-after: avoid !important;
-    page-break-before: avoid !important;
-    overflow: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* 重なり完全排除：フローレイアウト強制 */
+  /* 2. 要素の巨大化・重なり根絶：余白を半分に・推定市場価格を 1.5rem に */
   section[data-print-report] * {
     position: static !important;
-    display: block !important;
   }
-  /* ウォーターマーク（Confidential）は印刷時非表示 */
-  .business-report-watermark {
-    display: none !important;
-  }
-  /* ResponsiveContainer の高さ固定・チャート前後の余白 */
-  .recharts-responsive-container {
-    height: 250px !important;
-    min-height: 250px !important;
-    margin-top: 20px !important;
-    margin-bottom: 20px !important;
-  }
-  /* 4. 足し算：報告内の表示・色・レイアウト */
   [data-print-report] .no-print {
     display: none !important;
   }
@@ -743,41 +733,49 @@ body {
   [data-print-report] .glass-card-interactive {
     background: #ffffff !important;
     border: 1px solid #d1d5db !important;
-    padding: 4px 8px !important;
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
+    padding: 2px 4px !important;
+    margin: 2px 0 !important;
   }
   [data-print-report] .card-gradient-border::before {
     display: none;
   }
+  [data-print-report] .glass-panel-strong > div > p,
+  [data-print-report] .print-cert-single p {
+    font-size: 1.5rem !important;
+    margin: 2px 0 !important;
+  }
   [data-print-report] table {
-    break-inside: avoid !important;
     font-size: 8px !important;
+    margin: 2px 0 !important;
+    padding: 0 !important;
   }
   [data-print-report] h1,
   [data-print-report] h2,
   [data-print-report] h3 {
-    break-after: avoid !important;
-    font-size: 11px !important;
-    margin: 2px 0 !important;
+    font-size: 10px !important;
+    margin: 1px 0 !important;
     color: #0f172a !important;
   }
   [data-print-report] .space-y-5 > * + *,
   [data-print-report] .space-y-6 > * + * {
-    margin-top: 2px !important;
+    margin-top: 1px !important;
   }
   [data-print-report] .space-y-8 > * + * {
-    margin-top: 4px !important;
+    margin-top: 2px !important;
   }
   [data-print-report] .print-cert-single,
-  [data-print-report] .achievement-id-card,
   [data-print-report] .print-radar-section,
-  [data-print-report] .print-skill-scores {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  [data-print-report] .print-skill-scores,
+  [data-print-report] .print-radar-bg {
+    margin: 4px 0 !important;
+    padding: 2px 4px !important;
+  }
+  /* チャート：220px に縮小 */
+  .recharts-responsive-container {
+    height: 220px !important;
+    min-height: 220px !important;
+    margin: 10px auto !important;
+    flex-shrink: 0 !important;
   }
   [data-print-report] .print-radar-bg,
   [data-print-report] .print-radar-bg *,
@@ -786,41 +784,34 @@ body {
   [data-print-report] .print-radar-bg path {
     background: #ffffff !important;
     stroke: #333333 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
   [data-print-report] .print-radar-bg text {
     fill: #333333 !important;
   }
-  [data-print-report] .print-radar-bg,
-  [data-print-report] .print-radar-bg [class*="h-"],
   [data-print-report] .print-radar-bg [class*="recharts"] {
-    width: 200px !important;
-    height: 200px !important;
-    min-width: 200px !important;
-    min-height: 200px !important;
+    width: 180px !important;
+    height: 220px !important;
+    min-height: 220px !important;
     margin: 0 auto !important;
-    display: block !important;
-    visibility: visible !important;
   }
   [data-print-report] .print-skill-scores > div {
     border: 1px solid #e2e8f0 !important;
     background: #f8fafc !important;
+    padding: 2px !important;
+    margin: 1px 0 !important;
   }
   [data-print-report] p,
   [data-print-report] li {
-    margin: 2px 0 !important;
+    margin: 1px 0 !important;
     color: #1e293b !important;
   }
   [data-print-report] .print-advice-section,
   [data-print-report] .print-cert-footer {
-    display: block !important;
-    visibility: visible !important;
-    font-size: 8px !important;
+    font-size: 7px !important;
+    margin: 1px 0 !important;
   }
   [data-print-report] .print-cert-footer {
     color: #94a3b8 !important;
-    font-size: 7px !important;
-    letter-spacing: 0.15em !important;
+    letter-spacing: 0.1em !important;
   }
 }
