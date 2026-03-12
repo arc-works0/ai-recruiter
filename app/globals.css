@@ -692,13 +692,16 @@ body {
     display: none !important;
     visibility: hidden !important;
   }
-  /* 1. 印刷エリアを A4 に物理固定 */
+  /* 1. 印刷エリアを A4 に物理固定・完璧な中央配置 */
   section[data-print-report] {
+    position: absolute !important;
+    left: 50% !important;
+    top: 15mm !important;
+    transform: translateX(-50%) !important;
     width: 175mm !important;
     height: 260mm !important;
-    margin: 0 auto !important;
-    padding: 10mm !important;
-    position: relative !important;
+    margin: 0 !important;
+    padding: 12mm !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
@@ -784,9 +787,19 @@ body {
   [data-print-report] .print-radar-bg path {
     background: #ffffff !important;
     stroke: #333333 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   [data-print-report] .print-radar-bg text {
     fill: #333333 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .recharts-surface,
+  [data-print-report] .print-radar-bg svg,
+  [data-print-report] .print-radar-bg .recharts-surface {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   [data-print-report] .print-radar-bg [class*="recharts"] {
     width: 180px !important;
@@ -813,5 +826,10 @@ body {
   [data-print-report] .print-cert-footer {
     color: #94a3b8 !important;
     letter-spacing: 0.1em !important;
+  }
+  /* 1枚完結のダメ押し：2枚目を発生させない */
+  footer,
+  .no-print {
+    display: none !important;
   }
 }
