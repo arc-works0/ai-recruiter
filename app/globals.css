@@ -644,7 +644,7 @@ body {
   transform: scale(0.98);
 }
 
-/* Print — A4 1枚完結・プレミアム鑑定書（白紙2枚目・見切れ防止） */
+/* Print — A4 1枚完結・プレミアム鑑定書（白紙解消・表示・カラー強制） */
 @page {
   size: A4;
   margin: 5mm;
@@ -663,28 +663,56 @@ body {
     min-height: auto !important;
     max-height: none !important;
     background: #ffffff !important;
+    visibility: visible !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    color-adjust: exact;
   }
+  /* ① 印刷時は報告のみ表示（他は visibility で隠し、報告と親は表示） */
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
+  main,
+  main .print-content-wrapper,
   [data-print-report],
   [data-print-report] * {
-    visibility: visible;
+    visibility: visible !important;
   }
-  /* 印刷時は報告セクションのみ表示（報告の親は隠さない） */
   main > *:not(.print-content-wrapper) {
     display: none !important;
   }
   .print-content-wrapper > *:not([data-print-report]) {
     display: none !important;
   }
+  main {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  .print-content-wrapper {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
   [data-print-report] .no-print {
     display: none !important;
     visibility: hidden !important;
   }
+  /* ① 対象コンテンツに display: block と visibility: visible を強制 */
+  [data-print-report],
+  [data-print-report] * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
   [data-print-report] {
+    display: block !important;
     position: static !important;
     inset: auto !important;
     width: auto !important;
@@ -701,8 +729,35 @@ body {
     line-height: 1.35 !important;
     overflow: visible !important;
     box-sizing: border-box !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  }
+  /* ② 親要素の高さを保証（0 にしない） */
+  [data-print-report] > *,
+  [data-print-report] .print-cert-single,
+  [data-print-report] .print-radar-section,
+  [data-print-report] .print-skill-scores,
+  [data-print-report] .print-radar-bg,
+  [data-print-report] .radar-chart-wrapper,
+  [data-print-report] .radar-chart-inner {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  /* レーダー用コンテナ（Recharts SVG）の高さを固定 */
+  [data-print-report] .print-radar-bg .radar-chart-inner,
+  [data-print-report] .print-radar-bg [class*="recharts"] {
+    display: block !important;
+    visibility: visible !important;
+    width: 200px !important;
+    height: 200px !important;
+    min-width: 200px !important;
+    min-height: 200px !important;
+  }
+  [data-print-report] .print-radar-bg svg {
+    display: block !important;
+    visibility: visible !important;
+    overflow: visible !important;
   }
   [data-print-report] .space-y-5 > * + *,
   [data-print-report] .space-y-6 > * + * {

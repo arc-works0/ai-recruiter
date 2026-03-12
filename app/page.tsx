@@ -350,7 +350,12 @@ export default function Home() {
       window.removeEventListener("afterprint", onAfterPrint);
     };
     window.addEventListener("afterprint", onAfterPrint);
-    requestAnimationFrame(() => window.print());
+    /* ③ レーダー（SVG）の描画完了を待ってから印刷 */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => window.print(), 100);
+      });
+    });
   }, [mode, locale, pdfExporting, isMobile]);
 
   return (
