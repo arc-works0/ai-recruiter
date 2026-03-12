@@ -678,16 +678,15 @@ body {
     visibility: hidden !important;
   }
   [data-print-report] {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 210mm !important;
-    max-width: 210mm !important;
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    max-width: 100% !important;
     min-height: auto !important;
     max-height: none !important;
     height: auto !important;
-    padding: 5mm !important;
-    margin: 0 auto !important;
+    padding: 8mm !important;
+    margin: 0 !important;
     background: #ffffff !important;
     color: #0f172a !important;
     box-shadow: none !important;
@@ -695,7 +694,6 @@ body {
     line-height: 1.35 !important;
     overflow: visible !important;
     box-sizing: border-box !important;
-    zoom: 0.68;
   }
   [data-print-report] .space-y-5 > * + *,
   [data-print-report] .space-y-6 > * + * {

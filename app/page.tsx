@@ -275,7 +275,7 @@ export default function Home() {
     }
   };
 
-  const contactFormUrl = "/contact";
+  const contactFormUrl = "/contact#contact-form";
   const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
   const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
   const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
@@ -842,13 +842,6 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="flex flex-col gap-3 sm:gap-4">
-                      <Link
-                        href={contactFormUrl}
-                        className="limit-modal-enterprise-cta flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 px-6 py-4 text-base font-bold text-black shadow-[0_4px_24px_rgba(251,191,36,0.5)] transition hover:from-amber-400 hover:via-yellow-400 hover:to-amber-300 hover:shadow-[0_6px_28px_rgba(251,191,36,0.55)] active:scale-[0.99] sm:min-h-16 sm:text-lg"
-                      >
-                        {t.limitExceededEnterpriseCta}
-                        <span className="text-xl">→</span>
-                      </Link>
                       <Link
                         href={contactFormUrl}
                         className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white transition hover:scale-[1.01] active:scale-[0.99] sm:min-h-[52px]"

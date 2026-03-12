@@ -13,9 +13,6 @@ export default function PrivacyPage() {
         <p className="mt-4 text-sm">
           本ページは準備中です。プライバシーポリシーは改めて公開いたします。
         </p>
-        <Link href="/" className="mt-8 inline-block text-sm font-medium text-amber-400 hover:text-amber-300">
-          ← トップへ戻る
-        </Link>
       </div>
     </main>
   );
