@@ -572,7 +572,7 @@ export default function Home() {
 
             {mode === "personal" && jobTitle && (
               <>
-              {/* 1. 推定年収＋シェア＋Geeklyを最優先表示 */}
+              {/* 1. 推定年収＋シェアを最優先表示 */}
               <GlassCard className="refined-card animate-fade-in-up stagger-1 rounded-2xl overflow-hidden">
                 <div className="rounded-2xl p-4 sm:p-6 space-y-4">
                   {salaryDisplay && (
@@ -792,7 +792,7 @@ export default function Home() {
             </GlassCard>
             )}
 
-            {/* 法人: Geekly/アフィリエイトなし。PDF・お問い合わせのみ */}
+            {/* 法人: アフィリエイトなし。PDF・お問い合わせのみ */}
             {mode === "business" && (
             <>
             <div className="no-print animate-fade-in-up stagger-4b flex flex-col gap-4">
@@ -957,17 +957,6 @@ export default function Home() {
             {t.footerTrust}
             <span className="block mt-1 text-zinc-600">{t.footerTrustEn}</span>
           </p>
-          <div className="footer-partners mt-4 flex flex-wrap items-center justify-center gap-4">
-            <span className="footer-partner-item rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[10px] font-medium text-zinc-500 transition-all duration-200 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400 hover:grayscale-0">
-              Geekly
-            </span>
-            <span className="footer-partner-item rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[10px] font-medium text-zinc-500 transition-all duration-200 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400 hover:grayscale-0">
-              doda
-            </span>
-            <span className="footer-partner-item rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[10px] font-medium text-zinc-500 transition-all duration-200 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400 hover:grayscale-0">
-              LinkedIn
-            </span>
-          </div>
           <div className="footer-legal mt-8 pt-6 border-t border-white/[0.06]">
             <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-zinc-500">
               <Link href="/terms" className="underline-offset-2 hover:text-zinc-400 hover:underline">
