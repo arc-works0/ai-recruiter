@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { JSX, useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   Radar,
   RadarChart,
@@ -350,10 +351,17 @@ export default function Home() {
       window.removeEventListener("afterprint", onAfterPrint);
     };
     window.addEventListener("afterprint", onAfterPrint);
-    /* ③ レーダー（SVG）の描画完了を待ってから印刷 */
+    /* ③ ステート/DOM の描画完了を保証してから印刷 */
+    flushSync(() => {});
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        setTimeout(() => window.print(), 100);
+        const el = reportRef.current;
+        if (el) {
+          void el.offsetHeight; /* リフロー強制 */
+        }
+        setTimeout(() => {
+          window.print();
+        }, 250);
       });
     });
   }, [mode, locale, pdfExporting, isMobile]);

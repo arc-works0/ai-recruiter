@@ -654,83 +654,69 @@ body {
   .no-print {
     display: none !important;
   }
+  /* ルート：色・背景を印刷に反映 */
   html,
   body {
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
+    min-height: 100vh !important;
     overflow: visible !important;
-    min-height: auto !important;
-    max-height: none !important;
     background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  /* 印刷時はヘッダーを非表示。layout の main > page の main があるので内側 main を表示 */
+  body > header {
+    display: none !important;
+  }
+  main > main {
+    display: block !important;
     visibility: visible !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    color-adjust: exact;
+    height: auto !important;
+    overflow: visible !important;
   }
-  /* ① 印刷時は報告のみ表示（他は visibility で隠し、報告と親は表示） */
-  body * {
-    visibility: hidden !important;
-  }
-  main,
-  main .print-content-wrapper,
-  [data-print-report],
-  [data-print-report] * {
-    visibility: visible !important;
-  }
-  main > *:not(.print-content-wrapper) {
+  main > main > *:not(.print-content-wrapper) {
     display: none !important;
   }
   .print-content-wrapper > *:not([data-print-report]) {
     display: none !important;
   }
-  main {
+  /* ① 鑑定結果メインコンテナ：強制表示・親の隠しを上書き */
+  section[data-print-report] {
     display: block !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    color-adjust: exact;
-  }
-  .print-content-wrapper {
-    display: block !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  [data-print-report] .no-print {
-    display: none !important;
-    visibility: hidden !important;
-  }
-  /* ① 対象コンテンツに display: block と visibility: visible を強制 */
-  [data-print-report],
-  [data-print-report] * {
     visibility: visible !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    color-adjust: exact;
-  }
-  [data-print-report] {
-    display: block !important;
-    position: static !important;
-    inset: auto !important;
-    width: auto !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
     max-width: 100% !important;
-    min-height: auto !important;
-    max-height: none !important;
+    min-height: 1px !important;
     height: auto !important;
+    overflow: visible !important;
     padding: 8mm !important;
     margin: 0 !important;
     background: #ffffff !important;
     color: #0f172a !important;
-    box-shadow: none !important;
     font-size: 8px !important;
     line-height: 1.35 !important;
-    overflow: visible !important;
     box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
-  /* ② 親要素の高さを保証（0 にしない） */
+  /* 報告内はすべて表示・高さ0防止 */
+  [data-print-report] .no-print {
+    display: none !important;
+  }
+  [data-print-report],
+  [data-print-report] * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
   [data-print-report] > *,
   [data-print-report] .print-cert-single,
   [data-print-report] .print-radar-section,
@@ -744,7 +730,7 @@ body {
     min-height: 0 !important;
     overflow: visible !important;
   }
-  /* レーダー用コンテナ（Recharts SVG）の高さを固定 */
+  /* ② レーダー用コンテナ：高さ固定で0レンダリング防止 */
   [data-print-report] .print-radar-bg .radar-chart-inner,
   [data-print-report] .print-radar-bg [class*="recharts"] {
     display: block !important;
@@ -753,10 +739,28 @@ body {
     height: 200px !important;
     min-width: 200px !important;
     min-height: 200px !important;
+    overflow: visible !important;
   }
   [data-print-report] .print-radar-bg svg {
     display: block !important;
     visibility: visible !important;
+    overflow: visible !important;
+  }
+  /* main / ラッパー：高さ保持 */
+  main,
+  .print-content-wrapper {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  [data-print-report] .space-y-5 > * + *,
+  [data-print-report] .space-y-6 > * + * {
+    margin-top: 2px !important;
+  }
+  [data-print-report] .print-cert-single {
+    max-height: none !important;
     overflow: visible !important;
   }
   [data-print-report] .space-y-5 > * + *,
