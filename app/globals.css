@@ -673,6 +673,10 @@ body {
   [data-print-report] * {
     visibility: visible;
   }
+  /* 報告セクション以外をレイアウトから外して白紙ページを防止 */
+  main > *:not([data-print-report]) {
+    display: none !important;
+  }
   [data-print-report] .no-print {
     display: none !important;
     visibility: hidden !important;

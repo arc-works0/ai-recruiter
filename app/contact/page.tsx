@@ -11,8 +11,8 @@ export default function ContactPage() {
 
   const t = locale === "ja"
     ? {
-        title: "【法人様専用】無料トライアル・導入相談窓口",
-        subtitle: "大規模利用・API連携・導入相談は以下のフォームにご記入のうえ、送信内容をメールでお送りください。",
+        title: "無料トライアル・資料請求・導入相談はこちら",
+        subtitle: "大規模利用・API連携・導入相談など、法人様からのご要望は以下のフォームにご記入のうえ、送信内容をメールでお送りください。",
         purposeLabel: "導入目的",
         purposeOptions: ["書類選考の効率化", "既存社員の評価", "その他"] as const,
         companyLabel: "貴社名",
@@ -25,7 +25,7 @@ export default function ContactPage() {
         emailPlaceholder: "example@company.co.jp",
         messageLabel: "お問い合わせ内容",
         messagePlaceholder: "ご用件・ご要望をご記入ください。",
-        submit: "この内容で送信する",
+        submit: "入力内容を確認して送信する",
         sslNotice: "入力されたデータはSSL暗号化により保護されます",
         copy: "内容をコピー",
         sendMail: "メールで送る",
@@ -34,8 +34,8 @@ export default function ContactPage() {
         composedDesc: "「メールで送る」を押すとメールソフトが開きます。宛先はご自身のメールアドレスをBCCに追加するか、担当者へ転送してください。",
       }
     : {
-        title: "[For Business] Free trial & consultation",
-        subtitle: "For enterprise, API, or bulk use, please fill out the form and send the content via email.",
+        title: "Trial / brochure / consultation for businesses",
+        subtitle: "For enterprise trial, brochure requests, or implementation consultation, please fill out the form and send the content via email.",
         purposeLabel: "Purpose",
         purposeOptions: ["Document screening efficiency", "Existing staff evaluation", "Other"] as const,
         companyLabel: "Company name",
@@ -48,7 +48,7 @@ export default function ContactPage() {
         emailPlaceholder: "you@company.com",
         messageLabel: "Message",
         messagePlaceholder: "Your inquiry or request.",
-        submit: "Submit this information",
+        submit: "Review and send",
         sslNotice: "Your entered data is protected by SSL encryption.",
         copy: "Copy to clipboard",
         sendMail: "Send via email",
