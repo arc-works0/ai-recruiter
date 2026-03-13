@@ -39,6 +39,39 @@ function InlineBold({ text }: { text: string }) {
   );
 }
 
+/** 印刷用：テキストを最大行数・文字数に制限（各セクション3行以内） */
+function truncateToLines(text: string, maxLines: number): string {
+  if (!text?.trim()) return "";
+  const lines = text.trim().split(/\n/).filter(Boolean);
+  const joined = lines.slice(0, maxLines).join(" ");
+  const maxChars = 110;
+  const out = joined.length > maxChars ? joined.slice(0, maxChars).trim() + "…" : joined;
+  return lines.length > maxLines && !out.endsWith("…") ? out + "…" : out;
+}
+
+/** 印刷用：鑑定結果を約30%に要約（各見出しセクション3行以内） */
+function condenseMarkdownForPrint(md: string): string {
+  if (!md?.trim()) return "";
+  const maxChars = Math.floor(md.length * 0.32);
+  const sections = md.split(/(?=^#{2,3}\s)/m);
+  const out: string[] = [];
+  let total = 0;
+  for (const sec of sections) {
+    if (total >= maxChars) break;
+    const lines = sec.trim().split("\n");
+    const kept = lines.slice(0, 3).join("\n");
+    const len = kept.length;
+    if (total + len > maxChars) {
+      const remainder = maxChars - total - 2;
+      out.push(kept.slice(0, Math.max(0, remainder)) + "…");
+      break;
+    }
+    out.push(kept);
+    total += len;
+  }
+  return out.join("\n\n").trim() || md.slice(0, maxChars) + "…";
+}
+
 function SimpleMarkdown({ content }: { content: string }) {
   const lines = content.split("\n");
   const result: JSX.Element[] = [];
@@ -472,7 +505,7 @@ export default function Home() {
               <div className="print-cert-single">
                 <GlassCard className="business-report-card animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
                   <div className="business-report-watermark" aria-hidden>Confidential / AI Assessment Report</div>
-                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:max-h-[100%] print:overflow-hidden relative z-[1]">
+                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:p-3 print:max-h-[100%] print:overflow-hidden relative z-[1]">
                     <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[9px]">
                       {t.certTitle}
                     </p>
@@ -496,7 +529,7 @@ export default function Home() {
                       )}
                     </div>
                     {scores && (
-                      <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-3 print:gap-2 print:p-2 print:rounded">
+                      <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-2 print:gap-1 print:p-1 print:rounded">
                         {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
                           <div key={i} className="score-card-cell flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
                             <p className="score-card-label min-h-[2.25rem] min-w-0 max-w-full overflow-hidden break-words px-0.5 text-xs font-semibold leading-snug tracking-wide text-zinc-500 sm:min-h-[2rem] sm:text-sm sm:leading-snug print:min-h-0 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
@@ -506,13 +539,20 @@ export default function Home() {
                       </div>
                     )}
                     {(summaryStrengths || summaryMarketValue || summaryOutlook || tierFeedback || result) && (
-                      <div className="mx-auto mt-6 max-w-lg print:mt-3 print:max-w-full">
+                      <div className="mx-auto mt-6 max-w-lg print:mt-2 print:max-w-full">
                         {(summaryStrengths || summaryMarketValue || summaryOutlook) ? (
-                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
-                            {summaryStrengths && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelStrengths}: </span>{summaryStrengths}</li>}
-                            {summaryMarketValue && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelMarketValue}: </span>{summaryMarketValue}</li>}
-                            {summaryOutlook && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelOutlook}: </span>{summaryOutlook}</li>}
-                          </ul>
+                          <>
+                            <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300 print:hidden">
+                              {summaryStrengths && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelStrengths}: </span>{summaryStrengths}</li>}
+                              {summaryMarketValue && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelMarketValue}: </span>{summaryMarketValue}</li>}
+                              {summaryOutlook && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelOutlook}: </span>{summaryOutlook}</li>}
+                            </ul>
+                            <ul className="hidden space-y-1 text-left text-xs leading-snug text-zinc-300 print:block print:text-[9px] print:leading-tight print:text-slate-700">
+                              {summaryStrengths && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelStrengths}: </span>{truncateToLines(summaryStrengths, 3)}</li>}
+                              {summaryMarketValue && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelMarketValue}: </span>{truncateToLines(summaryMarketValue, 3)}</li>}
+                              {summaryOutlook && <li><span className="font-semibold text-zinc-100 print:text-slate-800">{t.summaryLabelOutlook}: </span>{truncateToLines(summaryOutlook, 3)}</li>}
+                            </ul>
+                          </>
                         ) : (
                           <p className="text-center text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
                             {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
@@ -521,23 +561,25 @@ export default function Home() {
                       </div>
                     )}
                     {(candidateStrengths || interviewConcerns) && (
-                      <div className="mx-auto mt-6 max-w-lg space-y-4 print:mt-3 print:max-w-full">
+                      <div className="mx-auto mt-6 max-w-lg space-y-4 print:mt-2 print:max-w-full print:space-y-2">
                         {candidateStrengths && (
-                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80">
-                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-amber-400/90 print:text-slate-600">{t.candidateStrengthsLabel}</p>
-                            <p className="text-sm leading-relaxed text-zinc-200 print:text-slate-700">{candidateStrengths}</p>
+                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80 print:p-2">
+                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-amber-400/90 print:mb-1 print:text-slate-600">{t.candidateStrengthsLabel}</p>
+                            <p className="text-sm leading-relaxed text-zinc-200 print:hidden print:text-slate-700">{candidateStrengths}</p>
+                            <p className="hidden text-sm leading-relaxed text-zinc-200 print:block print:text-xs print:leading-snug print:text-slate-700">{truncateToLines(candidateStrengths, 3)}</p>
                           </div>
                         )}
                         {interviewConcerns && (
-                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80">
-                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90 print:text-slate-600">{t.businessInterviewConcernsLabel}</p>
-                            <p className="text-sm leading-relaxed text-zinc-200 print:text-slate-700">{interviewConcerns}</p>
+                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80 print:p-2">
+                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90 print:mb-1 print:text-slate-600">{t.businessInterviewConcernsLabel}</p>
+                            <p className="text-sm leading-relaxed text-zinc-200 print:hidden print:text-slate-700">{interviewConcerns}</p>
+                            <p className="hidden text-sm leading-relaxed text-zinc-200 print:block print:text-xs print:leading-snug print:text-slate-700">{truncateToLines(interviewConcerns, 3)}</p>
                           </div>
                         )}
                       </div>
                     )}
                     {scores && (
-                      <div className="print-radar-section mt-6 print:mt-3">
+                      <div className="print-radar-section mt-6 print:mt-2">
                         <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-1 print:text-[8px]">
                           {t.businessRadarHeading}
                         </p>
@@ -563,9 +605,16 @@ export default function Home() {
                         </div>
                       </div>
                     )}
-                    <div className="print-advice-section mt-6 print:mt-3 print:flex-1 print:min-h-0">
+                    <div className="print-advice-section mt-6 print:mt-2 print:flex-1 print:min-h-0">
                       {(!isMobile || showFullMobile) && (
-                        <SimpleMarkdown content={result} />
+                        <>
+                          <div className="print:hidden">
+                            <SimpleMarkdown content={result} />
+                          </div>
+                          <div className="hidden print:block">
+                            <SimpleMarkdown content={condenseMarkdownForPrint(result)} />
+                          </div>
+                        </>
                       )}
                       {isMobile && (
                         <button
