@@ -692,20 +692,21 @@ body {
     display: none !important;
     visibility: hidden !important;
   }
-  /* 1. 印刷エリアを A4 に物理固定・完璧な中央配置 */
+  /* 1. 中央配置の数学的固定（relative + margin auto） */
   section[data-print-report] {
-    position: absolute !important;
-    left: 50% !important;
-    top: 15mm !important;
-    transform: translateX(-50%) !important;
-    width: 175mm !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    width: 170mm !important;
     height: 260mm !important;
-    margin: 0 !important;
     padding: 12mm !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
     box-sizing: border-box !important;
     background: #ffffff !important;
     color: #0f172a !important;
@@ -715,8 +716,15 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* 2. 要素の巨大化・重なり根絶：余白を半分に・推定市場価格を 1.5rem に */
-  section[data-print-report] * {
+  /* 2. 要素の重なり解消：全セクションを static で上から順に並べる */
+  section[data-print-report] *,
+  [data-print-report] .glass-panel-strong,
+  [data-print-report] .glass-panel,
+  [data-print-report] .glass-card-interactive,
+  [data-print-report] .print-cert-single,
+  [data-print-report] .print-radar-section,
+  [data-print-report] .print-skill-scores,
+  [data-print-report] .print-radar-bg {
     position: static !important;
   }
   [data-print-report] .no-print {
@@ -773,10 +781,10 @@ body {
     margin: 4px 0 !important;
     padding: 2px 4px !important;
   }
-  /* チャート：220px に縮小 */
+  /* チャート：200px に縮小（下のテキスト用スペース確保） */
   .recharts-responsive-container {
-    height: 220px !important;
-    min-height: 220px !important;
+    height: 200px !important;
+    min-height: 200px !important;
     margin: 10px auto !important;
     flex-shrink: 0 !important;
   }
@@ -803,8 +811,8 @@ body {
   }
   [data-print-report] .print-radar-bg [class*="recharts"] {
     width: 180px !important;
-    height: 220px !important;
-    min-height: 220px !important;
+    height: 200px !important;
+    min-height: 200px !important;
     margin: 0 auto !important;
   }
   [data-print-report] .print-skill-scores > div {
@@ -817,6 +825,11 @@ body {
   [data-print-report] li {
     margin: 1px 0 !important;
     color: #1e293b !important;
+  }
+  /* 最下部の文字切れ防止：強み・採用メリット・質問推奨例を枠内に収める */
+  [data-print-report] div.rounded-xl.border p {
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
   }
   [data-print-report] .print-advice-section,
   [data-print-report] .print-cert-footer {
