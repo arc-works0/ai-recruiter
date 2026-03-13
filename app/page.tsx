@@ -526,7 +526,7 @@ export default function Home() {
                       <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl print:text-[14pt] print:text-slate-900">
                         {jobTitle}
                       </p>
-                      <div className="mt-3 flex flex-wrap items-center justify-center gap-3 print:mt-2">
+                      <div className="print-market-value-block mt-3 flex flex-wrap items-center justify-center gap-3 print:mt-2">
                         {salaryDisplay && (
                           <p className="text-center text-lg font-semibold text-zinc-300 print:text-[11pt] print:text-slate-700">
                             {t.businessReportMarketValue}: {salaryDisplay}

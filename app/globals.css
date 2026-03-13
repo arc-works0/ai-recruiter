@@ -771,8 +771,24 @@ body {
     border: 1px solid #e5e7eb !important;
   }
   [data-print-report] .card-gradient-border::before,
-  [data-print-report] .card-gradient-border::after {
+  [data-print-report] .card-gradient-border::after,
+  [data-print-report] .glass-card-interactive::before,
+  [data-print-report] .glass-card-interactive::after,
+  [data-print-report] .glass-panel-strong::before,
+  [data-print-report] .glass-panel-strong::after,
+  .glass-card-interactive::before,
+  .glass-panel-strong::before {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    background: none !important;
+    background-image: none !important;
+  }
+  /* 想定年収セクション：ガラス効果の青を完全無効化 */
+  [data-print-report] .print-market-value-block {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
   }
   /* 2ページ構成：A4・余白確保 */
   section[data-print-report] {
@@ -821,9 +837,16 @@ body {
   [data-print-report] .glass-panel,
   [data-print-report] .glass-card-interactive {
     background: #ffffff !important;
+    background-color: #ffffff !important;
     background-image: none !important;
     padding: 8px 12px !important;
     margin: 0 !important;
+  }
+  [data-print-report] .card-gradient-border,
+  [data-print-report] .business-report-card {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
   [data-print-report] .card-gradient-border::before {
     display: none;
@@ -886,10 +909,11 @@ body {
     background-color: #ffffff !important;
     background-image: none !important;
   }
-  /* 青い箱の正体：Recharts が描く rect。印刷時は fill を透明にし、枠線も消す */
+  /* 青い箱：SVG rect を完全消去 */
+  [data-print-report] rect,
   [data-print-report] .print-radar-bg rect,
   [data-print-report] .print-radar-bg svg rect {
-    fill: transparent !important;
+    fill: none !important;
     stroke: none !important;
   }
   /* レーダーのデータ多角形は薄い色で残す（path の fill は触らない） */
