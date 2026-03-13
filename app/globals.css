@@ -692,25 +692,26 @@ body {
     display: none !important;
     visibility: hidden !important;
   }
-  /* 1. 中央配置の数学的固定（relative + margin auto） */
+  /* 1. 中央配置の最終調整・はみ出し強制カット */
   section[data-print-report] {
     margin: 0 auto !important;
     position: relative !important;
     left: 0 !important;
     right: 0 !important;
     transform: none !important;
-    width: 170mm !important;
+    width: 165mm !important;
+    max-height: 280mm !important;
     height: 260mm !important;
     padding: 12mm !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
-    gap: 4px !important;
+    gap: 1px !important;
     box-sizing: border-box !important;
     background: #ffffff !important;
     color: #0f172a !important;
-    font-size: 8px !important;
+    font-size: 0.8rem !important;
     line-height: 1.35 !important;
     page-break-inside: avoid !important;
     -webkit-print-color-adjust: exact !important;
@@ -745,46 +746,47 @@ body {
     background: #ffffff !important;
     border: 1px solid #d1d5db !important;
     padding: 2px 4px !important;
-    margin: 2px 0 !important;
+    margin: 0 !important;
   }
   [data-print-report] .card-gradient-border::before {
     display: none;
   }
+  /* 推定市場価値：10%縮小してスペース捻出 */
   [data-print-report] .glass-panel-strong > div > p,
   [data-print-report] .print-cert-single p {
-    font-size: 1.5rem !important;
-    margin: 2px 0 !important;
+    font-size: 1.35rem !important;
+    margin: 0 !important;
   }
   [data-print-report] table {
-    font-size: 8px !important;
-    margin: 2px 0 !important;
+    font-size: 0.8rem !important;
+    margin: 0 !important;
     padding: 0 !important;
   }
   [data-print-report] h1,
   [data-print-report] h2,
   [data-print-report] h3 {
-    font-size: 10px !important;
-    margin: 1px 0 !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
     color: #0f172a !important;
   }
   [data-print-report] .space-y-5 > * + *,
   [data-print-report] .space-y-6 > * + * {
-    margin-top: 1px !important;
+    margin-top: 0 !important;
   }
   [data-print-report] .space-y-8 > * + * {
-    margin-top: 2px !important;
+    margin-top: 0 !important;
   }
   [data-print-report] .print-cert-single,
   [data-print-report] .print-radar-section,
   [data-print-report] .print-skill-scores,
   [data-print-report] .print-radar-bg {
-    margin: 4px 0 !important;
+    margin: 0 !important;
     padding: 2px 4px !important;
   }
-  /* チャート：200px に縮小（下のテキスト用スペース確保） */
+  /* チャート：170px に物理カット（下部はみ出し防止） */
   .recharts-responsive-container {
-    height: 200px !important;
-    min-height: 200px !important;
+    height: 170px !important;
+    min-height: 170px !important;
     margin: 10px auto !important;
     flex-shrink: 0 !important;
   }
@@ -810,31 +812,32 @@ body {
     print-color-adjust: exact !important;
   }
   [data-print-report] .print-radar-bg [class*="recharts"] {
-    width: 180px !important;
-    height: 200px !important;
-    min-height: 200px !important;
+    width: 160px !important;
+    height: 170px !important;
+    min-height: 170px !important;
     margin: 0 auto !important;
   }
   [data-print-report] .print-skill-scores > div {
     border: 1px solid #e2e8f0 !important;
     background: #f8fafc !important;
     padding: 2px !important;
-    margin: 1px 0 !important;
+    margin: 0 !important;
   }
   [data-print-report] p,
   [data-print-report] li {
-    margin: 1px 0 !important;
+    margin: 0 !important;
     color: #1e293b !important;
+    font-size: 0.8rem !important;
   }
-  /* 最下部の文字切れ防止：強み・採用メリット・質問推奨例を枠内に収める */
+  /* 最下部の詳細テキスト：0.75rem で枠内に収める */
   [data-print-report] div.rounded-xl.border p {
-    font-size: 0.85rem !important;
+    font-size: 0.75rem !important;
     line-height: 1.2 !important;
   }
   [data-print-report] .print-advice-section,
   [data-print-report] .print-cert-footer {
-    font-size: 7px !important;
-    margin: 1px 0 !important;
+    font-size: 0.75rem !important;
+    margin: 0 !important;
   }
   [data-print-report] .print-cert-footer {
     color: #94a3b8 !important;
