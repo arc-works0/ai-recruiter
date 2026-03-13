@@ -651,6 +651,33 @@ body {
 }
 
 @media print {
+  /* 1. 青い背景・グラデーション根絶 */
+  html,
+  body,
+  main,
+  main > main,
+  section,
+  section[data-print-report],
+  .glass-panel,
+  .glass-panel-strong,
+  .glass-card-interactive,
+  .business-report-card,
+  [data-print-report],
+  [data-print-report] * {
+    background-image: none !important;
+  }
+  html,
+  body,
+  main,
+  main > main,
+  section,
+  section[data-print-report],
+  .glass-panel,
+  .glass-panel-strong,
+  .glass-card-interactive,
+  .business-report-card {
+    background: #ffffff !important;
+  }
   /* 印刷時は幅を安定させ、クリッピングを防ぐ */
   html,
   body {
@@ -661,7 +688,6 @@ body {
     overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: #ffffff !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -701,9 +727,10 @@ body {
   [data-print-report] .print-report-header {
     font-weight: 400 !important;
   }
-  /* 1ページ目：相対位置（スタンプ配置用） */
+  /* 3. 1ページ目と2ページ目の物理分離 */
   [data-print-report] .print-page-1 {
     position: relative !important;
+    page-break-after: always !important;
   }
   /* 鑑定済スタンプ：赤い丸枠・右下 */
   [data-print-report] .print-cert-stamp {
@@ -721,13 +748,27 @@ body {
     font-weight: 700 !important;
     color: #b91c1c !important;
   }
-  /* 印刷用：白基調・公文書スタイル */
+  /* 2. box-shadow・border リセット（黒線・影根絶） */
+  [data-print-report] *,
+  main *,
+  .glass-panel,
+  .glass-panel-strong,
+  .glass-card-interactive,
+  .business-report-card,
+  section[data-print-report] {
+    box-shadow: none !important;
+  }
   [data-print-report] .glass-panel-strong,
   [data-print-report] .glass-panel,
   [data-print-report] .glass-card-interactive,
-  [data-print-report] .business-report-card {
-    background: #ffffff !important;
-    box-shadow: none !important;
+  [data-print-report] .business-report-card,
+  section[data-print-report] {
+    border: none !important;
+  }
+  [data-print-report] .print-skill-scores > div,
+  [data-print-report] .print-report-header,
+  [data-print-report] .print-report-footer {
+    border: 1px solid #e5e7eb !important;
   }
   [data-print-report] .card-gradient-border::before,
   [data-print-report] .card-gradient-border::after {
@@ -749,9 +790,9 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  /* 2ページ目の開始を強制 */
   [data-print-report] .print-page-2 {
     page-break-before: always !important;
+    border: none !important;
   }
   /* 2. 要素の重なり解消：全セクションを static で上から順に並べる */
   section[data-print-report] *,
@@ -780,7 +821,7 @@ body {
   [data-print-report] .glass-panel,
   [data-print-report] .glass-card-interactive {
     background: #ffffff !important;
-    border: 1px solid #d1d5db !important;
+    background-image: none !important;
     padding: 8px 12px !important;
     margin: 0 !important;
   }
@@ -825,23 +866,25 @@ body {
     margin: 0 !important;
     padding: 0 !important;
   }
-  /* チャート：情報補完サイズ150px・青い矩形対策 */
-  .recharts-responsive-container {
+  /* 4. チャート背景の白紙化（青い四角根絶） */
+  .recharts-responsive-container,
+  [data-print-report] .recharts-responsive-container {
     width: 100% !important;
     max-width: 160px !important;
     height: 150px !important;
     min-height: 150px !important;
     margin: 2px auto !important;
     flex-shrink: 0 !important;
-    background: transparent !important;
+    background: #ffffff !important;
+    background-image: none !important;
   }
   [data-print-report] .radar-chart-wrapper,
-  [data-print-report] .radar-chart-inner {
-    background: transparent !important;
-    max-width: 100% !important;
-  }
-  [data-print-report] .print-radar-bg {
-    background: transparent !important;
+  [data-print-report] .radar-chart-inner,
+  [data-print-report] .print-radar-bg,
+  [data-print-report] .print-radar-bg * {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
   /* 青い箱の正体：Recharts が描く rect。印刷時は fill を透明にし、枠線も消す */
   [data-print-report] .print-radar-bg rect,
@@ -850,19 +893,17 @@ body {
     stroke: none !important;
   }
   /* レーダーのデータ多角形は薄い色で残す（path の fill は触らない） */
-  [data-print-report] .print-radar-bg *,
   [data-print-report] .print-radar-bg svg,
   [data-print-report] .print-radar-bg line {
-    background: transparent !important;
-    background-color: transparent !important;
     stroke: #333333 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
   [data-print-report] .print-radar-bg .recharts-wrapper,
   [data-print-report] .print-radar-bg .recharts-surface {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
   [data-print-report] .print-radar-bg text {
     fill: #333333 !important;
@@ -883,9 +924,8 @@ body {
     margin: 0 auto !important;
     background: transparent !important;
   }
-  /* ② スキルスコア */
+  /* ② スキルスコア（薄グレー枠） */
   [data-print-report] .print-skill-scores > div {
-    border: 1px solid #e2e8f0 !important;
     background: #f8fafc !important;
     padding: 8px !important;
     margin: 0 !important;
@@ -904,9 +944,9 @@ body {
   [data-print-report] .print-page-2 .print-page-2-content p:first-of-type {
     margin-bottom: 1em !important;
   }
-  /* 印刷用フッター：QRエリア・境界線 */
+  /* 印刷用フッター：QRエリア（薄グレー境界） */
   [data-print-report] .print-report-footer {
-    border-top: 1px solid #d1d5db !important;
+    border-top: 1px solid #e5e7eb !important;
   }
   [data-print-report] p,
   [data-print-report] li {
