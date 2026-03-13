@@ -595,6 +595,10 @@ export default function Home() {
                           </ul>
                         </div>
                       )}
+                      {/* 1ページ目：注釈・免責事項（下部空白埋め） */}
+                      <div className="hidden print:block print-disclaimer mt-6 pt-4">
+                        <p className="text-[7pt] text-slate-500 leading-relaxed">{t.printDisclaimer}</p>
+                      </div>
                       {/* 1ページ目：鑑定済スタンプ（右下） */}
                       <div className="hidden print:block print-cert-stamp" aria-hidden>
                         {t.printStampText}
@@ -618,6 +622,8 @@ export default function Home() {
                           )}
                         </div>
                       )}
+                      {/* 2ページ目末尾：計算根拠（常時表示） */}
+                      <p className="text-[8pt] text-slate-500 mt-6 pt-4 border-t border-slate-200">{t.printCalcBasis}</p>
                     </div>
                     {/* 画面上：従来のサマリー・候補者情報（印刷では非表示） */}
                     {(summaryStrengths || summaryMarketValue || summaryOutlook || tierFeedback || result) && (
