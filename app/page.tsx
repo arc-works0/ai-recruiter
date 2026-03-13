@@ -310,6 +310,10 @@ export default function Home() {
   };
 
   const contactFormUrl = "/contact#contact-form";
+  const baseUrl = typeof window !== "undefined"
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://ai-recruiter-4o7e.vercel.app");
+  const contactFullUrl = `${baseUrl}/contact`;
   const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
   const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
   const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
@@ -504,60 +508,123 @@ export default function Home() {
             {mode === "business" && jobTitle && (
               <div className="print-cert-single">
                 <GlassCard className="business-report-card animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
-                  <div className="business-report-watermark" aria-hidden>Confidential / AI Assessment Report</div>
-                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:p-4 print:max-h-[100%] print:overflow-hidden relative z-[1]">
-                    <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[9px]">
-                      {t.certTitle}
+                  <div className="business-report-watermark print:opacity-0 print:invisible" aria-hidden>Confidential / AI Assessment Report</div>
+                  {/* 印刷用ヘッダー：公文書スタイル */}
+                  <div className="hidden print:block print-report-header border-b border-slate-200 pb-2 mb-4">
+                    <p className="text-[10pt] font-normal text-slate-800 tracking-tight">
+                      {t.printReportTitle} / {t.printReportSubtitle}
                     </p>
-                    <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl print:text-lg">
-                      {jobTitle}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center justify-center gap-3 print:mt-2">
-                      {salaryDisplay && (
-                        <p className="text-center text-lg font-semibold text-zinc-300 print:text-base">
-                          {t.businessReportMarketValue}: {salaryDisplay}
-                        </p>
+                    <p className="text-[9pt] text-slate-600 mt-1">{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+                  </div>
+                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:p-4 print:max-h-none print:overflow-visible relative z-[1]">
+                    {/* 1ページ目：タイトル・スコア・レーダー */}
+                    <div className="print-page-1">
+                      <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[10pt] print:text-slate-600">
+                        {t.certTitle}
+                      </p>
+                      <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl print:text-[14pt] print:text-slate-900">
+                        {jobTitle}
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center justify-center gap-3 print:mt-2">
+                        {salaryDisplay && (
+                          <p className="text-center text-lg font-semibold text-zinc-300 print:text-[11pt] print:text-slate-700">
+                            {t.businessReportMarketValue}: {salaryDisplay}
+                          </p>
+                        )}
+                        {(tier || rank) && tierCfg && (
+                          <span
+                            className="inline-flex items-center gap-1.5 rounded-md border-2 border-amber-400/50 bg-amber-500/25 px-3.5 py-2 text-sm font-extrabold tracking-wider text-amber-100 shadow-[0_0_0_1px_rgba(251,191,36,0.2),0_2px_8px_rgba(0,0,0,0.2)] print:border-slate-300 print:bg-slate-100 print:text-slate-800"
+                            style={{ boxShadow: `0 0 12px ${tierCfg.color}30, 0 0 0 1px ${tierCfg.color}20` }}
+                          >
+                            <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-300/90 print:text-slate-600">{t.marketValueRankLabel}</span>
+                            <span className="rounded bg-white/10 px-1.5 py-0.5 font-black tabular-nums print:bg-transparent">{tier || rank}</span>
+                          </span>
+                        )}
+                      </div>
+                      {scores && (
+                        <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-4 print:grid-cols-4 print:gap-3 print:rounded">
+                          {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
+                            <div key={i} className="score-card-cell flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50 print:rounded print:p-3">
+                              <p className="score-card-label min-h-[2.25rem] min-w-0 max-w-full overflow-hidden break-words px-0.5 text-xs font-semibold leading-snug tracking-wide text-zinc-500 sm:min-h-[2rem] sm:text-sm sm:leading-snug print:min-h-0 print:text-[10pt] print:text-slate-600">{t.businessRadarLabels[i]}</p>
+                              <p className="mt-1.5 text-xl font-bold text-white sm:mt-2 sm:text-2xl print:mt-0 print:text-[12pt] print:text-slate-900">{val}</p>
+                            </div>
+                          ))}
+                        </div>
                       )}
-                      {(tier || rank) && tierCfg && (
-                        <span
-                          className="inline-flex items-center gap-1.5 rounded-md border-2 border-amber-400/50 bg-amber-500/25 px-3.5 py-2 text-sm font-extrabold tracking-wider text-amber-100 shadow-[0_0_0_1px_rgba(251,191,36,0.2),0_2px_8px_rgba(0,0,0,0.2)] print:border-amber-400/60 print:bg-amber-400/20 print:text-amber-900"
-                          style={{ boxShadow: `0 0 12px ${tierCfg.color}30, 0 0 0 1px ${tierCfg.color}20` }}
-                        >
-                          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-300/90">{t.marketValueRankLabel}</span>
-                          <span className="rounded bg-white/10 px-1.5 py-0.5 font-black tabular-nums">{tier || rank}</span>
-                        </span>
+                      {scores && (
+                        <div className="print-radar-section mt-6 print:mt-4">
+                          <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[10pt] print:text-slate-600">
+                            {t.businessRadarHeading}
+                          </p>
+                          <div className="print-radar-bg radar-chart-wrapper mx-auto flex min-w-0 max-w-full justify-center px-4 py-4 sm:px-6 sm:py-0">
+                            <div className={`radar-chart-inner h-[200px] w-full min-w-0 max-w-[200px] sm:h-[280px] sm:max-w-[320px] ${isMobile ? "scale-[0.8] origin-center" : ""}`}>
+                              <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart
+                                  margin={{ top: 24, right: 24, bottom: 24, left: 24 }}
+                                  data={RADAR_KEYS.map((key, i) => ({
+                                    subject: t.businessRadarLabels[i],
+                                    value: scores[key],
+                                    fullMark: 100,
+                                  }))}
+                                >
+                                  <PolarGrid stroke="rgba(255,255,255,0.12)" />
+                                  <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: isMobile ? 11 : 14 }} />
+                                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: isMobile ? 10 : 12 }} />
+                                  <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
+                                  <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 9 }} />
+                                </RadarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    {scores && (
-                      <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-0 print:grid-cols-4 print:gap-3 print:rounded">
-                        {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
-                          <div key={i} className="score-card-cell flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50/80 print:rounded print:p-2">
-                            <p className="score-card-label min-h-[2.25rem] min-w-0 max-w-full overflow-hidden break-words px-0.5 text-xs font-semibold leading-snug tracking-wide text-zinc-500 sm:min-h-[2rem] sm:text-sm sm:leading-snug print:min-h-0 print:text-[8px] print:text-slate-600">{t.businessRadarLabels[i]}</p>
-                            <p className="mt-1.5 text-xl font-bold text-white sm:mt-2 sm:text-2xl print:mt-0 print:text-lg print:text-slate-900">{val}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {/* 2ページ目：強み・実務貢献・質問推奨例 */}
+                    <div className="print-page-2 hidden print:block">
+                      {(candidateStrengths || summaryMarketValue || interviewConcerns) && (
+                        <div className="space-y-4">
+                          {candidateStrengths && (
+                            <div>
+                              <p className="text-[10pt] font-semibold text-slate-800 mb-2">{t.candidateStrengthsLabel}</p>
+                              <p className="text-[10pt] leading-relaxed text-slate-700">{candidateStrengths}</p>
+                            </div>
+                          )}
+                          {summaryMarketValue && (
+                            <div>
+                              <p className="text-[10pt] font-semibold text-slate-800 mb-2">{t.printContributionLabel}</p>
+                              <p className="text-[10pt] leading-relaxed text-slate-700">{summaryMarketValue}</p>
+                            </div>
+                          )}
+                          {interviewConcerns && (
+                            <div>
+                              <p className="text-[10pt] font-semibold text-slate-800 mb-2">{t.businessInterviewConcernsLabel}</p>
+                              <p className="text-[10pt] leading-relaxed text-slate-700 whitespace-pre-wrap">{interviewConcerns}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {/* 画面上：従来のサマリー・候補者情報（印刷では非表示） */}
                     {(summaryStrengths || summaryMarketValue || summaryOutlook || tierFeedback || result) && (
-                      <div className="print-strengths-summary mx-auto mt-6 max-w-lg print:mt-4 print:max-w-full">
+                      <div className="mx-auto mt-6 max-w-lg print:hidden">
                         {(summaryStrengths || summaryMarketValue || summaryOutlook) ? (
-                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300 print:space-y-3 print:text-base print:leading-relaxed print:text-slate-700">
+                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300">
                             {[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((text) => {
                               const labels = [t.summaryLabelStrengths, t.summaryLabelMarketValue, t.summaryLabelOutlook];
                               const key = text === summaryStrengths ? "s" : text === summaryMarketValue ? "m" : "o";
                               const label = labels[[summaryStrengths, summaryMarketValue, summaryOutlook].indexOf(text)];
-                              return <li key={key}><span className="font-semibold text-zinc-100 print:text-slate-800">{label}: </span>{text}</li>;
+                              return <li key={key}><span className="font-semibold text-zinc-100">{label}: </span>{text}</li>;
                             })}
                           </ul>
                         ) : (
-                          <p className="text-center text-sm leading-relaxed text-zinc-300 print:text-[9px] print:leading-snug print:text-slate-700">
+                          <p className="text-center text-sm leading-relaxed text-zinc-300">
                             {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
                           </p>
                         )}
                       </div>
                     )}
                     {(candidateStrengths || interviewConcerns) && (
-                      <div className="print-no-show mx-auto mt-6 max-w-lg space-y-4 print:mt-2 print:max-w-full print:space-y-2">
+                      <div className="mx-auto mt-6 max-w-lg space-y-4 print:hidden">
                         {candidateStrengths && (
                           <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80 print:p-2">
                             <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-amber-400/90 print:mb-1 print:text-slate-600">{t.candidateStrengthsLabel}</p>
@@ -574,34 +641,7 @@ export default function Home() {
                         )}
                       </div>
                     )}
-                    {scores && (
-                      <div className="print-radar-section mt-6 print:mt-0">
-                        <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-xs">
-                          {t.businessRadarHeading}
-                        </p>
-                        <div className="print-radar-bg radar-chart-wrapper mx-auto flex min-w-0 max-w-full justify-center px-4 py-4 sm:px-6 sm:py-0">
-                          <div className={`radar-chart-inner h-[200px] w-full min-w-0 max-w-[200px] sm:h-[280px] sm:max-w-[320px] ${isMobile ? "scale-[0.8] origin-center" : ""}`}>
-                            <ResponsiveContainer width="100%" height="100%">
-                              <RadarChart
-                                margin={{ top: 24, right: 24, bottom: 24, left: 24 }}
-                                data={RADAR_KEYS.map((key, i) => ({
-                                  subject: t.businessRadarLabels[i],
-                                  value: scores[key],
-                                  fullMark: 100,
-                                }))}
-                              >
-                                <PolarGrid stroke="rgba(255,255,255,0.12)" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: isMobile ? 11 : 14 }} />
-                                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: isMobile ? 10 : 12 }} />
-                              <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
-                                <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 9 }} />
-                              </RadarChart>
-                            </ResponsiveContainer>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div className="print-no-show print-advice-section mt-6 print:mt-2 print:flex-1 print:min-h-0">
+                    <div className="print:hidden print-advice-section mt-6 print:mt-2 print:flex-1 print:min-h-0">
                       {(!isMobile || showFullMobile) && (
                         <>
                           <div className="print:hidden">
@@ -622,9 +662,21 @@ export default function Home() {
                         </button>
                       )}
                     </div>
-                    <p className="print-no-show print-cert-footer mt-8 hidden text-center text-[9px] font-medium tracking-widest text-zinc-500 print:mt-4 print:block print:text-[8px] print:text-slate-500">
+                    <p className="print:hidden mt-8 text-center text-[9px] font-medium tracking-widest text-zinc-500">
                       {t.certFooter}
                     </p>
+                    {/* 印刷用フッター：QRコード＋法人問い合わせURL */}
+                    <div className="hidden print:block print-report-footer mt-8 pt-4 border-t border-slate-200 text-right">
+                      <p className="text-[8pt] text-slate-600 mb-1">{t.printContactLabel}</p>
+                      <div className="flex items-center justify-end gap-2">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=56x56&data=${encodeURIComponent(contactFullUrl)}`}
+                          alt="QR"
+                          className="w-14 h-14"
+                        />
+                        <span className="text-[7pt] text-slate-500 break-all max-w-[140px]">{contactFullUrl}</span>
+                      </div>
+                    </div>
                   </div>
                 </GlassCard>
               </div>
