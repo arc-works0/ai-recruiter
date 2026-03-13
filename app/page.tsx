@@ -371,8 +371,11 @@ export default function Home() {
           v: "final",
         }).toString()}`
       : window.location.href;
-    const salaryStr = salaryDisplay || (locale === "ja" ? "〇〇" : "—");
-    const shareText = (t.shareBragTweet as string).replace("{salary}", salaryStr);
+    const numMatch = salaryDisplay?.match(/[\d,]+/);
+    const manStr = numMatch
+      ? `${Math.round(parseInt(numMatch[0].replace(/,/g, ""), 10) / 10000)}`
+      : (locale === "ja" ? "〇〇" : "—");
+    const shareText = (t.shareBragTweet as string).replace("{salary}", manStr);
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, locale, t]);
@@ -503,71 +506,43 @@ export default function Home() {
         </GlassCard>
 
         {result && (
-          <section ref={reportRef} data-print-report className="mt-6 sm:mt-10 space-y-5 sm:space-y-6">
-            <div className="space-y-5 sm:space-y-6">
+          <section ref={reportRef} data-print-report className="mt-6 sm:mt-10">
+            <div className="space-y-5 sm:space-y-6 print-hide-web">
             {mode === "business" && jobTitle && (
-              <div className="print-cert-single">
-                <GlassCard className="business-report-card animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
-                  <div className="business-report-watermark print:opacity-0 print:invisible" aria-hidden>Confidential / AI Assessment Report</div>
-                  {/* 印刷用ヘッダー：公文書スタイル・社名太字 */}
-                  <div className="hidden print:flex print:flex-row print:items-start print:justify-between print:gap-4 print-report-header border-b border-slate-200 pb-2 mb-4">
-                    <div>
-                      <p className="text-[10pt] font-normal text-slate-800 tracking-tight">{t.printReportTitle}</p>
-                      <p className="text-[9pt] text-slate-600 mt-1">{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
-                    </div>
-                    <p className="text-[11pt] font-bold text-slate-900 shrink-0">{t.printReportSubtitle}</p>
-                  </div>
-                  <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:p-4 print:max-h-none print:overflow-visible relative z-[1]">
-                    {/* 1ページ目：タイトル・スコア・レーダー */}
-                    <div className="print-page-1">
-                      <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[10pt] print:text-slate-600">
-                        {t.certTitle}
-                      </p>
-                      <p className="text-center text-xl font-bold tracking-tight text-white sm:text-2xl print:text-[14pt] print:text-slate-900">
-                        {jobTitle}
-                      </p>
-                      <div className="print-market-value-block mt-3 flex flex-wrap items-center justify-center gap-3 print:mt-2">
-                        {salaryDisplay && (
-                          <p className="text-center text-lg font-semibold text-zinc-300 print:text-[11pt] print:text-slate-700">
-                            {t.businessReportMarketValue}: {salaryDisplay}
-                          </p>
-                        )}
+              <>
+                {/* Web表示：印刷時は完全非表示 */}
+                <div className="print-hide-web">
+                  <GlassCard className="business-report-card animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
+                    <div className="business-report-watermark" aria-hidden>Confidential</div>
+                    <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 relative z-[1]">
+                      <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">{t.certTitle}</p>
+                      <p className="text-center text-xl font-bold text-white sm:text-2xl">{jobTitle}</p>
+                      <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+                        {salaryDisplay && <p className="text-center text-lg font-semibold text-zinc-300">{t.businessReportMarketValue}: {salaryDisplay}</p>}
                         {(tier || rank) && tierCfg && (
-                          <span
-                            className="inline-flex items-center gap-1.5 rounded-md border-2 border-amber-400/50 bg-amber-500/25 px-3.5 py-2 text-sm font-extrabold tracking-wider text-amber-100 shadow-[0_0_0_1px_rgba(251,191,36,0.2),0_2px_8px_rgba(0,0,0,0.2)] print:border-slate-300 print:bg-slate-100 print:text-slate-800"
-                            style={{ boxShadow: `0 0 12px ${tierCfg.color}30, 0 0 0 1px ${tierCfg.color}20` }}
-                          >
-                            <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-300/90 print:text-slate-600">{t.marketValueRankLabel}</span>
-                            <span className="rounded bg-white/10 px-1.5 py-0.5 font-black tabular-nums print:bg-transparent">{tier || rank}</span>
+                          <span className="inline-flex items-center gap-1.5 rounded-md border-2 border-amber-400/50 bg-amber-500/25 px-3.5 py-2 text-sm font-extrabold text-amber-100">
+                            <span className="text-[10px] font-semibold uppercase">{t.marketValueRankLabel}</span>
+                            <span className="rounded bg-white/10 px-1.5 py-0.5 font-black tabular-nums">{tier || rank}</span>
                           </span>
                         )}
                       </div>
                       {scores && (
-                        <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-4 print:mt-4 print:grid-cols-4 print:gap-3 print:rounded">
+                        <div className="print-skill-scores mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                           {[scores.technical, scores.contribution, scores.sustainability, scores.market].map((val, i) => (
-                            <div key={i} className="score-card-cell flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center sm:p-4 print:border print:border-slate-200 print:bg-slate-50 print:rounded print:p-3">
-                              <p className="score-card-label min-h-[2.25rem] min-w-0 max-w-full overflow-hidden break-words px-0.5 text-xs font-semibold leading-snug tracking-wide text-zinc-500 sm:min-h-[2rem] sm:text-sm sm:leading-snug print:min-h-0 print:text-[10pt] print:text-slate-600">{t.businessRadarLabels[i]}</p>
-                              <p className="mt-1.5 text-xl font-bold text-white sm:mt-2 sm:text-2xl print:mt-0 print:text-[12pt] print:text-slate-900">{val}</p>
+                            <div key={i} className="score-card-cell flex flex-col items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 text-center">
+                              <p className="score-card-label text-xs font-semibold text-zinc-500">{t.businessRadarLabels[i]}</p>
+                              <p className="mt-1.5 text-xl font-bold text-white">{val}</p>
                             </div>
                           ))}
                         </div>
                       )}
                       {scores && (
-                        <div className="print-radar-section mt-6 print:mt-4">
-                          <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500 print:mb-2 print:text-[10pt] print:text-slate-600">
-                            {t.businessRadarHeading}
-                          </p>
-                          <div className="print-radar-bg radar-chart-wrapper mx-auto flex min-w-0 max-w-full justify-center px-4 py-4 sm:px-6 sm:py-0">
-                            <div className={`radar-chart-inner h-[200px] w-full min-w-0 max-w-[200px] sm:h-[280px] sm:max-w-[320px] ${isMobile ? "scale-[0.8] origin-center" : ""}`}>
+                        <div className="print-radar-section mt-6">
+                          <p className="mb-2 text-center text-[10px] font-semibold uppercase text-zinc-500">{t.businessRadarHeading}</p>
+                          <div className="radar-chart-wrapper mx-auto flex justify-center">
+                            <div className={`radar-chart-inner h-[200px] w-full max-w-[200px] sm:h-[280px] sm:max-w-[320px] ${isMobile ? "scale-[0.8] origin-center" : ""}`}>
                               <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart
-                                  margin={{ top: 24, right: 24, bottom: 24, left: 24 }}
-                                  data={RADAR_KEYS.map((key, i) => ({
-                                    subject: t.businessRadarLabels[i],
-                                    value: scores[key],
-                                    fullMark: 100,
-                                  }))}
-                                >
+                                <RadarChart margin={{ top: 24, right: 24, bottom: 24, left: 24 }} data={RADAR_KEYS.map((key, i) => ({ subject: t.businessRadarLabels[i], value: scores[key], fullMark: 100 }))}>
                                   <PolarGrid stroke="rgba(255,255,255,0.12)" />
                                   <PolarAngleAxis dataKey="subject" tick={{ fill: "#a1a1aa", fontSize: isMobile ? 11 : 14 }} />
                                   <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#71717a", fontSize: isMobile ? 10 : 12 }} />
@@ -579,128 +554,26 @@ export default function Home() {
                           </div>
                         </div>
                       )}
-                      {/* 1ページ目：強み・採用メリット（3点）エグゼクティブサマリー */}
                       {(summaryStrengths || summaryMarketValue || summaryOutlook) && (
-                        <div className="print-strengths-summary mt-6 print:mt-4">
-                          <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500 print:mb-3 print:text-left print:text-[10pt] print:text-slate-600 print:tracking-wide">
-                            {t.candidateStrengthsLabel}
-                          </p>
-                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300 print:space-y-2 print:text-[10pt] print:leading-relaxed print:text-slate-700">
-                            {[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((text) => {
-                              const labels = [t.summaryLabelStrengths, t.summaryLabelMarketValue, t.summaryLabelOutlook];
-                              const key = text === summaryStrengths ? "s" : text === summaryMarketValue ? "m" : "o";
-                              const label = labels[[summaryStrengths, summaryMarketValue, summaryOutlook].indexOf(text)];
-                              return <li key={key}><span className="font-semibold text-zinc-100 print:text-slate-800">{label}: </span>{text}</li>;
-                            })}
+                        <div className="mx-auto mt-6 max-w-lg">
+                          <ul className="space-y-2 text-left text-sm text-zinc-300">
+                            {[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((text, i) => (
+                              <li key={i}><span className="font-semibold text-zinc-100">{[t.summaryLabelStrengths, t.summaryLabelMarketValue, t.summaryLabelOutlook][[summaryStrengths, summaryMarketValue, summaryOutlook].indexOf(text)]}: </span>{text}</li>
+                            ))}
                           </ul>
                         </div>
                       )}
-                      {/* 1ページ目：注釈・免責事項（下部空白埋め） */}
-                      <div className="hidden print:block print-disclaimer mt-6 pt-4">
-                        <p className="text-[7pt] text-slate-500 leading-relaxed">{t.printDisclaimer}</p>
-                      </div>
-                      {/* 1ページ目：鑑定済スタンプ（右下） */}
-                      <div className="hidden print:block print-cert-stamp" aria-hidden>
-                        {t.printStampText}
-                      </div>
-                    </div>
-                    {/* 2ページ目：詳細分析（実務貢献・質問推奨例） */}
-                    <div className="print-page-2 hidden print:block">
-                      {(summaryMarketValue || interviewConcerns) && (
-                        <div className="print-page-2-content space-y-6">
-                          {summaryMarketValue && (
-                            <div>
-                              <p className="text-[11pt] font-bold text-slate-800 mb-3">{t.printContributionLabel}</p>
-                              <p className="text-[11pt] leading-[1.7] text-slate-700">{summaryMarketValue}</p>
-                            </div>
-                          )}
-                          {interviewConcerns && (
-                            <div>
-                              <p className="text-[11pt] font-bold text-slate-800 mb-3">{t.businessInterviewConcernsLabel}</p>
-                              <p className="text-[11pt] leading-[1.7] text-slate-700 whitespace-pre-wrap">{interviewConcerns}</p>
-                            </div>
-                          )}
+                      {(candidateStrengths || interviewConcerns) && (
+                        <div className="mx-auto mt-6 max-w-lg space-y-4">
+                          {candidateStrengths && <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4"><p className="mb-2 text-[10px] font-semibold text-amber-400/90">{t.candidateStrengthsLabel}</p><p className="text-sm text-zinc-200">{candidateStrengths}</p></div>}
+                          {interviewConcerns && <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4"><p className="mb-2 text-[10px] font-semibold text-indigo-400/90">{t.businessInterviewConcernsLabel}</p><p className="text-sm text-zinc-200">{interviewConcerns}</p></div>}
                         </div>
                       )}
-                      {/* 2ページ目末尾：計算根拠（常時表示） */}
-                      <p className="text-[8pt] text-slate-500 mt-6 pt-4 border-t border-slate-200">{t.printCalcBasis}</p>
+                      {(!isMobile || showFullMobile) && <div className="mt-6"><SimpleMarkdown content={result} /></div>}
                     </div>
-                    {/* 画面上：従来のサマリー・候補者情報（印刷では非表示） */}
-                    {(summaryStrengths || summaryMarketValue || summaryOutlook || tierFeedback || result) && (
-                      <div className="mx-auto mt-6 max-w-lg print:hidden">
-                        {(summaryStrengths || summaryMarketValue || summaryOutlook) ? (
-                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300">
-                            {[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((text) => {
-                              const labels = [t.summaryLabelStrengths, t.summaryLabelMarketValue, t.summaryLabelOutlook];
-                              const key = text === summaryStrengths ? "s" : text === summaryMarketValue ? "m" : "o";
-                              const label = labels[[summaryStrengths, summaryMarketValue, summaryOutlook].indexOf(text)];
-                              return <li key={key}><span className="font-semibold text-zinc-100">{label}: </span>{text}</li>;
-                            })}
-                          </ul>
-                        ) : (
-                          <p className="text-center text-sm leading-relaxed text-zinc-300">
-                            {tierFeedback || result.split("\n").slice(0, 4).join(" ").slice(0, 200) + "…"}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {(candidateStrengths || interviewConcerns) && (
-                      <div className="mx-auto mt-6 max-w-lg space-y-4 print:hidden">
-                        {candidateStrengths && (
-                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80 print:p-2">
-                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-amber-400/90 print:mb-1 print:text-slate-600">{t.candidateStrengthsLabel}</p>
-                            <p className="text-sm leading-relaxed text-zinc-200 print:hidden print:text-slate-700">{candidateStrengths}</p>
-                            <p className="hidden text-sm leading-relaxed text-zinc-200 print:block print:text-xs print:leading-snug print:text-slate-700">{truncateToLines(candidateStrengths, 3)}</p>
-                          </div>
-                        )}
-                        {interviewConcerns && (
-                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 print:border-slate-200 print:bg-slate-50/80 print:p-2">
-                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-indigo-400/90 print:mb-1 print:text-slate-600">{t.businessInterviewConcernsLabel}</p>
-                            <p className="text-sm leading-relaxed text-zinc-200 print:hidden print:text-slate-700">{interviewConcerns}</p>
-                            <p className="hidden text-sm leading-relaxed text-zinc-200 print:block print:text-xs print:leading-snug print:text-slate-700">{truncateToLines(interviewConcerns, 3)}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    <div className="print:hidden print-advice-section mt-6 print:mt-2 print:flex-1 print:min-h-0">
-                      {(!isMobile || showFullMobile) && (
-                        <>
-                          <div className="print:hidden">
-                            <SimpleMarkdown content={result} />
-                          </div>
-                          <div className="hidden print:block">
-                            <SimpleMarkdown content={condenseMarkdownForPrint(result)} />
-                          </div>
-                        </>
-                      )}
-                      {isMobile && (
-                        <button
-                          type="button"
-                          onClick={() => setShowFullMobile((v) => !v)}
-                          className="mt-4 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-200 transition-colors hover:bg-white/10"
-                        >
-                          {showFullMobile ? t.readLessMobile : t.readMoreMobile}
-                        </button>
-                      )}
-                    </div>
-                    <p className="print:hidden mt-8 text-center text-[9px] font-medium tracking-widest text-zinc-500">
-                      {t.certFooter}
-                    </p>
-                    {/* 印刷用フッター：QR＋URL・最下部横並び */}
-                    <div className="hidden print:block print-report-footer pt-4 mt-8 border-t border-slate-300">
-                      <p className="text-[9pt] text-slate-600 mb-3">{t.printFooterLabel}</p>
-                      <div className="flex flex-row items-center gap-4">
-                        <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=${encodeURIComponent(contactFullUrl)}`}
-                          alt="QR"
-                          className="w-16 h-16 flex-shrink-0"
-                        />
-                        <span className="text-[8pt] text-slate-600 break-all flex-1">{contactFullUrl}</span>
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
-              </div>
+                  </GlassCard>
+                </div>
+              </>
             )}
 
             {mode === "personal" && jobTitle && (
@@ -957,6 +830,19 @@ export default function Home() {
             </>
             )}
             </div>
+            {/* PDF出力専用：4ブロックのみ・1枚A4白紙（法人/個人共通） */}
+            {(jobTitle || scores) && (
+              <div className="print-only-root hidden">
+                <div className="print-block"><strong>{t.printReportTitle}</strong><br />{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
+                <div className="print-block">{salaryDisplay && <>{t.businessReportMarketValue}: {salaryDisplay}</>}{(tier || rank) && <> / {t.marketValueRankLabel}: {tier || rank}</>}</div>
+                <div className="print-block">{scores ? [scores.technical, scores.contribution, scores.sustainability, scores.market].join(" / ") : null}</div>
+                <div className="print-block">{[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((s, i) => <p key={i}>{s}</p>)}</div>
+                <div className="print-footer-fixed">
+                  <span className="print-stamp">{t.printStampText}</span>
+                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=56x56&data=${encodeURIComponent(contactFullUrl)}`} alt="QR" width={56} height={56} />
+                </div>
+              </div>
+            )}
 
             {limitExceededOpen && (
               <div className="modal-lock-overlay limit-modal-premium" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
