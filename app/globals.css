@@ -697,9 +697,29 @@ body {
   .print-content-wrapper > *:not([data-print-report]) {
     display: none !important;
   }
-  /* 印刷用ヘッダー：公文書スタイル */
+  /* 印刷用ヘッダー：公文書スタイル・社名太字 */
   [data-print-report] .print-report-header {
     font-weight: 400 !important;
+  }
+  /* 1ページ目：相対位置（スタンプ配置用） */
+  [data-print-report] .print-page-1 {
+    position: relative !important;
+  }
+  /* 鑑定済スタンプ：赤い丸枠・右下 */
+  [data-print-report] .print-cert-stamp {
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 48px !important;
+    height: 48px !important;
+    border: 2px solid #b91c1c !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    color: #b91c1c !important;
   }
   /* 印刷用：白基調・公文書スタイル */
   [data-print-report] .glass-panel-strong,
@@ -876,10 +896,17 @@ body {
   [data-print-report] .print-skill-scores .score-card-label + p {
     font-size: 12pt !important;
   }
-  /* 2ページ目：強み・実務貢献・質問推奨例 */
-  [data-print-report] .print-page-2 p {
-    font-size: 10pt !important;
-    line-height: 1.5 !important;
+  /* 2ページ目：詳細分析・読み物スタイル */
+  [data-print-report] .print-page-2-content p {
+    font-size: 11pt !important;
+    line-height: 1.7 !important;
+  }
+  [data-print-report] .print-page-2 .print-page-2-content p:first-of-type {
+    margin-bottom: 1em !important;
+  }
+  /* 印刷用フッター：QRエリア・境界線 */
+  [data-print-report] .print-report-footer {
+    border-top: 1px solid #d1d5db !important;
   }
   [data-print-report] p,
   [data-print-report] li {

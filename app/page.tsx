@@ -509,12 +509,13 @@ export default function Home() {
               <div className="print-cert-single">
                 <GlassCard className="business-report-card animate-fade-in-up stagger-1 card-gradient-border rounded-2xl overflow-hidden">
                   <div className="business-report-watermark print:opacity-0 print:invisible" aria-hidden>Confidential / AI Assessment Report</div>
-                  {/* 印刷用ヘッダー：公文書スタイル */}
-                  <div className="hidden print:block print-report-header border-b border-slate-200 pb-2 mb-4">
-                    <p className="text-[10pt] font-normal text-slate-800 tracking-tight">
-                      {t.printReportTitle} / {t.printReportSubtitle}
-                    </p>
-                    <p className="text-[9pt] text-slate-600 mt-1">{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+                  {/* 印刷用ヘッダー：公文書スタイル・社名太字 */}
+                  <div className="hidden print:flex print:flex-row print:items-start print:justify-between print:gap-4 print-report-header border-b border-slate-200 pb-2 mb-4">
+                    <div>
+                      <p className="text-[10pt] font-normal text-slate-800 tracking-tight">{t.printReportTitle}</p>
+                      <p className="text-[9pt] text-slate-600 mt-1">{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+                    </div>
+                    <p className="text-[11pt] font-bold text-slate-900 shrink-0">{t.printReportSubtitle}</p>
                   </div>
                   <div className="flex min-h-0 flex-col rounded-2xl glass-panel-strong p-6 sm:p-8 print:p-4 print:max-h-none print:overflow-visible relative z-[1]">
                     {/* 1ページ目：タイトル・スコア・レーダー */}
@@ -578,27 +579,41 @@ export default function Home() {
                           </div>
                         </div>
                       )}
+                      {/* 1ページ目：強み・採用メリット（3点）エグゼクティブサマリー */}
+                      {(summaryStrengths || summaryMarketValue || summaryOutlook) && (
+                        <div className="print-strengths-summary mt-6 print:mt-4">
+                          <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500 print:mb-3 print:text-left print:text-[10pt] print:text-slate-600 print:tracking-wide">
+                            {t.candidateStrengthsLabel}
+                          </p>
+                          <ul className="space-y-2 text-left text-sm leading-relaxed text-zinc-300 print:space-y-2 print:text-[10pt] print:leading-relaxed print:text-slate-700">
+                            {[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((text) => {
+                              const labels = [t.summaryLabelStrengths, t.summaryLabelMarketValue, t.summaryLabelOutlook];
+                              const key = text === summaryStrengths ? "s" : text === summaryMarketValue ? "m" : "o";
+                              const label = labels[[summaryStrengths, summaryMarketValue, summaryOutlook].indexOf(text)];
+                              return <li key={key}><span className="font-semibold text-zinc-100 print:text-slate-800">{label}: </span>{text}</li>;
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                      {/* 1ページ目：鑑定済スタンプ（右下） */}
+                      <div className="hidden print:block print-cert-stamp" aria-hidden>
+                        {t.printStampText}
+                      </div>
                     </div>
-                    {/* 2ページ目：強み・実務貢献・質問推奨例 */}
+                    {/* 2ページ目：詳細分析（実務貢献・質問推奨例） */}
                     <div className="print-page-2 hidden print:block">
-                      {(candidateStrengths || summaryMarketValue || interviewConcerns) && (
-                        <div className="space-y-4">
-                          {candidateStrengths && (
-                            <div>
-                              <p className="text-[10pt] font-semibold text-slate-800 mb-2">{t.candidateStrengthsLabel}</p>
-                              <p className="text-[10pt] leading-relaxed text-slate-700">{candidateStrengths}</p>
-                            </div>
-                          )}
+                      {(summaryMarketValue || interviewConcerns) && (
+                        <div className="print-page-2-content space-y-6">
                           {summaryMarketValue && (
                             <div>
-                              <p className="text-[10pt] font-semibold text-slate-800 mb-2">{t.printContributionLabel}</p>
-                              <p className="text-[10pt] leading-relaxed text-slate-700">{summaryMarketValue}</p>
+                              <p className="text-[11pt] font-bold text-slate-800 mb-3">{t.printContributionLabel}</p>
+                              <p className="text-[11pt] leading-[1.7] text-slate-700">{summaryMarketValue}</p>
                             </div>
                           )}
                           {interviewConcerns && (
                             <div>
-                              <p className="text-[10pt] font-semibold text-slate-800 mb-2">{t.businessInterviewConcernsLabel}</p>
-                              <p className="text-[10pt] leading-relaxed text-slate-700 whitespace-pre-wrap">{interviewConcerns}</p>
+                              <p className="text-[11pt] font-bold text-slate-800 mb-3">{t.businessInterviewConcernsLabel}</p>
+                              <p className="text-[11pt] leading-[1.7] text-slate-700 whitespace-pre-wrap">{interviewConcerns}</p>
                             </div>
                           )}
                         </div>
@@ -665,16 +680,16 @@ export default function Home() {
                     <p className="print:hidden mt-8 text-center text-[9px] font-medium tracking-widest text-zinc-500">
                       {t.certFooter}
                     </p>
-                    {/* 印刷用フッター：QRコード＋法人問い合わせURL */}
-                    <div className="hidden print:block print-report-footer mt-8 pt-4 border-t border-slate-200 text-right">
-                      <p className="text-[8pt] text-slate-600 mb-1">{t.printContactLabel}</p>
-                      <div className="flex items-center justify-end gap-2">
+                    {/* 印刷用フッター：QR＋URL・最下部横並び */}
+                    <div className="hidden print:block print-report-footer pt-4 mt-8 border-t border-slate-300">
+                      <p className="text-[9pt] text-slate-600 mb-3">{t.printFooterLabel}</p>
+                      <div className="flex flex-row items-center gap-4">
                         <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=56x56&data=${encodeURIComponent(contactFullUrl)}`}
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=${encodeURIComponent(contactFullUrl)}`}
                           alt="QR"
-                          className="w-14 h-14"
+                          className="w-16 h-16 flex-shrink-0"
                         />
-                        <span className="text-[7pt] text-slate-500 break-all max-w-[140px]">{contactFullUrl}</span>
+                        <span className="text-[8pt] text-slate-600 break-all flex-1">{contactFullUrl}</span>
                       </div>
                     </div>
                   </div>
