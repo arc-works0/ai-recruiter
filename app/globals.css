@@ -644,17 +644,20 @@ body {
   transform: scale(0.98);
 }
 
-/* Print — A4 物理固定・1枚強制・重なり根絶 */
+/* Print — A4 標準レイアウト・欠けず表示を最優先 */
 @page {
   size: A4;
-  margin: 0;
+  margin: 10mm;
 }
 
 @media print {
-  /* 強制1ページ設定 */
+  /* 印刷時は幅を安定させ、クリッピングを防ぐ */
   html,
   body {
-    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
     overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -665,8 +668,15 @@ body {
   main,
   main > main {
     display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
+  }
+  .print-content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
     overflow: visible !important;
   }
   /* 印刷対象以外を消す */
@@ -692,21 +702,23 @@ body {
     display: none !important;
     visibility: hidden !important;
   }
-  /* 1. 中央配置・はみ出し強制カット・上下バランス */
+  /* 1. A4 標準レイアウト・クリッピングなし・上部から配置 */
   section[data-print-report] {
     margin: 0 auto !important;
     position: relative !important;
     left: 0 !important;
     right: 0 !important;
     transform: none !important;
-    width: 180mm !important;
-    max-height: 280mm !important;
-    height: 260mm !important;
-    padding: 12mm !important;
-    overflow: hidden !important;
+    width: 100% !important;
+    max-width: 210mm !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 8mm 10mm !important;
+    overflow: visible !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     gap: 6px !important;
     box-sizing: border-box !important;
     background: #ffffff !important;
@@ -783,25 +795,34 @@ body {
     margin: 4px 0 !important;
     padding: 4px 6px !important;
   }
-  /* チャート：高さ固定・青いボックス防止（背景を白/透明に統一） */
+  /* チャート：青い矩形対策（Recharts の rect を透明に）・サイズ崩れ防止 */
   .recharts-responsive-container {
-    height: 170px !important;
-    min-height: 170px !important;
+    width: 100% !important;
+    max-width: 200px !important;
+    height: 180px !important;
+    min-height: 180px !important;
     margin: 6px auto !important;
     flex-shrink: 0 !important;
-    background: #ffffff !important;
+    background: transparent !important;
   }
   [data-print-report] .radar-chart-wrapper,
   [data-print-report] .radar-chart-inner {
     background: transparent !important;
+    max-width: 100% !important;
   }
   [data-print-report] .print-radar-bg {
-    background: #ffffff !important;
+    background: transparent !important;
   }
+  /* 青い箱の正体：Recharts が描く rect。印刷時は fill を透明にし、枠線も消す */
+  [data-print-report] .print-radar-bg rect,
+  [data-print-report] .print-radar-bg svg rect {
+    fill: transparent !important;
+    stroke: none !important;
+  }
+  /* レーダーのデータ多角形は薄い色で残す（path の fill は触らない） */
   [data-print-report] .print-radar-bg *,
   [data-print-report] .print-radar-bg svg,
-  [data-print-report] .print-radar-bg line,
-  [data-print-report] .print-radar-bg path {
+  [data-print-report] .print-radar-bg line {
     background: transparent !important;
     background-color: transparent !important;
     stroke: #333333 !important;
@@ -825,9 +846,10 @@ body {
     print-color-adjust: exact !important;
   }
   [data-print-report] .print-radar-bg [class*="recharts"] {
-    width: 180px !important;
-    height: 170px !important;
-    min-height: 170px !important;
+    max-width: 100% !important;
+    width: 200px !important;
+    height: 180px !important;
+    min-height: 180px !important;
     margin: 0 auto !important;
     background: transparent !important;
   }
