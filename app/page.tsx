@@ -248,15 +248,6 @@ export default function Home() {
     }
   }, []);
 
-  const getShareBonus = () => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return parseInt(localStorage.getItem("ai-recruiter-share-bonus") ?? "0", 10) || 0;
-    } catch {
-      return 0;
-    }
-  };
-
   useEffect(() => {
     setLocale(getLocaleFromBrowser());
   }, []);
@@ -272,8 +263,7 @@ export default function Home() {
   const t = translations[locale];
 
   const analyze = async () => {
-    const effectiveUsage = Math.max(0, usageCount - getShareBonus());
-    if (effectiveUsage >= USAGE_LIMIT) {
+    if (usageCount >= USAGE_LIMIT) {
       setLimitExceededOpen(true);
       return;
     }
@@ -335,10 +325,6 @@ export default function Home() {
       setUsageCount(newCount);
       try {
         localStorage.setItem("ai-recruiter-usage", String(newCount));
-        const bonus = getShareBonus();
-        if (bonus > 0) {
-          localStorage.setItem("ai-recruiter-share-bonus", String(bonus - 1));
-        }
       } catch {}
       setIsCoolingDown(true);
       setTimeout(() => setIsCoolingDown(false), RATE_LIMIT_MS);
@@ -362,7 +348,7 @@ export default function Home() {
     }
   };
 
-  const contactFormUrl = "/contact#contact-form";
+  const contactFormUrl = "/contact";
   const baseUrl = typeof window !== "undefined"
     ? window.location.origin
     : (process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://ai-recruiter-4o7e.vercel.app");
@@ -990,8 +976,10 @@ export default function Home() {
                         type="button"
                         onClick={() => {
                           try {
-                            const bonus = parseInt(localStorage.getItem("ai-recruiter-share-bonus") ?? "0", 10);
-                            localStorage.setItem("ai-recruiter-share-bonus", String(Math.max(0, bonus) + 1));
+                            const count = parseInt(localStorage.getItem("ai-recruiter-usage") ?? "0", 10);
+                            const next = Math.max(0, count - 1);
+                            localStorage.setItem("ai-recruiter-usage", String(next));
+                            setUsageCount(next);
                           } catch {}
                           const shareText = locale === "ja" ? "GitHub技術資産をAIで鑑定できるサービスを使いました。 #GitHub鑑定" : "I got my GitHub technical assets certified by AI. #GitHubCertification";
                           const url = typeof window !== "undefined" ? window.location.origin : "https://ai-recruiter-4o7e.vercel.app";
