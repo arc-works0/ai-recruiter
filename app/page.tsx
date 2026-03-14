@@ -58,6 +58,36 @@ function truncateToLines(text: string, maxLines: number): string {
   return lines.length > maxLines && !out.endsWith("…") ? out + "…" : out;
 }
 
+/** テキストを3行以上の所見として整形 */
+function ensureMinLines(text: string, minLines: number): string {
+  if (!text?.trim()) return "";
+  const byPeriod = text.split(/(?<=[。.])/).map((t) => t.trim()).filter(Boolean);
+  const byNewline = text.split(/\n+/).filter(Boolean);
+  let lines = byPeriod.length >= minLines ? byPeriod : byNewline.length >= minLines ? byNewline : byPeriod.length > 0 ? byPeriod : [text];
+  while (lines.length < minLines && lines[0]) {
+    const last = lines[lines.length - 1];
+    const mid = Math.floor((last?.length ?? 0) / 2);
+    if (mid < 10) break;
+    lines = [...lines.slice(0, -1), last!.slice(0, mid), last!.slice(mid)];
+  }
+  return lines.slice(0, Math.max(minLines, 1)).join("\n");
+}
+
+/** スコア別にAI解析所見（3行以上）を取得 */
+function getScoreFindings(
+  key: "technical" | "contribution" | "sustainability" | "market",
+  opts: { summaryStrengths: string; summaryMarketValue: string; summaryOutlook: string; tierFeedback: string; result: string }
+): string {
+  const r = opts.result || "";
+  switch (key) {
+    case "technical": return ensureMinLines(opts.summaryStrengths || r.slice(0, 350), 3);
+    case "contribution": return ensureMinLines(opts.tierFeedback || r.slice(350, 700), 3);
+    case "sustainability": return ensureMinLines(opts.summaryOutlook || r.slice(700, 1050), 3);
+    case "market": return ensureMinLines(opts.summaryMarketValue || r.slice(1050, 1400), 3);
+    default: return ensureMinLines(r.slice(0, 200), 3);
+  }
+}
+
 /** 印刷用：鑑定結果を約30%に要約（各見出しセクション3行以内） */
 function condenseMarkdownForPrint(md: string): string {
   if (!md?.trim()) return "";
@@ -839,23 +869,81 @@ export default function Home() {
             </>
             )}
             </div>
-            {/* PDF出力専用：4ブロックのみ・1枚A4白紙（法人/個人共通） */}
+            {/* PDF出力専用：2カラム・テーブル構造・高密度（法人/個人共通） */}
             {(jobTitle || scores) && (
               <div className="print-only-root hidden">
-                <div className="print-block"><strong>{t.printReportTitle}</strong><br />{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
-                <div className="print-block">{salaryDisplay && <>{t.businessReportMarketValue}: {salaryDisplay}</>}{(tier || rank) && <> / {t.marketValueRankLabel}: {tier || rank}</>}</div>
-                <div className="print-block">
-                  {scores ? RADAR_KEYS.map((key, i) => {
-                    const v = scores[key];
-                    const label = scoreToLabel(v, t);
-                    return <span key={key}>{i > 0 && " / "}{v}（{label}）</span>;
-                  }) : null}
-                </div>
-                <div className="print-block">
-                  {summaryStrengths && <p><strong>{t.summaryLabelStrengths}</strong><br />{summaryStrengths}</p>}
-                  {summaryMarketValue && <p><strong>{t.summaryLabelMarketValue}</strong><br />{summaryMarketValue}</p>}
-                  {summaryOutlook && <p><strong>{t.summaryLabelOutlook}</strong><br />{summaryOutlook}</p>}
-                </div>
+                <table className="print-table">
+                  <thead>
+                    <tr>
+                      <th colSpan={2} className="print-th">{t.printReportTitle} / {t.printSubjectLabel}</th>
+                    </tr>
+                    <tr>
+                      <th colSpan={2} className="print-th">{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="print-td print-td-label">{t.businessReportMarketValue}</td>
+                      <td className="print-td">{salaryDisplay || "—"}{(tier || rank) && ` / ${t.marketValueRankLabel}: ${tier || rank}`}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td print-td-section">{t.businessReportSkillRadar}（{t.printReportSubtitle}）</td>
+                    </tr>
+                    {scores && RADAR_KEYS.map((key) => (
+                      <tr key={key}>
+                        <td className="print-td print-td-label">{t.businessRadarLabels[RADAR_KEYS.indexOf(key)]} {scores[key]}（{scoreToLabel(scores[key], t)}）</td>
+                        <td className="print-td print-td-findings">{getScoreFindings(key, { summaryStrengths: summaryStrengths || "", summaryMarketValue: summaryMarketValue || "", summaryOutlook: summaryOutlook || "", tierFeedback: tierFeedback || "", result: result || "" }).split("\n").map((line, i) => <span key={i}>{line}<br /></span>)}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td colSpan={2} className="print-td print-td-section">{t.summaryLabelStrengths}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td">{summaryStrengths || "—"}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td print-td-section">{t.summaryLabelMarketValue}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td">{summaryMarketValue || "—"} {t.printMarketValueBasisSuffix}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td print-td-section">{t.summaryLabelOutlook}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td">{summaryOutlook || "—"}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td print-td-section">{t.printRiskReductionTitle}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="print-td">{t.printRiskReductionText}</td>
+                    </tr>
+                    {githubStats && (
+                      <>
+                        <tr>
+                          <td colSpan={2} className="print-td print-td-section">{t.printGitHubStatsTitle}</td>
+                        </tr>
+                        <tr>
+                          <td className="print-td print-td-label">{t.printStatsRepos}</td>
+                          <td className="print-td">{githubStats.publicRepos}</td>
+                        </tr>
+                        <tr>
+                          <td className="print-td print-td-label">{t.printStatsStars}</td>
+                          <td className="print-td">{githubStats.totalStars}</td>
+                        </tr>
+                        <tr>
+                          <td className="print-td print-td-label">{t.printStatsStarRate}</td>
+                          <td className="print-td">{(githubStats.totalStars / Math.max(1, githubStats.publicRepos)).toFixed(1)}</td>
+                        </tr>
+                        <tr>
+                          <td className="print-td print-td-label">{t.printStatsLanguages}</td>
+                          <td className="print-td">{githubStats.topLanguages.join(", ") || "—"}</td>
+                        </tr>
+                      </>
+                    )}
+                  </tbody>
+                </table>
                 <div className="print-signature">{t.printSignature}</div>
                 <div className="print-footer-fixed">
                   <span className="print-stamp">{t.printStampText}</span>

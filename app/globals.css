@@ -708,10 +708,42 @@ body {
     display: block !important;
     width: 100% !important;
   }
-  /* 2. PDF専用4ブロック：1枚A4・直角黒枠 */
+  /* 2. PDF専用：テーブル構造・2カラム（ラベル|内容）・高密度 */
   [data-print-report] .print-only-root {
     display: block !important;
-    padding: 10mm !important;
+    padding: 8mm !important;
+  }
+  [data-print-report] .print-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border: 1px solid #333333 !important;
+    font-size: 9pt !important;
+    background: #ffffff !important;
+  }
+  [data-print-report] .print-table th,
+  [data-print-report] .print-table td {
+    border: 1px solid #333333 !important;
+    padding: 6px 8px !important;
+    text-align: left !important;
+    vertical-align: top !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+  }
+  [data-print-report] .print-th {
+    background: #f0f0f0 !important;
+    background-color: #f0f0f0 !important;
+    font-weight: 700 !important;
+  }
+  [data-print-report] .print-td-section {
+    font-weight: 700 !important;
+    background: #f0f0f0 !important;
+    background-color: #f0f0f0 !important;
+  }
+  [data-print-report] .print-td-label {
+    width: 28% !important;
+  }
+  [data-print-report] .print-td-findings {
+    font-size: 8pt !important;
   }
   [data-print-report] .print-block {
     display: block !important;
