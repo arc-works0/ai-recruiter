@@ -752,6 +752,27 @@ body {
   [data-print-report] .print-footer-fixed img {
     opacity: 1 !important;
   }
+  /* 署名欄：ページ下部・証明書様のフォントサイズ */
+  [data-print-report] .print-signature {
+    display: block !important;
+    position: fixed !important;
+    bottom: 8mm !important;
+    left: 10mm !important;
+    font-size: 8pt !important;
+    color: #000000 !important;
+    background: transparent !important;
+  }
+  /* QR横の誘導文 */
+  [data-print-report] .print-qr-section {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  [data-print-report] .print-qr-guidance {
+    font-size: 8pt !important;
+    color: #000000 !important;
+  }
   footer,
   .no-print {
     display: none !important;

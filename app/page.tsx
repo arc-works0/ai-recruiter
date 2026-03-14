@@ -39,6 +39,15 @@ function InlineBold({ text }: { text: string }) {
   );
 }
 
+/** スコア(0-100)を言語ラベルに変換 */
+function scoreToLabel(score: number, t: { printScoreLabelJunior: string; printScoreLabelGrowing: string; printScoreLabelStandard: string; printScoreLabelExpert: string; printScoreLabelGodly: string }): string {
+  if (score <= 30) return t.printScoreLabelJunior;
+  if (score <= 50) return t.printScoreLabelGrowing;
+  if (score <= 70) return t.printScoreLabelStandard;
+  if (score <= 85) return t.printScoreLabelExpert;
+  return t.printScoreLabelGodly;
+}
+
 /** 印刷用：テキストを最大行数・文字数に制限（各セクション3行以内） */
 function truncateToLines(text: string, maxLines: number): string {
   if (!text?.trim()) return "";
@@ -835,11 +844,25 @@ export default function Home() {
               <div className="print-only-root hidden">
                 <div className="print-block"><strong>{t.printReportTitle}</strong><br />{new Date().toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
                 <div className="print-block">{salaryDisplay && <>{t.businessReportMarketValue}: {salaryDisplay}</>}{(tier || rank) && <> / {t.marketValueRankLabel}: {tier || rank}</>}</div>
-                <div className="print-block">{scores ? [scores.technical, scores.contribution, scores.sustainability, scores.market].join(" / ") : null}</div>
-                <div className="print-block">{[summaryStrengths, summaryMarketValue, summaryOutlook].filter(Boolean).slice(0, 3).map((s, i) => <p key={i}>{s}</p>)}</div>
+                <div className="print-block">
+                  {scores ? RADAR_KEYS.map((key, i) => {
+                    const v = scores[key];
+                    const label = scoreToLabel(v, t);
+                    return <span key={key}>{i > 0 && " / "}{v}（{label}）</span>;
+                  }) : null}
+                </div>
+                <div className="print-block">
+                  {summaryStrengths && <p><strong>{t.summaryLabelStrengths}</strong><br />{summaryStrengths}</p>}
+                  {summaryMarketValue && <p><strong>{t.summaryLabelMarketValue}</strong><br />{summaryMarketValue}</p>}
+                  {summaryOutlook && <p><strong>{t.summaryLabelOutlook}</strong><br />{summaryOutlook}</p>}
+                </div>
+                <div className="print-signature">{t.printSignature}</div>
                 <div className="print-footer-fixed">
                   <span className="print-stamp">{t.printStampText}</span>
-                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=56x56&data=${encodeURIComponent(contactFullUrl)}`} alt="QR" width={56} height={56} />
+                  <div className="print-qr-section">
+                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=56x56&data=${encodeURIComponent(contactFullUrl)}`} alt="QR" width={56} height={56} />
+                    <span className="print-qr-guidance">{t.printQrGuidance}</span>
+                  </div>
                 </div>
               </div>
             )}
