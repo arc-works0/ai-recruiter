@@ -1,17 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 import { getLocaleFromBrowser, type Locale } from "../../lib/i18n";
-import { useEffect } from "react";
+
+const SHARE_TWEET_JA = "GitHub技術資産をAIで鑑定できるサービスを使いました。 #GitHub鑑定";
+const SHARE_TWEET_EN = "I got my GitHub technical assets certified by AI. #GitHubCertification";
 
 export default function ContactPage() {
   const [locale, setLocale] = useState<Locale>("ja");
   useEffect(() => setLocale(getLocaleFromBrowser()), []);
 
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const appUrl = baseUrl || "https://ai-recruiter-4o7e.vercel.app";
+
+  const handleShareForBonus = () => {
+    const t = translations[locale];
+    const shareText = locale === "ja" ? SHARE_TWEET_JA : SHARE_TWEET_EN;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
+    try {
+      const bonus = parseInt(localStorage.getItem("ai-recruiter-share-bonus") ?? "0", 10);
+      localStorage.setItem("ai-recruiter-share-bonus", String(Math.max(0, bonus) + 1));
+    } catch {}
+    window.open(tweetUrl, "_blank", "noopener,noreferrer");
+  };
+
   const t = locale === "ja"
     ? {
-        title: "無料トライアル・資料請求・導入相談はこちら",
-        subtitle: "大規模利用・API連携・導入相談など、法人様からのご要望は以下のフォームにご記入のうえ、送信内容をメールでお送りください。",
+        title: "追加鑑定・法人お問い合わせ",
+        personalTitle: "個人の方へ：SNSシェアで追加鑑定",
+        personalCopy: "X（Twitter）で鑑定結果をシェアしてくれた方は、追加でもう1回無料で鑑定できます。",
+        personalCta: "Xでシェアして追加1回無料鑑定",
+        businessTitle: "法人・採用担当者様へ：無制限プランのご案内",
+        businessCopy: "採用候補者のスキルを客観的に可視化し、面接工数を削減しませんか？ 月額制の無制限鑑定プランをご用意しています。",
+        subtitle: "以下のフォームにご記入のうえ、送信内容をメールでお送りください。",
         purposeLabel: "導入目的",
         purposeOptions: ["書類選考の効率化", "既存社員の評価", "その他"] as const,
         companyLabel: "貴社名",
@@ -33,8 +55,13 @@ export default function ContactPage() {
         composedDesc: "「メールで送る」を押すとメールソフトが開きます。宛先はご自身のメールアドレスをBCCに追加するか、担当者へ転送してください。",
       }
     : {
-        title: "Trial / brochure / consultation for businesses",
-        subtitle: "For enterprise trial, brochure requests, or implementation consultation, please fill out the form and send the content via email.",
+        title: "Additional certification & business inquiry",
+        personalTitle: "For individuals: Share to get +1 free",
+        personalCopy: "Share your certification result on X (Twitter) to get 1 additional free certification.",
+        personalCta: "Share on X for +1 free certification",
+        businessTitle: "For recruiters: Unlimited plan",
+        businessCopy: "Objectively visualize candidate skills and reduce interview workload. We offer an unlimited certification plan on a monthly basis.",
+        subtitle: "Please fill out the form below and send the content via email.",
         purposeLabel: "Purpose",
         purposeOptions: ["Document screening efficiency", "Existing staff evaluation", "Other"] as const,
         companyLabel: "Company name",
@@ -95,16 +122,38 @@ export default function ContactPage() {
           <div key={i} className="meteor" />
         ))}
       </div>
-      <div className="relative z-10 mx-auto max-w-xl px-4 py-16 sm:py-24">
+      <div className="relative z-10 mx-auto max-w-xl px-4 py-16 sm:py-24 space-y-10">
         <h1 className="text-center text-2xl font-semibold text-white sm:text-3xl">
           {t.title}
         </h1>
-        <p className="mt-3 text-center text-sm text-zinc-500">
-          {t.subtitle}
-        </p>
+
+        {/* 1. 個人の方へ：Xシェアで追加1回 */}
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl">
+          <h2 className="text-base font-semibold text-amber-400/90">{t.personalTitle}</h2>
+          <p className="mt-2 text-sm text-zinc-300">{t.personalCopy}</p>
+          <button
+            type="button"
+            onClick={handleShareForBonus}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1da1f2] py-3.5 px-6 text-sm font-bold text-white transition hover:bg-[#1a91da] active:scale-[0.99]"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            {t.personalCta}
+          </button>
+          <Link href="/" className="mt-3 block text-center text-xs text-zinc-500 hover:text-zinc-300">
+            {locale === "ja" ? "鑑定ページに戻る" : "Back to certification"}
+          </Link>
+        </div>
+
+        {/* 2. 法人・採用担当者様へ：無制限プラン＋お問い合わせフォーム */}
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl">
+          <h2 className="text-base font-semibold text-amber-400/90">{t.businessTitle}</h2>
+          <p className="mt-2 text-sm text-zinc-300">{t.businessCopy}</p>
+          <p className="mt-1 text-xs text-zinc-500">{t.subtitle}</p>
 
         {!showComposed ? (
-          <div className="mt-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl sm:p-8">
+          <div className="mt-6">
             <form id="contact-form" onSubmit={(e) => { e.preventDefault(); setShowComposed(true); }} className="space-y-5">
               <div>
                 <label htmlFor="contact-company" className="block text-xs font-medium text-zinc-400">
@@ -205,8 +254,9 @@ export default function ContactPage() {
             </p>
             </form>
           </div>
-        ) : (
-          <div className="mt-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-xl backdrop-blur-xl sm:p-8">
+        ) : null}
+        {showComposed ? (
+          <div className="mt-6">
             <h2 className="text-lg font-semibold text-white">{t.composedTitle}</h2>
             <p className="mt-2 text-xs text-zinc-500">{t.composedDesc}</p>
             <pre className="mt-6 whitespace-pre-wrap rounded-xl border border-white/[0.06] bg-black/20 p-4 text-sm text-zinc-300">
@@ -235,7 +285,8 @@ export default function ContactPage() {
               </button>
             </div>
           </div>
-        )}
+        ) : null}
+        </div>
       </div>
     </main>
   );

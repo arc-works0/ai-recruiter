@@ -248,6 +248,15 @@ export default function Home() {
     }
   }, []);
 
+  const getShareBonus = () => {
+    if (typeof window === "undefined") return 0;
+    try {
+      return parseInt(localStorage.getItem("ai-recruiter-share-bonus") ?? "0", 10) || 0;
+    } catch {
+      return 0;
+    }
+  };
+
   useEffect(() => {
     setLocale(getLocaleFromBrowser());
   }, []);
@@ -263,7 +272,8 @@ export default function Home() {
   const t = translations[locale];
 
   const analyze = async () => {
-    if (usageCount >= USAGE_LIMIT) {
+    const effectiveUsage = Math.max(0, usageCount - getShareBonus());
+    if (effectiveUsage >= USAGE_LIMIT) {
       setLimitExceededOpen(true);
       return;
     }
@@ -325,6 +335,10 @@ export default function Home() {
       setUsageCount(newCount);
       try {
         localStorage.setItem("ai-recruiter-usage", String(newCount));
+        const bonus = getShareBonus();
+        if (bonus > 0) {
+          localStorage.setItem("ai-recruiter-share-bonus", String(bonus - 1));
+        }
       } catch {}
       setIsCoolingDown(true);
       setTimeout(() => setIsCoolingDown(false), RATE_LIMIT_MS);
@@ -972,11 +986,30 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="flex flex-col gap-3 sm:gap-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          try {
+                            const bonus = parseInt(localStorage.getItem("ai-recruiter-share-bonus") ?? "0", 10);
+                            localStorage.setItem("ai-recruiter-share-bonus", String(Math.max(0, bonus) + 1));
+                          } catch {}
+                          const shareText = locale === "ja" ? "GitHub技術資産をAIで鑑定できるサービスを使いました。 #GitHub鑑定" : "I got my GitHub technical assets certified by AI. #GitHubCertification";
+                          const url = typeof window !== "undefined" ? window.location.origin : "https://ai-recruiter-4o7e.vercel.app";
+                          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`, "_blank", "noopener,noreferrer");
+                          setLimitExceededOpen(false);
+                        }}
+                        className="flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-[#1da1f2] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#1a91da] active:scale-[0.99] sm:min-h-[52px]"
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                        {t.limitExceededCtaShare}
+                      </button>
                       <Link
                         href={contactFormUrl}
                         className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white transition hover:scale-[1.01] active:scale-[0.99] sm:min-h-[52px]"
                       >
-                        {t.limitExceededCta}
+                        {t.limitExceededCtaBusiness}
                         <span className="text-lg">→</span>
                       </Link>
                     </div>
