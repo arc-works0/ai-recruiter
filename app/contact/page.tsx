@@ -15,7 +15,6 @@ export default function ContactPage() {
   const appUrl = baseUrl || "https://ai-recruiter-4o7e.vercel.app";
 
   const handleShareForBonus = () => {
-    const t = translations[locale];
     const shareText = locale === "ja" ? SHARE_TWEET_JA : SHARE_TWEET_EN;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     try {
