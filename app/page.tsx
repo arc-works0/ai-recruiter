@@ -236,6 +236,7 @@ export default function Home() {
   const [usageCount, setUsageCount] = useState(0);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [shareSparkle, setShareSparkle] = useState(false);
+  const [shareImageCreating, setShareImageCreating] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -397,7 +398,7 @@ export default function Home() {
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, locale]);
 
-  const handleShareBrag = useCallback(() => {
+  const handleShareBrag = useCallback(async () => {
     if (typeof window === "undefined") return;
     setShareSparkle(true);
     setTimeout(() => setShareSparkle(false), 650);
@@ -410,34 +411,64 @@ export default function Home() {
           v: "final",
         }).toString()}`
       : window.location.href;
+    const salaryLine = salaryDisplay || (locale === "ja" ? "—" : "—");
     const scoreLine = scores
       ? `技術${scores.technical} 貢献${scores.contribution} 持続${scores.sustainability} 需要${scores.market}`
       : (locale === "ja" ? "—" : "—");
-    const langLine = (githubStats?.topLanguages?.slice(0, 3).join("、") || (locale === "ja" ? "—" : "—"));
-    const outlookSnippet = (summaryOutlook || (locale === "ja" ? "—" : "—")).slice(0, 50);
     const shareText =
       locale === "ja"
         ? `【GitHub技術力鑑定結果】
-AIが私のGitHubを解析！
+AIが私のGitHubを解析しました！
 
-🔹 技術力スコア：${scoreLine}
-🔹 得意言語：${langLine}
-🔹 今後の展望：${outlookSnippet}${outlookSnippet.length >= 50 ? "…" : ""}
+🔹 推定年収：${salaryLine}
+🔹 鑑定スコア：${scoreLine}
 
+結果の詳細は画像でチェック！👇
 あなたのGitHubも、エンジニア採用AI技術アセスメントで今すぐ鑑定！
 #エンジニア採用 #GitHubアセスメント #AI鑑定`
         : `【GitHub Tech Certification】
 AI analyzed my GitHub!
 
-🔹 Tech scores: ${scoreLine}
-🔹 Top languages: ${langLine}
-🔹 Outlook: ${outlookSnippet}${outlookSnippet.length >= 50 ? "…" : ""}
+🔹 Est. Salary: ${salaryLine}
+🔹 Certification Score: ${scoreLine}
 
+See full results in the image! 👇
 Get your GitHub certified now!
 #EngineerHiring #GitHubAssessment #AICertification`;
+
+    const captureEl = reportRef.current?.querySelector(".refined-card") ?? reportRef.current?.querySelector(".business-report-card") ?? reportRef.current?.querySelector(".print-hide-web");
+    if (captureEl) {
+      setShareImageCreating(true);
+      try {
+        const { default: html2canvas } = await import("html2canvas");
+        const canvas = await html2canvas(captureEl as HTMLElement, {
+          useCORS: true,
+          scale: 2,
+          backgroundColor: "#050505",
+          logging: false,
+        });
+        const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "ai-github-certification-result.png";
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } catch {
+        /* fallback to text-only */
+      } finally {
+        setShareImageCreating(false);
+      }
+    }
+
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, jobTitle, salaryDisplay, locale, t, githubStats, summaryOutlook, mode]);
+    if (captureEl) {
+      setTimeout(() => alert(translations[locale].saveImageAndShareAlert), 300);
+    }
+  }, [scores, jobTitle, salaryDisplay, locale, t, mode]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -667,12 +698,22 @@ Get your GitHub certified now!
                     <button
                       type="button"
                       onClick={handleShareBrag}
-                      className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3"
+                      disabled={shareImageCreating}
+                      className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3 disabled:pointer-events-none disabled:opacity-70"
                     >
-                      <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                      </svg>
-                      {t.shareBragCta}
+                      {shareImageCreating ? (
+                        <>
+                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                          {t.saveImageCreating}
+                        </>
+                      ) : (
+                        <>
+                          <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                          {t.shareBragCta}
+                        </>
+                      )}
                     </button>
                   </div>
                   <Link
@@ -1109,12 +1150,22 @@ Get your GitHub certified now!
             <button
               type="button"
               onClick={handleShareBrag}
-              className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98]"
+              disabled={shareImageCreating}
+              className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
             >
-              <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              {t.shareBragCta}
+              {shareImageCreating ? (
+                <>
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  {t.saveImageCreating}
+                </>
+              ) : (
+                <>
+                  <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  {t.shareBragCta}
+                </>
+              )}
             </button>
           </div>
         )}
