@@ -410,14 +410,34 @@ export default function Home() {
           v: "final",
         }).toString()}`
       : window.location.href;
-    const numMatch = salaryDisplay?.match(/[\d,]+/);
-    const manStr = numMatch
-      ? `${Math.round(parseInt(numMatch[0].replace(/,/g, ""), 10) / 10000)}`
-      : (locale === "ja" ? "〇〇" : "—");
-    const shareText = (t.shareBragTweet as string).replace("{salary}", manStr);
+    const scoreLine = scores
+      ? `技術${scores.technical} 貢献${scores.contribution} 持続${scores.sustainability} 需要${scores.market}`
+      : (locale === "ja" ? "—" : "—");
+    const langLine = (githubStats?.topLanguages?.slice(0, 3).join("、") || (locale === "ja" ? "—" : "—"));
+    const outlookSnippet = (summaryOutlook || (locale === "ja" ? "—" : "—")).slice(0, 50);
+    const shareText =
+      locale === "ja"
+        ? `【GitHub技術力鑑定結果】
+AIが私のGitHubを解析！
+
+🔹 技術力スコア：${scoreLine}
+🔹 得意言語：${langLine}
+🔹 今後の展望：${outlookSnippet}${outlookSnippet.length >= 50 ? "…" : ""}
+
+あなたのGitHubも、エンジニア採用AI技術アセスメントで今すぐ鑑定！
+#エンジニア採用 #GitHubアセスメント #AI鑑定`
+        : `【GitHub Tech Certification】
+AI analyzed my GitHub!
+
+🔹 Tech scores: ${scoreLine}
+🔹 Top languages: ${langLine}
+🔹 Outlook: ${outlookSnippet}${outlookSnippet.length >= 50 ? "…" : ""}
+
+Get your GitHub certified now!
+#EngineerHiring #GitHubAssessment #AICertification`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, jobTitle, salaryDisplay, locale, t]);
+  }, [scores, jobTitle, salaryDisplay, locale, t, githubStats, summaryOutlook, mode]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -861,6 +881,8 @@ export default function Home() {
                 </button>
                 <Link
                   href={contactFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-6 py-4 text-center text-sm font-bold text-black shadow-[0_4px_20px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(217,119,6,0.5)] sm:min-w-0 sm:min-h-12 sm:py-3.5"
                 >
                   {t.ctaBusinessResultContact}
