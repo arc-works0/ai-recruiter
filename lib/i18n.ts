@@ -98,6 +98,8 @@ export const translations = {
     contactEnterprise: "大規模利用・API連携のお問い合わせ",
     ctaHeroMain: "法人・採用担当者：今すぐ無制限プランを開始する",
     ctaEnterpriseTrial: "無料で法人トライアルを申し込む",
+    /** 鑑定結果ページ下部（法人モード）：お問い合わせ */
+    ctaBusinessResultContact: "法人導入・カスタマイズのご相談（お問い合わせ）",
     vipTitlePersonal: "あなたの才能を100万高く売る道",
     vipSubtitlePersonal: "転職で市場価値を試すか、学習でランクを上げるか。",
     vipCtaPersonal: "ゴールドVIPルートへ進む",
@@ -258,6 +260,7 @@ export const translations = {
     contactEnterprise: "Enterprise & API integration inquiries",
     ctaHeroMain: "For recruiters: Start unlimited plan now",
     ctaEnterpriseTrial: "Apply for free business trial",
+    ctaBusinessResultContact: "Enterprise setup & customization (contact)",
     vipTitlePersonal: "Path to sell your talent for $10K+ more",
     vipSubtitlePersonal: "Test your value in the job market or level up with learning.",
     vipCtaPersonal: "Go to Gold VIP route",

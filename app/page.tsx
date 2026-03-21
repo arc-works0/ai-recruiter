@@ -863,7 +863,7 @@ export default function Home() {
                   href={contactFormUrl}
                   className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-6 py-4 text-center text-sm font-bold text-black shadow-[0_4px_20px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(217,119,6,0.5)] sm:min-w-0 sm:min-h-12 sm:py-3.5"
                 >
-                  {t.ctaEnterpriseTrial}
+                  {t.ctaBusinessResultContact}
                 </Link>
               </div>
               <p className="text-center text-xs text-zinc-500">{t.pdfNote}</p>
