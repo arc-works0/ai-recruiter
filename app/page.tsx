@@ -236,7 +236,6 @@ export default function Home() {
   const [usageCount, setUsageCount] = useState(0);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [shareSparkle, setShareSparkle] = useState(false);
-  const [shareImageCreating, setShareImageCreating] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -398,7 +397,7 @@ export default function Home() {
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, locale]);
 
-  const handleShareBrag = useCallback(async () => {
+  const handleShareBrag = useCallback(() => {
     if (typeof window === "undefined") return;
     setShareSparkle(true);
     setTimeout(() => setShareSparkle(false), 650);
@@ -407,12 +406,15 @@ export default function Home() {
           scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
           ...(jobTitle && { title: jobTitle }),
           ...(salaryDisplay && { salary: salaryDisplay }),
+          ...(rank && { rank }),
+          ...(tier && { tier }),
+          ...(tierFeedback && { feedback: tierFeedback }),
           mode,
           v: "final",
         }).toString()}`
       : window.location.href;
-    const salaryLine = salaryDisplay || (locale === "ja" ? "—" : "—");
-    const scoreLine = scores
+    const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
+    const totalScore = scores
       ? `技術${scores.technical} 貢献${scores.contribution} 持続${scores.sustainability} 需要${scores.market}`
       : (locale === "ja" ? "—" : "—");
     const shareText =
@@ -420,8 +422,8 @@ export default function Home() {
         ? `【GitHub技術力鑑定結果】
 AIが私のGitHubを解析しました！
 
-🔹 推定年収：${salaryLine}
-🔹 鑑定スコア：${scoreLine}
+🔹 推定年収：${estimatedSalary}
+🔹 鑑定スコア：${totalScore}
 
 結果の詳細は画像でチェック！👇
 あなたのGitHubも、エンジニア採用AI技術アセスメントで今すぐ鑑定！
@@ -429,46 +431,15 @@ AIが私のGitHubを解析しました！
         : `【GitHub Tech Certification】
 AI analyzed my GitHub!
 
-🔹 Est. Salary: ${salaryLine}
-🔹 Certification Score: ${scoreLine}
+🔹 Est. Salary: ${estimatedSalary}
+🔹 Certification Score: ${totalScore}
 
 See full results in the image! 👇
 Get your GitHub certified now!
 #EngineerHiring #GitHubAssessment #AICertification`;
-
-    const captureEl = reportRef.current?.querySelector(".refined-card") ?? reportRef.current?.querySelector(".business-report-card") ?? reportRef.current?.querySelector(".print-hide-web");
-    if (captureEl) {
-      setShareImageCreating(true);
-      try {
-        const { default: html2canvas } = await import("html2canvas");
-        const canvas = await html2canvas(captureEl as HTMLElement, {
-          useCORS: true,
-          scale: 2,
-          backgroundColor: "#050505",
-          logging: false,
-        });
-        const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "ai-github-certification-result.png";
-          a.click();
-          URL.revokeObjectURL(url);
-        }
-      } catch {
-        /* fallback to text-only */
-      } finally {
-        setShareImageCreating(false);
-      }
-    }
-
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-    if (captureEl) {
-      setTimeout(() => alert(translations[locale].saveImageAndShareAlert), 300);
-    }
-  }, [scores, jobTitle, salaryDisplay, locale, t, mode]);
+  }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, locale, mode]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -698,22 +669,12 @@ Get your GitHub certified now!
                     <button
                       type="button"
                       onClick={handleShareBrag}
-                      disabled={shareImageCreating}
-                      className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3 disabled:pointer-events-none disabled:opacity-70"
+                      className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3"
                     >
-                      {shareImageCreating ? (
-                        <>
-                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                          {t.saveImageCreating}
-                        </>
-                      ) : (
-                        <>
-                          <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                          </svg>
-                          {t.shareBragCta}
-                        </>
-                      )}
+                      <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg>
+                      {t.shareBragCta}
                     </button>
                   </div>
                   <Link
@@ -900,16 +861,16 @@ Get your GitHub certified now!
             </GlassCard>
             )}
 
-            {/* 法人: アフィリエイトなし。PDF・お問い合わせのみ */}
+            {/* 法人: PDF出力のみ（中央配置） */}
             {mode === "business" && (
             <>
             <div className="no-print animate-fade-in-up stagger-4b flex flex-col gap-4">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:justify-center">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:justify-center items-center">
                 <button
                   type="button"
                   onClick={handlePdfExport}
                   disabled={pdfExporting || isMobile}
-                  className="flex w-full min-h-14 flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/[0.1] hover:border-white/[0.18] disabled:pointer-events-none disabled:opacity-80 sm:min-w-0 sm:min-h-12 sm:py-3.5"
+                  className="flex w-full min-h-14 flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:bg-white/[0.1] hover:border-white/[0.18] disabled:pointer-events-none disabled:opacity-80 sm:min-w-0 sm:min-h-12 sm:py-3.5 sm:flex-initial sm:max-w-md"
                 >
                   {pdfExporting ? (
                     <>
@@ -920,14 +881,6 @@ Get your GitHub certified now!
                     t.pdfExport
                   )}
                 </button>
-                <Link
-                  href={contactFormUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full min-h-14 flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-6 py-4 text-center text-sm font-bold text-black shadow-[0_4px_20px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_6px_24px_rgba(217,119,6,0.5)] sm:min-w-0 sm:min-h-12 sm:py-3.5"
-                >
-                  {t.ctaBusinessResultContact}
-                </Link>
               </div>
               <p className="text-center text-xs text-zinc-500">{t.pdfNote}</p>
             </div>
@@ -1150,22 +1103,12 @@ Get your GitHub certified now!
             <button
               type="button"
               onClick={handleShareBrag}
-              disabled={shareImageCreating}
-              className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
+              className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98]"
             >
-              {shareImageCreating ? (
-                <>
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  {t.saveImageCreating}
-                </>
-              ) : (
-                <>
-                  <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                  {t.shareBragCta}
-                </>
-              )}
+              <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              {t.shareBragCta}
             </button>
           </div>
         )}
