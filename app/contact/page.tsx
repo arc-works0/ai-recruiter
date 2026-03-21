@@ -7,7 +7,7 @@ import { getLocaleFromBrowser, type Locale } from "../../lib/i18n";
 const SHARE_TWEET_JA = "GitHub技術資産をAIで鑑定できるサービスを使いました。 #GitHub鑑定";
 const SHARE_TWEET_EN = "I got my GitHub technical assets certified by AI. #GitHubCertification";
 
-const STRIPE_CHECKOUT_URL = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL || "#";
+const STRIPE_CHECKOUT_URL = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL || "https://buy.stripe.com/7sYbJ0fSabx86Wb3K563K00";
 
 export default function PlanPage() {
   const [locale, setLocale] = useState<Locale>("ja");
@@ -88,6 +88,8 @@ export default function PlanPage() {
             <p className="mt-4 text-sm text-zinc-300">{t.businessCopy}</p>
             <Link
               href={STRIPE_CHECKOUT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 py-4 px-8 text-base font-bold text-black shadow-[0_4px_24px_rgba(251,191,36,0.4)] transition hover:from-amber-400 hover:via-yellow-400 hover:to-amber-300 hover:shadow-[0_6px_28px_rgba(251,191,36,0.5)] active:scale-[0.99]"
             >
               {t.businessCta}

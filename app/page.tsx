@@ -355,8 +355,8 @@ export default function Home() {
   const contactFullUrl = `${baseUrl}/contact`;
   const businessStep1Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP1 || DEFAULT_BUSINESS_STEP1;
   const businessStep2Url = process.env.NEXT_PUBLIC_AFFILIATE_BUSINESS_STEP2 || DEFAULT_BUSINESS_STEP2;
-  const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
-  const stripeCheckoutUrl = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "#";
+  const businessStep3Url = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "https://buy.stripe.com/7sYbJ0fSabx86Wb3K563K00";
+  const stripeCheckoutUrl = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "https://buy.stripe.com/7sYbJ0fSabx86Wb3K563K00";
 
   const transferUrl = locale === "ja"
     ? (process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER ?? DEFAULT_TRANSFER_JA)
@@ -511,10 +511,12 @@ export default function Home() {
             {locale === "ja" ? "エンジニア採用の書類選考を1分に短縮。GitHubから技術力と自社適性をAIが即座に可視化" : "Shorten document screening to 1 minute. AI visualizes technical skills and company fit from GitHub instantly."}
           </h1>
             <Link
-            href={contactFormUrl}
+            href={stripeCheckoutUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-8 py-3 text-sm font-bold text-black shadow-[0_4px_24px_rgba(217,119,6,0.5)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_8px_32px_rgba(217,119,6,0.55)] active:scale-[0.98]"
           >
-            {t.ctaEnterpriseTrial}
+            {t.ctaHeroMain}
           </Link>
         </section>
         <GlassCard className="refined-card rounded-2xl p-4 transition-all duration-300 sm:p-6">
@@ -994,7 +996,9 @@ export default function Home() {
                         {t.limitExceededCtaShare}
                       </button>
                       <Link
-                        href={contactFormUrl}
+                        href={stripeCheckoutUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="limit-modal-geekly-cta golden-vip-button flex w-full min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold text-white transition hover:scale-[1.01] active:scale-[0.99] sm:min-h-[52px]"
                       >
                         {t.limitExceededCtaBusiness}
