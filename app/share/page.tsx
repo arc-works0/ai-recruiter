@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import ShareContent from "./ShareContent";
-
-function parseScores(scoresParam: string | null): number[] {
-  if (!scoresParam) return [70, 70, 70, 70];
-  return scoresParam.split(",").map((s) => Math.min(100, Math.max(0, parseInt(s.trim(), 10) || 70)));
-}
+import { redirect } from "next/navigation";
 
 type Props = {
   searchParams: Promise<{
@@ -57,25 +52,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function SharePage({ searchParams }: Props) {
-  const params = await searchParams;
-  const scores = parseScores(params.scores ?? null);
-  const sNum = parseInt(String(params.s ?? "").replace(/\D/g, ""), 10);
-  const salaryFromM = !Number.isNaN(sNum) && sNum > 0 ? `${sNum}万円` : "";
-  const legacySalary = params.salary ?? "";
-  const salaryDisplay = salaryFromM || legacySalary;
-  const tier = params.tier ?? "";
-  const rank = params.rank ?? "";
-  const tierFeedback = params.feedback ?? "";
-  const legacyTitle = params.title ?? "";
-
-  return (
-    <ShareContent
-      scores={scores}
-      jobTitle={legacyTitle}
-      salaryDisplay={salaryDisplay}
-      rank={rank}
-      tier={tier}
-      tierFeedback={tierFeedback}
-    />
-  );
+  await searchParams;
+  redirect("/");
 }

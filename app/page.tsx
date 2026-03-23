@@ -1114,7 +1114,7 @@ ${appUrl}`;
             {t.footerTrust}
             <span className="block mt-1 text-zinc-600">{t.footerTrustEn}</span>
           </p>
-          <div className="footer-legal mt-8 pt-6 border-t border-white/[0.06]">
+          {/* <div className="footer-legal mt-8 pt-6 border-t border-white/[0.06]">
             <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-zinc-500">
               <Link href="/terms" className="underline-offset-2 hover:text-zinc-400 hover:underline">
                 {locale === "ja" ? "利用規約" : "Terms of Use"}
@@ -1124,7 +1124,7 @@ ${appUrl}`;
                 {locale === "ja" ? "プライバシーポリシー" : "Privacy Policy"}
               </Link>
             </p>
-          </div>
+          </div> */}
         </footer>
       </div>
     </main>

@@ -151,7 +151,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
           {t.sharePageCtaPrimary}
           <span className="text-xl">→</span>
         </a>
-        <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
+        {/* <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
           <p className="text-sm font-medium text-zinc-200">{t.sharePageRecruiterCta}</p>
           <a
             href="/contact"
@@ -161,7 +161,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
           >
             {t.ctaEnterpriseTrial}
           </a>
-        </div>
+        </div> */}
         <p className="mt-4 text-center">
           <a href="/" className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors">
             {t.sharePageBack}
