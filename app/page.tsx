@@ -409,7 +409,7 @@ export default function Home() {
           salaryDisplay,
         }).toString()}`
       : window.location.href;
-    const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
+    const appUrl = baseUrl;
     const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
     const totalScore = scores
       ? Math.round((scores.technical + scores.contribution + scores.sustainability + scores.market) / 4)
