@@ -401,7 +401,7 @@ export default function Home() {
     if (typeof window === "undefined") return;
     setShareSparkle(true);
     setTimeout(() => setShareSparkle(false), 650);
-    const appUrl = scores
+    const baseUrl = scores
       ? `${window.location.origin}/share?${new URLSearchParams({
           scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
           ...(jobTitle && { title: jobTitle }),
@@ -413,6 +413,7 @@ export default function Home() {
           v: "final",
         }).toString()}`
       : window.location.href;
+    const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
     const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
     const shareText =
       locale === "ja"

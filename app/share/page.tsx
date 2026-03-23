@@ -7,7 +7,7 @@ function parseScores(scoresParam: string | null): number[] {
 }
 
 type Props = {
-  searchParams: Promise<{ scores?: string; title?: string; salary?: string; rank?: string; tier?: string; feedback?: string; mode?: string }>;
+  searchParams: Promise<{ scores?: string; title?: string; salary?: string; rank?: string; tier?: string; feedback?: string; mode?: string; t?: string }>;
 };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -19,6 +19,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const tier = params.tier ?? "";
   const feedback = params.feedback ?? "";
   const mode = params.mode ?? "personal";
+  const t = params.t ?? "";
   const baseUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ai-recruiter-4o7e.vercel.app")
@@ -30,6 +31,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   if (rank) ogParams.set("rank", rank);
   if (tier) ogParams.set("tier", tier);
   if (feedback) ogParams.set("feedback", feedback);
+  if (t) ogParams.set("t", t);
   const ogImageAbsoluteUrl = `${origin}/api/og?${ogParams.toString()}`;
 
   const metaTitle = title ? `${title} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
