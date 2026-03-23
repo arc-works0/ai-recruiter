@@ -380,7 +380,7 @@ export default function Home() {
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
           salaryDisplay,
-        }).toString()}`
+        }).toString()}&f=1`
       : window.location.href;
     const tierCfg = tier ? getTierConfig(tier) : null;
     const rankName = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : (tier || rank || "—");
@@ -402,7 +402,7 @@ export default function Home() {
           salaryDisplay,
         }).toString()}`
       : window.location.href;
-    const appUrl = baseUrl;
+    const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}f=1`;
     const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
     const totalScore = scores
       ? Math.round((scores.technical + scores.contribution + scores.sustainability + scores.market) / 4)
