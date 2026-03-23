@@ -22,11 +22,7 @@ type Props = {
 };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const params = await searchParams;
-  const scores = params.scores ?? "70,70,70,70";
-  const mode = params.mode ?? "personal";
-  const s = params.s ?? "";
-  const sc = params.sc ?? "";
+  await searchParams;
 
   const baseUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -34,18 +30,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   ).replace(/\/$/, "");
   const origin = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
 
-  const ogParams = new URLSearchParams();
-  ogParams.set("scores", scores);
-  ogParams.set("mode", mode);
-  if (params.v) ogParams.set("v", params.v);
-  if (s) ogParams.set("s", s);
-  if (sc) ogParams.set("sc", sc);
-
   const metaTitle = "鑑定結果 | AI市場価値鑑定";
-  const metaDesc =
-    s || sc
-      ? `推定年収（万円単位の数値）とスコアを表示。GitHubからあなたの市場価値を鑑定。`
-      : "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
+  const metaDesc = "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
 
   return {
     title: metaTitle,
@@ -53,15 +39,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     openGraph: {
       title: metaTitle,
       description: metaDesc,
-      url: `${origin}/share?${ogParams.toString()}`,
+      url: `${origin}/share`,
       type: "website",
-      images: [{ url: "/og-image.png?v=1", width: 1200, height: 630, alt: "AI GitHub技術鑑定結果" }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI GitHub技術鑑定結果" }],
     },
     twitter: {
       card: "summary_large_image" as const,
       title: metaTitle,
       description: metaDesc,
-      images: ["/og-image.png?v=1"],
+      images: ["/og-image.png"],
     },
   };
 }
