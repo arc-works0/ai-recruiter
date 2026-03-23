@@ -411,8 +411,6 @@ export default function Home() {
       `【GitHub技術鑑定】
 💰 推定年収：${estimatedSalary}
 🎯 鑑定スコア：${totalScore || "—"}
-AIが私のGitHubをアセスメント！
-結果は画像でチェック 👇（保存した画像を添付してね！）
 あなたのGitHubも今すぐ鑑定！
 #エンジニア採用 #GitHubアセスメント #AI鑑定`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
