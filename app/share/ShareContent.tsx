@@ -166,11 +166,6 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
             {locale === "ja" ? "この市場価値でオファーを受け取る（無料）" : "Get high-paying offers based on this value (Free)"}
           </a>
         </div>
-        <p className="mt-4 text-center">
-          <a href="/" className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors">
-            {t.sharePageBack}
-          </a>
-        </p>
       </div>
     </main>
   );
