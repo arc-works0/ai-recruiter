@@ -206,7 +206,7 @@ const DEFAULT_SIDEBIZ_EN = "https://www.upwork.com/";
 
 const DEFAULT_BUSINESS_STEP1 = "https://www.geekly.co.jp/";
 const DEFAULT_BUSINESS_STEP2 = "https://techacademy.jp/biz/training";
-const USAGE_LIMIT = 3;
+const USAGE_LIMIT = 999; /* 一時的に無効化（デバッグ・テスト用） */
 const RATE_LIMIT_MS = 5000;
 
 export default function Home() {
