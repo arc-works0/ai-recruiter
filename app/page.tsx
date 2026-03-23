@@ -237,10 +237,6 @@ export default function Home() {
   const [usageCount, setUsageCount] = useState(0);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [shareSparkle, setShareSparkle] = useState(false);
-  const [shareGenerating, setShareGenerating] = useState(false);
-  const [shareToast, setShareToast] = useState(false);
-  const [shareGuideOpen, setShareGuideOpen] = useState(false);
-  const [pendingTweetUrl, setPendingTweetUrl] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -377,7 +373,6 @@ export default function Home() {
   const tierLabel = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : "";
 
   const reportRef = useRef<HTMLElement>(null);
-  const shareBlobUrlRef = useRef<string | null>(null);
 
   const handleShareOnX = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -397,12 +392,10 @@ export default function Home() {
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, rank, tier, locale]);
 
-  const handleShareBrag = useCallback(async () => {
+  const handleShareBrag = useCallback(() => {
     if (typeof window === "undefined") return;
-    if (shareGenerating) return;
     setShareSparkle(true);
     setTimeout(() => setShareSparkle(false), 650);
-    setShareGenerating(true);
     const baseUrl = scores
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
@@ -416,54 +409,15 @@ export default function Home() {
       : 0;
     const shareText =
       `【GitHub技術鑑定】
-AIが私のGitHubをアセスメント！
-
 💰 推定年収：${estimatedSalary}
 🎯 鑑定スコア：${totalScore || "—"}
-
-結果は画像でチェック 👇（保存した画像を添付してね！）
+AIが私のGitHubをアセスメント！
+結果を画像でチェック 👇
 あなたのGitHubも今すぐ鑑定！
 #エンジニア採用 #GitHubアセスメント #AI鑑定`;
-
-    let downloaded = false;
-    try {
-      const target = reportRef.current?.querySelector(".refined-card") as HTMLElement | null;
-      if (target) {
-        const { default: html2canvas } = await import("html2canvas");
-        const canvas = await html2canvas(target, {
-          backgroundColor: "#050505",
-          useCORS: true,
-          scale: 2,
-          logging: false,
-        });
-        const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-        if (blob) {
-          if (shareBlobUrlRef.current) {
-            URL.revokeObjectURL(shareBlobUrlRef.current);
-          }
-          shareBlobUrlRef.current = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = shareBlobUrlRef.current;
-          a.download = "github-salary.png";
-          a.click();
-          downloaded = true;
-        }
-      }
-    } catch {
-      // 自動添付が難しい環境では、投稿後に手動添付を案内
-    }
-
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
-    if (downloaded) {
-      setPendingTweetUrl(tweetUrl);
-      setShareGuideOpen(true);
-    } else {
-      setShareToast(true);
-      setTimeout(() => setShareToast(false), 2600);
-      window.open(tweetUrl, "_blank", "noopener,noreferrer");
-    }
-    setShareGenerating(false);
-  }, [scores, salaryDisplay, tier, mode, shareGenerating]);
+    window.open(tweetUrl, "_blank", "noopener,noreferrer");
+  }, [scores, salaryDisplay]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -693,13 +647,12 @@ AIが私のGitHubをアセスメント！
                     <button
                       type="button"
                       onClick={handleShareBrag}
-                      disabled={shareGenerating}
                       className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3"
                     >
                       <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
-                      {shareGenerating ? "生成中..." : t.shareBragCta}
+                      {t.shareBragCta}
                     </button>
                   </div>
                   <Link
@@ -1128,49 +1081,13 @@ AIが私のGitHubをアセスメント！
             <button
               type="button"
               onClick={handleShareBrag}
-              disabled={shareGenerating}
               className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98]"
             >
               <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
-              {shareGenerating ? "生成中..." : t.shareBragCta}
+              {t.shareBragCta}
             </button>
-          </div>
-        )}
-
-        {shareToast && (
-          <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-4 py-2 text-xs text-white">
-            画像を保存して投稿に添付してください
-          </div>
-        )}
-        {shareGuideOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="share-guide-title">
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" aria-hidden />
-            <div className="relative w-full max-w-md rounded-2xl border border-white/[0.1] bg-[#0f0f12] p-6 text-center shadow-2xl">
-              <p className="text-5xl" aria-hidden>
-                📸
-              </p>
-              <h2 id="share-guide-title" className="mt-3 text-xl font-bold text-white">
-                鑑定結果を保存しました！
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-300">
-                Xの投稿画面で、この画像を添付して投稿すると拡散力が10倍になります！
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setShareGuideOpen(false);
-                  if (pendingTweetUrl) {
-                    window.open(pendingTweetUrl, "_blank", "noopener,noreferrer");
-                    setPendingTweetUrl("");
-                  }
-                }}
-                className="mt-6 w-full rounded-xl bg-white/10 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
-              >
-                OK（投稿画面へ）
-              </button>
-            </div>
           </div>
         )}
 
