@@ -149,7 +149,7 @@ export const translations = {
     verifiedByAI: "Verified by AI Engine v3.0",
     potentialInfinite: "Potential: Infinite（伸びしろ：無限大）",
     nextActionSubtitle: "キャリアアップの正解",
-    geeklyMainCta: "プロによる詳細査定を依頼する",
+    geeklyMainCta: "年収アップの可能性をプロに相談する（無料）",
     footerTrust: "本サイトは、高度なAI解析エンジンを搭載したエンジニア支援ツールです。",
     footerTrustEn: "This site is an engineer support tool powered by advanced AI analysis.",
     footerPartners: "Trusted by leading companies",

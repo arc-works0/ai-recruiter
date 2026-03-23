@@ -414,10 +414,10 @@ export default function Home() {
 AIが私のGitHubをガチ鑑定！
 
 私の市場価値は【年収${estimatedSalary}】でした。
-これ、私の界隈で上位何%に入りますか？
+これ、界隈で上位何%に入りますか？
 
-「我こそは」というエンジニア、挑戦求む 👇
-#エンジニア採用 #GitHubアセスメント #AI鑑定
+「我こそは」という猛者、求む 👇
+#エンジニア採用 #GitHubアセスメント
 ${appUrl}`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
