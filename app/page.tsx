@@ -237,6 +237,8 @@ export default function Home() {
   const [usageCount, setUsageCount] = useState(0);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [shareSparkle, setShareSparkle] = useState(false);
+  const [shareGenerating, setShareGenerating] = useState(false);
+  const [shareToast, setShareToast] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -373,6 +375,7 @@ export default function Home() {
   const tierLabel = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : "";
 
   const reportRef = useRef<HTMLElement>(null);
+  const shareBlobUrlRef = useRef<string | null>(null);
 
   const handleShareOnX = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -394,10 +397,12 @@ export default function Home() {
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, jobTitle, salaryDisplay, rank, tier, locale]);
 
-  const handleShareBrag = useCallback(() => {
+  const handleShareBrag = useCallback(async () => {
     if (typeof window === "undefined") return;
+    if (shareGenerating) return;
     setShareSparkle(true);
     setTimeout(() => setShareSparkle(false), 650);
+    setShareGenerating(true);
     const baseUrl = scores
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
@@ -408,27 +413,53 @@ export default function Home() {
       : window.location.href;
     const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
     const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
+    const totalScore = scores
+      ? Math.round((scores.technical + scores.contribution + scores.sustainability + scores.market) / 4)
+      : 0;
     const shareText =
-      locale === "ja"
-        ? `【GitHub技術鑑定】
+      `【GitHub技術鑑定】
 AIが私のGitHubをアセスメント！
 
 💰 推定年収：${estimatedSalary}
+🎯 鑑定スコア：${totalScore || "—"}
 
-結果を画像でチェック👇
+結果は画像でチェック 👇
 あなたのGitHubも今すぐ鑑定！
-#エンジニア採用 #GitHubアセスメント #AI鑑定`
-        : `【GitHub Tech Certification】
-AI assessed my GitHub!
+#エンジニア採用 #GitHubアセスメント #AI鑑定`;
 
-💰 Est. Salary: ${estimatedSalary}
+    try {
+      const target = reportRef.current?.querySelector(".refined-card") as HTMLElement | null;
+      if (target) {
+        const { default: html2canvas } = await import("html2canvas");
+        const canvas = await html2canvas(target, {
+          backgroundColor: "#050505",
+          useCORS: true,
+          scale: 2,
+          logging: false,
+        });
+        const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (blob) {
+          if (shareBlobUrlRef.current) {
+            URL.revokeObjectURL(shareBlobUrlRef.current);
+          }
+          shareBlobUrlRef.current = URL.createObjectURL(blob);
+        }
+      }
+    } catch {
+      // 自動添付が難しい環境では、投稿後に手動添付を案内
+    }
 
-Check the results in the image👇
-Get your GitHub certified now!
-#EngineerHiring #GitHubAssessment #AICertification`;
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
+    const imageParam = shareBlobUrlRef.current
+      ? `&image=${encodeURIComponent(shareBlobUrlRef.current)}`
+      : "";
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}${imageParam}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, salaryDisplay, tier, locale, mode]);
+    if (shareBlobUrlRef.current) {
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2600);
+    }
+    setShareGenerating(false);
+  }, [scores, salaryDisplay, tier, mode, shareGenerating]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -658,12 +689,13 @@ Get your GitHub certified now!
                     <button
                       type="button"
                       onClick={handleShareBrag}
+                      disabled={shareGenerating}
                       className="flex w-full min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-indigo-500 hover:shadow-[0_0_32px_rgba(217,119,6,0.5)] active:scale-[0.99] sm:min-h-12 sm:py-3"
                     >
                       <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
-                      {t.shareBragCta}
+                      {shareGenerating ? "生成中..." : t.shareBragCta}
                     </button>
                   </div>
                   <Link
@@ -1092,13 +1124,20 @@ Get your GitHub certified now!
             <button
               type="button"
               onClick={handleShareBrag}
+              disabled={shareGenerating}
               className="flex w-full max-w-xl min-h-14 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-indigo-600 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(217,119,6,0.4)] transition-all active:scale-[0.98]"
             >
               <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
-              {t.shareBragCta}
+              {shareGenerating ? "生成中..." : t.shareBragCta}
             </button>
+          </div>
+        )}
+
+        {shareToast && (
+          <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-4 py-2 text-xs text-white">
+            画像を保存して投稿に添付してください
           </div>
         )}
 
