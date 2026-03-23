@@ -411,8 +411,14 @@ export default function Home() {
       `【GitHub技術鑑定】
 💰 推定年収：${estimatedSalary}
 🎯 鑑定スコア：${totalScore || "—"}
-あなたのGitHubも今すぐ鑑定！
-#エンジニア採用 #GitHubアセスメント #AI鑑定`;
+AIが私のGitHubをガチ鑑定！
+
+私の市場価値は【年収${estimatedSalary}】でした。
+これ、私の界隈で上位何%に入りますか？
+
+「我こそは」というエンジニア、挑戦求む 👇
+#エンジニア採用 #GitHubアセスメント #AI鑑定
+${appUrl}`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
   }, [scores, salaryDisplay]);
