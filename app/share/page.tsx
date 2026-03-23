@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { truncateForShareUrl, SHARE_TITLE_MAX_LEN, SHARE_SALARY_MAX_LEN } from "../../lib/shareUrlParams";
+import { buildOgImageSearchParams, truncateForShareUrl, SHARE_TITLE_MAX_LEN, SHARE_SALARY_MAX_LEN } from "../../lib/shareUrlParams";
 import ShareContent from "./ShareContent";
 
 function parseScores(scoresParam: string | null): number[] {
@@ -26,15 +26,22 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ai-recruiter-4o7e.vercel.app")
   ).replace(/\/$/, "");
   const origin = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
-  const ogParams = new URLSearchParams({ scores, mode });
   const titleForOg = truncateForShareUrl(title, SHARE_TITLE_MAX_LEN);
   const salaryForOg = truncateForShareUrl(salary, SHARE_SALARY_MAX_LEN);
+  const ogParams = new URLSearchParams({ scores, mode });
   if (titleForOg) ogParams.set("title", titleForOg);
   if (salaryForOg) ogParams.set("salary", salaryForOg);
   if (rank) ogParams.set("rank", rank.slice(0, 16));
   if (tier) ogParams.set("tier", tier.slice(0, 16));
   if (t) ogParams.set("t", t);
-  const ogImageAbsoluteUrl = `${origin}/api/og?${ogParams.toString()}`;
+  const ogImageOnly = buildOgImageSearchParams({
+    salary: salaryForOg || salary,
+    title: titleForOg || title,
+    rank,
+    tier,
+    t,
+  });
+  const ogImageAbsoluteUrl = `${origin}/api/og?${ogImageOnly.toString()}`;
 
   const metaTitle = titleForOg ? `${titleForOg} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
   const metaDesc =
