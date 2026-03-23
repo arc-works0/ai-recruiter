@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { buildOgImageSearchParams } from "../../lib/shareUrlParams";
 import ShareContent from "./ShareContent";
 
 function parseScores(scoresParam: string | null): number[] {
@@ -13,7 +12,6 @@ type Props = {
     mode?: string;
     s?: string;
     sc?: string;
-    t?: string;
     v?: string;
     title?: string;
     salary?: string;
@@ -27,7 +25,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const params = await searchParams;
   const scores = params.scores ?? "70,70,70,70";
   const mode = params.mode ?? "personal";
-  const t = params.t ?? "";
   const s = params.s ?? "";
   const sc = params.sc ?? "";
 
@@ -43,9 +40,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   if (params.v) ogParams.set("v", params.v);
   if (s) ogParams.set("s", s);
   if (sc) ogParams.set("sc", sc);
-  if (t) ogParams.set("t", t);
-
-  const ogImageAbsoluteUrl = `${origin}/api/og?${buildOgImageSearchParams({ s, sc, t }).toString()}`;
 
   const metaTitle = "鑑定結果 | AI市場価値鑑定";
   const metaDesc =
@@ -61,13 +55,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       description: metaDesc,
       url: `${origin}/share?${ogParams.toString()}`,
       type: "website",
-      images: [{ url: ogImageAbsoluteUrl, width: 1200, height: 630, alt: "AI市場価値鑑定ポスター" }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI GitHub技術鑑定結果" }],
     },
     twitter: {
       card: "summary_large_image" as const,
       title: metaTitle,
       description: metaDesc,
-      images: [ogImageAbsoluteUrl],
+      images: ["/og-image.png"],
     },
   };
 }
