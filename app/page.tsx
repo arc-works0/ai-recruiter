@@ -414,27 +414,22 @@ export default function Home() {
         }).toString()}`
       : window.location.href;
     const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
-    const totalScore = scores
-      ? `技術${scores.technical} 貢献${scores.contribution} 持続${scores.sustainability} 需要${scores.market}`
-      : (locale === "ja" ? "—" : "—");
     const shareText =
       locale === "ja"
-        ? `【GitHub技術力鑑定結果】
-AIが私のGitHubを解析しました！
+        ? `【GitHub技術鑑定】
+AIが私のGitHubをアセスメント！
 
-🔹 推定年収：${estimatedSalary}
-🔹 鑑定スコア：${totalScore}
+💰 推定年収：${estimatedSalary}
 
-結果の詳細は画像でチェック！👇
-あなたのGitHubも、エンジニア採用AI技術アセスメントで今すぐ鑑定！
+結果を画像でチェック👇
+あなたのGitHubも今すぐ鑑定！
 #エンジニア採用 #GitHubアセスメント #AI鑑定`
         : `【GitHub Tech Certification】
-AI analyzed my GitHub!
+AI assessed my GitHub!
 
-🔹 Est. Salary: ${estimatedSalary}
-🔹 Certification Score: ${totalScore}
+💰 Est. Salary: ${estimatedSalary}
 
-See full results in the image! 👇
+Check the results in the image👇
 Get your GitHub certified now!
 #EngineerHiring #GitHubAssessment #AICertification`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;

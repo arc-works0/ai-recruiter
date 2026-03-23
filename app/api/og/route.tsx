@@ -121,6 +121,12 @@ export async function GET(request: Request) {
         </p>
       </div>
     ),
-    { width, height }
+    {
+      width,
+      height,
+      headers: {
+        "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+      },
+    }
   );
 }
