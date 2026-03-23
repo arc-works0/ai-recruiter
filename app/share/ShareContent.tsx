@@ -16,6 +16,8 @@ import { translations, getLocaleFromBrowser, type Locale } from "../../lib/i18n"
 const LABELS_EN = ["Tech Depth", "Code Quality", "Learning", "Demand Fit"];
 const LABELS_JA = ["技術深化", "コード品質", "学習意欲", "需要適合"];
 const KEYS = ["technical", "contribution", "sustainability", "market"] as const;
+const DEFAULT_OFFER_JA = "https://doda.jp/";
+const DEFAULT_OFFER_EN = "https://www.linkedin.com/jobs/";
 
 function decode(s: string): string {
   try {
@@ -40,6 +42,9 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
 
   const t = translations[locale];
   const labels = locale === "ja" ? LABELS_JA : LABELS_EN;
+  const offerUrl = locale === "ja"
+    ? (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_JA ?? DEFAULT_OFFER_JA)
+    : (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_EN ?? DEFAULT_OFFER_EN);
   const data = KEYS.map((key, i) => ({
     subject: labels[i],
     value: scores[i] ?? 70,
@@ -151,17 +156,16 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
           {t.sharePageCtaPrimary}
           <span className="text-xl">→</span>
         </a>
-        {/* <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
-          <p className="text-sm font-medium text-zinc-200">{t.sharePageRecruiterCta}</p>
+        <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-center">
           <a
-            href="/contact"
+            href={offerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
           >
-            {t.ctaEnterpriseTrial}
+            {locale === "ja" ? "この市場価値でオファーを受け取る（無料）" : "Get high-paying offers based on this value (Free)"}
           </a>
-        </div> */}
+        </div>
         <p className="mt-4 text-center">
           <a href="/" className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors">
             {t.sharePageBack}

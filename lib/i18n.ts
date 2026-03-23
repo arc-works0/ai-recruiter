@@ -45,7 +45,7 @@ export const translations = {
     sharePageCta: "GitHubから市場価値を診断する →",
     sharePageBack: "鑑定ページへ",
     sharePageRecruiterCta: "【採用担当者様へ】自社の選考に導入して工数を削減しませんか？",
-    sharePageCtaPrimary: "あなたの市場価値を測定する",
+    sharePageCtaPrimary: "あなたの市場価値をガチ鑑定する",
     summaryLabelStrengths: "強み",
     summaryLabelMarketValue: "市場価値の根拠",
     summaryLabelOutlook: "今後の展望",
