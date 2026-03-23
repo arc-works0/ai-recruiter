@@ -419,10 +419,11 @@ AIが私のGitHubをアセスメント！
 💰 推定年収：${estimatedSalary}
 🎯 鑑定スコア：${totalScore || "—"}
 
-結果は画像でチェック 👇
+結果は画像でチェック 👇（保存した画像を添付してね！）
 あなたのGitHubも今すぐ鑑定！
 #エンジニア採用 #GitHubアセスメント #AI鑑定`;
 
+    let downloaded = false;
     try {
       const target = reportRef.current?.querySelector(".refined-card") as HTMLElement | null;
       if (target) {
@@ -439,21 +440,26 @@ AIが私のGitHubをアセスメント！
             URL.revokeObjectURL(shareBlobUrlRef.current);
           }
           shareBlobUrlRef.current = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = shareBlobUrlRef.current;
+          a.download = "github-salary.png";
+          a.click();
+          downloaded = true;
         }
       }
     } catch {
       // 自動添付が難しい環境では、投稿後に手動添付を案内
     }
 
-    const imageParam = shareBlobUrlRef.current
-      ? `&image=${encodeURIComponent(shareBlobUrlRef.current)}`
-      : "";
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}${imageParam}`;
-    window.open(tweetUrl, "_blank", "noopener,noreferrer");
-    if (shareBlobUrlRef.current) {
+    if (downloaded) {
+      alert("📸 鑑定結果を保存しました！ Xの投稿画面で、保存した画像を添付して投稿すると拡散力が10倍になります！");
+    } else {
       setShareToast(true);
       setTimeout(() => setShareToast(false), 2600);
     }
+
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
+    window.open(tweetUrl, "_blank", "noopener,noreferrer");
     setShareGenerating(false);
   }, [scores, salaryDisplay, tier, mode, shareGenerating]);
 
