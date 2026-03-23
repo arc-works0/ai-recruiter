@@ -362,6 +362,9 @@ export default function Home() {
   const transferUrl = locale === "ja"
     ? (process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER ?? DEFAULT_TRANSFER_JA)
     : (process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER_EN ?? DEFAULT_TRANSFER_EN);
+  const offerUrl = locale === "ja"
+    ? (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_JA ?? transferUrl)
+    : (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_EN ?? transferUrl);
   const learningUrl = locale === "ja"
     ? (process.env.NEXT_PUBLIC_AFFILIATE_LEARNING ?? DEFAULT_LEARNING_JA)
     : (process.env.NEXT_PUBLIC_AFFILIATE_LEARNING_EN ?? DEFAULT_LEARNING_EN);
@@ -408,20 +411,26 @@ export default function Home() {
       ? Math.round((scores.technical + scores.contribution + scores.sustainability + scores.market) / 4)
       : 0;
     const shareText =
-      `【GitHub技術鑑定】
-💰 推定年収：${estimatedSalary}
-🎯 鑑定スコア：${totalScore || "—"}
-AIが私のGitHubをガチ鑑定！
-
+      locale === "ja"
+        ? `💰 推定年収：${estimatedSalary}
+🎯 スコア：${totalScore || "—"}
+AIがGitHubをガチ鑑定！
 私の市場価値は【年収${estimatedSalary}】でした。
-これ、界隈で上位何%に入りますか？
-
-「我こそは」という猛者、求む 👇
-#エンジニア採用 #GitHubアセスメント
+これ、界隈で上位何%？
+挑戦求む 👇
+#GitHubアセスメント #AI鑑定
+${appUrl}`
+        : `💰 Est. Salary: ${estimatedSalary}
+🎯 Score: ${totalScore || "—"}
+AI assessed my GitHub!
+My value is 【${estimatedSalary}】.
+Top % in the field?
+Take the challenge 👇
+#GitHubAssessment #AI
 ${appUrl}`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, salaryDisplay]);
+  }, [scores, salaryDisplay, locale]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;
@@ -660,11 +669,13 @@ ${appUrl}`;
                     </button>
                   </div>
                   <Link
-                    href={contactFormUrl}
+                    href={offerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
                   >
                     <span className="text-lg font-bold text-white drop-shadow-sm">
-                      {t.geeklyMainCta}
+                      {locale === "ja" ? "この市場価値でオファーを受け取る（無料）" : "Get high-paying offers based on this value (Free)"}
                     </span>
                     <span className="text-2xl">→</span>
                   </Link>
