@@ -384,7 +384,7 @@ export default function Home() {
           scores,
           salaryDisplay,
         }).toString()}&f=1`
-      : window.location.href;
+      : `${window.location.origin}/share?f=1`;
     const tierCfg = tier ? getTierConfig(tier) : null;
     const rankName = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : (tier || rank || "—");
     const shareText =
@@ -404,7 +404,7 @@ export default function Home() {
           scores,
           salaryDisplay,
         }).toString()}`
-      : window.location.href;
+      : `${window.location.origin}/share`;
     const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}f=1`;
     const estimatedSalary = salaryDisplay || (locale === "ja" ? "—" : "—");
     const totalScore = scores

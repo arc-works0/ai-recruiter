@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import ShareContent from "./ShareContent";
 
 type Props = {
   searchParams: Promise<{
@@ -7,6 +7,7 @@ type Props = {
     mode?: string;
     s?: string;
     sc?: string;
+    f?: string;
     v?: string;
     title?: string;
     salary?: string;
@@ -17,7 +18,7 @@ type Props = {
 };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  await searchParams;
+  const params = await searchParams;
 
   const baseUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -28,13 +29,20 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const metaTitle = "鑑定結果 | AI市場価値鑑定";
   const metaDesc = "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
 
+  const s = params.s ?? "";
+  const sc = params.sc ?? "";
+  const shareParams = new URLSearchParams();
+  if (s) shareParams.set("s", s);
+  if (sc) shareParams.set("sc", sc);
+  shareParams.set("f", "1");
+
   return {
     title: metaTitle,
     description: metaDesc,
     openGraph: {
       title: metaTitle,
       description: metaDesc,
-      url: `${origin}/share`,
+      url: `${origin}/share?${shareParams.toString()}`,
       type: "website",
       images: [
         {
@@ -52,6 +60,25 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function SharePage({ searchParams }: Props) {
-  await searchParams;
-  redirect("/");
+  const params = await searchParams;
+  const scoresParam = params.scores ?? "70,70,70,70";
+  const scores = scoresParam.split(",").map((s) => Math.min(100, Math.max(0, parseInt(s.trim(), 10) || 70)));
+  const sNum = parseInt(String(params.s ?? "").replace(/\D/g, ""), 10);
+  const salaryFromS = !Number.isNaN(sNum) && sNum > 0 ? `${sNum}万円` : "";
+  const salaryDisplay = salaryFromS || (params.salary ?? "");
+  const tier = params.tier ?? "";
+  const rank = params.rank ?? "";
+  const tierFeedback = params.feedback ?? "";
+  const jobTitle = params.title ?? "";
+
+  return (
+    <ShareContent
+      scores={scores}
+      jobTitle={jobTitle}
+      salaryDisplay={salaryDisplay}
+      rank={rank}
+      tier={tier}
+      tierFeedback={tierFeedback}
+    />
+  );
 }
