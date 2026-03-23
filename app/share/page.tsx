@@ -55,13 +55,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       description: metaDesc,
       url: `${origin}/share?${ogParams.toString()}`,
       type: "website",
-      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI GitHub技術鑑定結果" }],
+      images: [{ url: "/og-image.png?v=1", width: 1200, height: 630, alt: "AI GitHub技術鑑定結果" }],
     },
     twitter: {
       card: "summary_large_image" as const,
       title: metaTitle,
       description: metaDesc,
-      images: ["/og-image.png"],
+      images: ["/og-image.png?v=1"],
     },
   };
 }
