@@ -383,8 +383,6 @@ export default function Home() {
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
           salaryDisplay,
-          tier,
-          mode,
         }).toString()}`
       : window.location.href;
     const tierCfg = tier ? getTierConfig(tier) : null;
@@ -407,8 +405,6 @@ export default function Home() {
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
           salaryDisplay,
-          tier,
-          mode,
         }).toString()}`
       : window.location.href;
     const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;

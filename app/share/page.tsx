@@ -11,9 +11,8 @@ type Props = {
   searchParams: Promise<{
     scores?: string;
     mode?: string;
-    m?: string;
+    s?: string;
     sc?: string;
-    g?: string;
     t?: string;
     v?: string;
     title?: string;
@@ -29,9 +28,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const scores = params.scores ?? "70,70,70,70";
   const mode = params.mode ?? "personal";
   const t = params.t ?? "";
-  const m = params.m ?? "";
+  const s = params.s ?? "";
   const sc = params.sc ?? "";
-  const g = params.g ?? "";
 
   const baseUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -43,16 +41,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   ogParams.set("scores", scores);
   ogParams.set("mode", mode);
   if (params.v) ogParams.set("v", params.v);
-  if (m) ogParams.set("m", m);
+  if (s) ogParams.set("s", s);
   if (sc) ogParams.set("sc", sc);
-  if (g) ogParams.set("g", g);
   if (t) ogParams.set("t", t);
 
-  const ogImageAbsoluteUrl = `${origin}/api/og?${buildOgImageSearchParams({ m, sc, g, t }).toString()}`;
+  const ogImageAbsoluteUrl = `${origin}/api/og?${buildOgImageSearchParams({ s, sc, t }).toString()}`;
 
   const metaTitle = "鑑定結果 | AI市場価値鑑定";
   const metaDesc =
-    m || sc
+    s || sc
       ? `推定年収（万円単位の数値）とスコアを表示。GitHubからあなたの市場価値を鑑定。`
       : "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
 
@@ -78,12 +75,11 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SharePage({ searchParams }: Props) {
   const params = await searchParams;
   const scores = parseScores(params.scores ?? null);
-  const mNum = parseInt(String(params.m ?? "").replace(/\D/g, ""), 10);
-  const salaryFromM = !Number.isNaN(mNum) && mNum > 0 ? `${mNum}万円` : "";
+  const sNum = parseInt(String(params.s ?? "").replace(/\D/g, ""), 10);
+  const salaryFromM = !Number.isNaN(sNum) && sNum > 0 ? `${sNum}万円` : "";
   const legacySalary = params.salary ?? "";
   const salaryDisplay = salaryFromM || legacySalary;
-  const tierFromG = params.g?.trim().slice(0, 1).toUpperCase() ?? "";
-  const tier = tierFromG && /^[A-E]$/.test(tierFromG) ? tierFromG : (params.tier ?? "");
+  const tier = params.tier ?? "";
   const rank = params.rank ?? "";
   const tierFeedback = params.feedback ?? "";
   const legacyTitle = params.title ?? "";

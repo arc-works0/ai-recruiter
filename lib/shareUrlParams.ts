@@ -31,45 +31,30 @@ export function averageScore(scores: ShareScores): number {
   );
 }
 
-/**
- * シェアURL：日本語テキストは含めない（scores, m, sc, g, mode, v のみ + 任意 t）
- * encodeURIComponent は使わず URLSearchParams のみ
- */
+/** シェアURL：英数字の最小パラメータのみ（s, sc） */
 export function buildShareSearchParams(opts: {
   scores: ShareScores;
   salaryDisplay?: string;
-  tier?: string;
-  mode: string;
+  mode?: string;
 }): URLSearchParams {
   const p = new URLSearchParams();
-  p.set(
-    "scores",
-    `${opts.scores.technical},${opts.scores.contribution},${opts.scores.sustainability},${opts.scores.market}`
-  );
-  p.set("mode", opts.mode);
-  p.set("v", "final");
   const man = salaryDisplayToManYen(opts.salaryDisplay);
-  if (man != null && man > 0) p.set("m", String(man));
+  if (man != null && man > 0) p.set("s", String(man));
   p.set("sc", String(averageScore(opts.scores)));
-  const g = opts.tier?.trim().slice(0, 1).toUpperCase();
-  if (g && /^[A-E]$/.test(g)) p.set("g", g);
   return p;
 }
 
-/** /api/og 用：英数字のみ（m=万円の数値, sc=平均スコア, g=格付け1文字, t=キャッシュバスト） */
+/** /api/og 用：英数字のみ（s=万円の数値, sc=平均スコア, t=キャッシュバスト） */
 export function buildOgImageSearchParams(opts: {
-  m?: string | number;
+  s?: string | number;
   sc?: string | number;
-  g?: string;
   t?: string;
 }): URLSearchParams {
   const p = new URLSearchParams();
-  const mi = typeof opts.m === "number" ? opts.m : parseInt(String(opts.m ?? ""), 10);
-  if (!Number.isNaN(mi) && mi > 0) p.set("m", String(mi));
+  const si = typeof opts.s === "number" ? opts.s : parseInt(String(opts.s ?? ""), 10);
+  if (!Number.isNaN(si) && si > 0) p.set("s", String(si));
   const sci = typeof opts.sc === "number" ? opts.sc : parseInt(String(opts.sc ?? ""), 10);
   if (!Number.isNaN(sci) && sci >= 0 && sci <= 100) p.set("sc", String(sci));
-  const g = opts.g?.trim().slice(0, 1).toUpperCase();
-  if (g && /^[A-E]$/.test(g)) p.set("g", g);
   if (opts.t) p.set("t", String(opts.t).replace(/\D/g, "").slice(0, 20));
   return p;
 }

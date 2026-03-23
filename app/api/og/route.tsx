@@ -1,7 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
-
 const width = 1200;
 const height = 630;
 
@@ -68,20 +66,18 @@ export async function GET(request: Request) {
   try {
     const searchParams = parseSearchParamsFromRequestUrl(request.url);
 
-    const mRaw = searchParams.get("m") ?? "";
+    const sRaw = searchParams.get("s") ?? "";
     const scRaw = searchParams.get("sc") ?? "";
-    const gRaw = (searchParams.get("g") ?? "").trim().slice(0, 1).toUpperCase();
 
-    const m = parseInt(mRaw.replace(/\D/g, ""), 10);
+    const s = parseInt(sRaw.replace(/\D/g, ""), 10);
     const sc = parseInt(scRaw.replace(/\D/g, ""), 10);
-    const hasM = !Number.isNaN(m) && m > 0 && m < 1_000_000;
+    const hasS = !Number.isNaN(s) && s > 0 && s < 1_000_000;
     const hasSc = !Number.isNaN(sc) && sc >= 0 && sc <= 100;
-    const g = /^[A-E]$/.test(gRaw) ? gRaw : "";
 
-    const salaryLine = hasM ? `推定市場価値 ${m}万円${g ? ` (${g})` : ""}` : "";
+    const salaryLine = hasS ? `推定市場価値 ${s}万円` : "";
     const scoreLine = hasSc ? `鑑定スコア ${sc}` : "";
 
-    if (!hasM && !hasSc) {
+    if (!hasS && !hasSc) {
       return defaultOgResponse();
     }
 
@@ -102,7 +98,7 @@ export async function GET(request: Request) {
           <p style={{ fontSize: 48, fontWeight: 800, color: "#fff", margin: 0 }}>
             エンジニア採用AI査定
           </p>
-          {hasM ? (
+          {hasS ? (
             <p
               style={{
                 fontSize: 32,
@@ -121,10 +117,10 @@ export async function GET(request: Request) {
           {hasSc ? (
             <p
               style={{
-                fontSize: hasM ? 26 : 32,
+                fontSize: hasS ? 26 : 32,
                 fontWeight: 700,
                 color: "#fbbf24",
-                margin: hasM ? "16px 0 0" : "24px 0 0",
+                margin: hasS ? "16px 0 0" : "24px 0 0",
               }}
             >
               {scoreLine}
