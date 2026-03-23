@@ -13,6 +13,7 @@ import {
   Legend,
 } from "recharts";
 import { translations, getLocaleFromBrowser, type Locale, type AppMode } from "../lib/i18n";
+import { buildShareSearchParams } from "../lib/shareUrlParams";
 import { getTierConfig } from "../lib/tiers";
 
 const RADAR_KEYS = ["technical", "contribution", "sustainability", "market"] as const;
@@ -376,15 +377,13 @@ export default function Home() {
   const handleShareOnX = useCallback(() => {
     if (typeof window === "undefined") return;
     const appUrl = scores
-      ? `${window.location.origin}/share?${new URLSearchParams({
-          scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
-          ...(jobTitle && { title: jobTitle }),
-          ...(salaryDisplay && { salary: salaryDisplay }),
-          ...(rank && { rank }),
-          ...(tier && { tier }),
-          ...(tierFeedback && { feedback: tierFeedback }),
+      ? `${window.location.origin}/share?${buildShareSearchParams({
+          scores,
+          jobTitle,
+          salaryDisplay,
+          rank,
+          tier,
           mode,
-          v: "final",
         }).toString()}`
       : window.location.href;
     const tierCfg = tier ? getTierConfig(tier) : null;
@@ -395,22 +394,20 @@ export default function Home() {
         : `Got my engineer market value certified by AI! My tier: ${rankName} #AICertification #EngineerSalary`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, locale]);
+  }, [scores, jobTitle, salaryDisplay, rank, tier, locale]);
 
   const handleShareBrag = useCallback(() => {
     if (typeof window === "undefined") return;
     setShareSparkle(true);
     setTimeout(() => setShareSparkle(false), 650);
     const baseUrl = scores
-      ? `${window.location.origin}/share?${new URLSearchParams({
-          scores: [scores.technical, scores.contribution, scores.sustainability, scores.market].join(","),
-          ...(jobTitle && { title: jobTitle }),
-          ...(salaryDisplay && { salary: salaryDisplay }),
-          ...(rank && { rank }),
-          ...(tier && { tier }),
-          ...(tierFeedback && { feedback: tierFeedback }),
+      ? `${window.location.origin}/share?${buildShareSearchParams({
+          scores,
+          jobTitle,
+          salaryDisplay,
+          rank,
+          tier,
           mode,
-          v: "final",
         }).toString()}`
       : window.location.href;
     const appUrl = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
@@ -435,7 +432,7 @@ Get your GitHub certified now!
 #EngineerHiring #GitHubAssessment #AICertification`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, locale, mode]);
+  }, [scores, jobTitle, salaryDisplay, rank, tier, locale, mode]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;

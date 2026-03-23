@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { truncateForShareUrl, SHARE_TITLE_MAX_LEN, SHARE_SALARY_MAX_LEN } from "../../lib/shareUrlParams";
 import ShareContent from "./ShareContent";
 
 function parseScores(scoresParam: string | null): number[] {
@@ -26,18 +27,19 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   ).replace(/\/$/, "");
   const origin = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
   const ogParams = new URLSearchParams({ scores, mode });
-  if (title) ogParams.set("title", title);
-  if (salary) ogParams.set("salary", salary);
-  if (rank) ogParams.set("rank", rank);
-  if (tier) ogParams.set("tier", tier);
-  if (feedback) ogParams.set("feedback", feedback);
+  const titleForOg = truncateForShareUrl(title, SHARE_TITLE_MAX_LEN);
+  const salaryForOg = truncateForShareUrl(salary, SHARE_SALARY_MAX_LEN);
+  if (titleForOg) ogParams.set("title", titleForOg);
+  if (salaryForOg) ogParams.set("salary", salaryForOg);
+  if (rank) ogParams.set("rank", rank.slice(0, 16));
+  if (tier) ogParams.set("tier", tier.slice(0, 16));
   if (t) ogParams.set("t", t);
   const ogImageAbsoluteUrl = `${origin}/api/og?${ogParams.toString()}`;
 
-  const metaTitle = title ? `${title} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
+  const metaTitle = titleForOg ? `${titleForOg} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
   const metaDesc =
-    title && (salary || rank)
-      ? `${title}。${salary ? `推定年収 ${salary}。` : ""}${tier || rank ? `格付け ${tier || rank}。` : ""}GitHubからあなたの市場価値を鑑定。`
+    titleForOg && (salaryForOg || rank)
+      ? `${titleForOg}。${salaryForOg ? `推定年収 ${salaryForOg}。` : ""}${tier || rank ? `格付け ${tier || rank}。` : ""}GitHubからあなたの市場価値を鑑定。`
       : "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
 
   return {
