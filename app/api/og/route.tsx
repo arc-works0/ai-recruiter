@@ -9,36 +9,7 @@ const OG_HEADERS = {
   "Cache-Control": "public, no-cache, no-store, must-revalidate, max-age=0",
 } as const;
 
-const MAX_LINE = 50;
-
-function stripControl(s: string): string {
-  return s.replace(/[\x00-\x1F\x7F]/g, "");
-}
-
-/** 取得は常に成功扱い。例外時は "" */
-function getParam(sp: URLSearchParams, key: string): string {
-  try {
-    const v = sp.get(key);
-    return typeof v === "string" ? v : "";
-  } catch {
-    return "";
-  }
-}
-
-/** salary を「◯◯万円」形式に正規化（短縮は SVG 直前に実施） */
-function toManStr(salary: string): string {
-  const raw = stripControl(salary).trim();
-  if (!raw) return "";
-  try {
-    const digits = raw.replace(/,/g, "").replace(/[^\d]/g, "");
-    const n = parseInt(digits, 10);
-    if (isNaN(n)) return raw.slice(0, MAX_LINE);
-    const man = raw.includes("万") && n < 10000 ? n : Math.round(n / 10000);
-    return `${man}万円`;
-  } catch {
-    return raw.slice(0, MAX_LINE);
-  }
-}
+const FIXED_SUBTITLE = "エンジニア技術鑑定結果";
 
 function defaultOgResponse() {
   return new ImageResponse(
@@ -72,7 +43,7 @@ function defaultOgResponse() {
             whiteSpace: "nowrap",
           }}
         >
-          GitHubから技術力と自社適性をAIが即座に可視化
+          {FIXED_SUBTITLE}
         </p>
       </div>
     ),
@@ -80,27 +51,39 @@ function defaultOgResponse() {
   );
 }
 
-export async function GET(request: Request) {
+/** new URL(request.url) を使わず query 文字列のみパース */
+function parseSearchParamsFromRequestUrl(requestUrl: string): URLSearchParams {
+  const qPart = requestUrl.split("?")[1] ?? "";
+  const beforeHash = qPart.split("#")[0] ?? "";
   try {
-    let searchParams: URLSearchParams;
-    try {
-      searchParams = new URL(request.url).searchParams;
-    } catch (e) {
-      console.error("[api/og] new URL failed", e, request.url);
+    return new URLSearchParams(beforeHash);
+  } catch {
+    return new URLSearchParams();
+  }
+}
+
+export async function GET(request: Request) {
+  console.log("Full URL:", request.url);
+
+  try {
+    const searchParams = parseSearchParamsFromRequestUrl(request.url);
+
+    const mRaw = searchParams.get("m") ?? "";
+    const scRaw = searchParams.get("sc") ?? "";
+    const gRaw = (searchParams.get("g") ?? "").trim().slice(0, 1).toUpperCase();
+
+    const m = parseInt(mRaw.replace(/\D/g, ""), 10);
+    const sc = parseInt(scRaw.replace(/\D/g, ""), 10);
+    const hasM = !Number.isNaN(m) && m > 0 && m < 1_000_000;
+    const hasSc = !Number.isNaN(sc) && sc >= 0 && sc <= 100;
+    const g = /^[A-E]$/.test(gRaw) ? gRaw : "";
+
+    const salaryLine = hasM ? `推定市場価値 ${m}万円${g ? ` (${g})` : ""}` : "";
+    const scoreLine = hasSc ? `鑑定スコア ${sc}` : "";
+
+    if (!hasM && !hasSc) {
       return defaultOgResponse();
     }
-
-    const salaryRaw = getParam(searchParams, "salary");
-    const titleRaw = getParam(searchParams, "title");
-    const rankRaw = getParam(searchParams, "rank") || getParam(searchParams, "tier");
-
-    const salaryLabel = toManStr(salaryRaw);
-    const salaryLine = salaryLabel ? salaryLabel.substring(0, MAX_LINE) : "";
-    const titleLine = stripControl(titleRaw).replace(/\s+/g, " ").trim().substring(0, MAX_LINE);
-    const rankLine = stripControl(rankRaw).replace(/\s+/g, " ").trim().substring(0, MAX_LINE);
-
-    const subtitle =
-      titleLine || "GitHubから技術力と自社適性をAIが即座に可視化";
 
     return new ImageResponse(
       (
@@ -119,7 +102,7 @@ export async function GET(request: Request) {
           <p style={{ fontSize: 48, fontWeight: 800, color: "#fff", margin: 0 }}>
             エンジニア採用AI査定
           </p>
-          {salaryLine ? (
+          {hasM ? (
             <p
               style={{
                 fontSize: 32,
@@ -132,14 +115,21 @@ export async function GET(request: Request) {
                 whiteSpace: "nowrap",
               }}
             >
-              推定市場価値 {salaryLine}
-              {rankLine ? ` (${rankLine})` : ""}
+              {salaryLine}
             </p>
-          ) : (
-            <p style={{ fontSize: 24, fontWeight: 700, color: "#fbbf24", margin: "24px 0 0" }}>
-              法人向けプラン受付中
+          ) : null}
+          {hasSc ? (
+            <p
+              style={{
+                fontSize: hasM ? 26 : 32,
+                fontWeight: 700,
+                color: "#fbbf24",
+                margin: hasM ? "16px 0 0" : "24px 0 0",
+              }}
+            >
+              {scoreLine}
             </p>
-          )}
+          ) : null}
           <p
             style={{
               fontSize: 20,
@@ -151,7 +141,7 @@ export async function GET(request: Request) {
               whiteSpace: "nowrap",
             }}
           >
-            {subtitle}
+            {FIXED_SUBTITLE}
           </p>
         </div>
       ),

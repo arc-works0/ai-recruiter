@@ -1,20 +1,7 @@
-/** 改行・タブ・制御文字を除去（二重エンコードはしない。URLSearchParams がエンコード担当） */
+/** 改行・タブ・制御文字を除去（URL は英数字中心・URLSearchParams のみでエンコード） */
 export function stripControlChars(value: string | undefined): string {
   if (!value) return "";
   return value.replace(/[\x00-\x1F\x7F]/g, "");
-}
-
-/** シェアURL用の長さ制限 */
-export const SHARE_TITLE_MAX_LEN = 72;
-export const SHARE_SALARY_MAX_LEN = 48;
-export const SHARE_RANK_TIER_MAX_LEN = 16;
-
-export function truncateForShareUrl(value: string | undefined, max: number): string {
-  const stripped = stripControlChars(value);
-  const t = stripped.replace(/\s+/g, " ").trim();
-  if (!t) return "";
-  if (t.length <= max) return t;
-  return `${t.slice(0, Math.max(0, max - 1))}…`;
 }
 
 export type ShareScores = {
@@ -24,15 +11,33 @@ export type ShareScores = {
   market: number;
 };
 
+/** 表示用文字列（例: 5,200,000円）から推定「万円」の整数部分を算出 */
+export function salaryDisplayToManYen(value: string | undefined): number | null {
+  if (!value?.trim()) return null;
+  try {
+    const digits = value.replace(/,/g, "").replace(/[^\d]/g, "");
+    const n = parseInt(digits, 10);
+    if (isNaN(n) || n <= 0) return null;
+    if (value.includes("万") && n < 100000) return n;
+    return Math.round(n / 10000);
+  } catch {
+    return null;
+  }
+}
+
+export function averageScore(scores: ShareScores): number {
+  return Math.round(
+    (scores.technical + scores.contribution + scores.sustainability + scores.market) / 4
+  );
+}
+
 /**
- * 鑑定結果ページ用のクエリ（scores は画面表示に必要）
- * encodeURIComponent は使わず URLSearchParams のみ（二重エンコード防止）
+ * シェアURL：日本語テキストは含めない（scores, m, sc, g, mode, v のみ + 任意 t）
+ * encodeURIComponent は使わず URLSearchParams のみ
  */
 export function buildShareSearchParams(opts: {
   scores: ShareScores;
-  jobTitle?: string;
   salaryDisplay?: string;
-  rank?: string;
   tier?: string;
   mode: string;
 }): URLSearchParams {
@@ -43,34 +48,28 @@ export function buildShareSearchParams(opts: {
   );
   p.set("mode", opts.mode);
   p.set("v", "final");
-  const title = truncateForShareUrl(opts.jobTitle, SHARE_TITLE_MAX_LEN);
-  if (title) p.set("title", title);
-  const salary = truncateForShareUrl(opts.salaryDisplay, SHARE_SALARY_MAX_LEN);
-  if (salary) p.set("salary", salary);
-  if (opts.rank) p.set("rank", stripControlChars(opts.rank).slice(0, SHARE_RANK_TIER_MAX_LEN));
-  if (opts.tier) p.set("tier", stripControlChars(opts.tier).slice(0, SHARE_RANK_TIER_MAX_LEN));
+  const man = salaryDisplayToManYen(opts.salaryDisplay);
+  if (man != null && man > 0) p.set("m", String(man));
+  p.set("sc", String(averageScore(opts.scores)));
+  const g = opts.tier?.trim().slice(0, 1).toUpperCase();
+  if (g && /^[A-E]$/.test(g)) p.set("g", g);
   return p;
 }
 
-/**
- * /api/og 専用の最小クエリ（OGP画像に不要な scores / mode / v は含めない）
- */
+/** /api/og 用：英数字のみ（m=万円の数値, sc=平均スコア, g=格付け1文字, t=キャッシュバスト） */
 export function buildOgImageSearchParams(opts: {
-  salary?: string;
-  title?: string;
-  rank?: string;
-  tier?: string;
+  m?: string | number;
+  sc?: string | number;
+  g?: string;
   t?: string;
 }): URLSearchParams {
   const p = new URLSearchParams();
-  const salary = truncateForShareUrl(stripControlChars(opts.salary), SHARE_SALARY_MAX_LEN);
-  const title = truncateForShareUrl(stripControlChars(opts.title), SHARE_TITLE_MAX_LEN);
-  if (salary) p.set("salary", salary);
-  if (title) p.set("title", title);
-  const r = stripControlChars(opts.rank).slice(0, SHARE_RANK_TIER_MAX_LEN);
-  const ti = stripControlChars(opts.tier).slice(0, SHARE_RANK_TIER_MAX_LEN);
-  if (r) p.set("rank", r);
-  else if (ti) p.set("tier", ti);
-  if (opts.t) p.set("t", String(opts.t).replace(/[^\d]/g, "").slice(0, 20));
+  const mi = typeof opts.m === "number" ? opts.m : parseInt(String(opts.m ?? ""), 10);
+  if (!Number.isNaN(mi) && mi > 0) p.set("m", String(mi));
+  const sci = typeof opts.sc === "number" ? opts.sc : parseInt(String(opts.sc ?? ""), 10);
+  if (!Number.isNaN(sci) && sci >= 0 && sci <= 100) p.set("sc", String(sci));
+  const g = opts.g?.trim().slice(0, 1).toUpperCase();
+  if (g && /^[A-E]$/.test(g)) p.set("g", g);
+  if (opts.t) p.set("t", String(opts.t).replace(/\D/g, "").slice(0, 20));
   return p;
 }

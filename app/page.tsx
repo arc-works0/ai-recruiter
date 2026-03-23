@@ -379,9 +379,7 @@ export default function Home() {
     const appUrl = scores
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
-          jobTitle,
           salaryDisplay,
-          rank,
           tier,
           mode,
         }).toString()}`
@@ -403,9 +401,7 @@ export default function Home() {
     const baseUrl = scores
       ? `${window.location.origin}/share?${buildShareSearchParams({
           scores,
-          jobTitle,
           salaryDisplay,
-          rank,
           tier,
           mode,
         }).toString()}`
@@ -432,7 +428,7 @@ Get your GitHub certified now!
 #EngineerHiring #GitHubAssessment #AICertification`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
     window.open(tweetUrl, "_blank", "noopener,noreferrer");
-  }, [scores, jobTitle, salaryDisplay, rank, tier, locale, mode]);
+  }, [scores, salaryDisplay, tier, locale, mode]);
 
   const handlePdfExport = useCallback(() => {
     if (typeof window === "undefined" || !reportRef.current || pdfExporting || isMobile) return;

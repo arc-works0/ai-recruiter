@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildOgImageSearchParams, truncateForShareUrl, SHARE_TITLE_MAX_LEN, SHARE_SALARY_MAX_LEN } from "../../lib/shareUrlParams";
+import { buildOgImageSearchParams } from "../../lib/shareUrlParams";
 import ShareContent from "./ShareContent";
 
 function parseScores(scoresParam: string | null): number[] {
@@ -8,45 +8,52 @@ function parseScores(scoresParam: string | null): number[] {
 }
 
 type Props = {
-  searchParams: Promise<{ scores?: string; title?: string; salary?: string; rank?: string; tier?: string; feedback?: string; mode?: string; t?: string }>;
+  searchParams: Promise<{
+    scores?: string;
+    mode?: string;
+    m?: string;
+    sc?: string;
+    g?: string;
+    t?: string;
+    v?: string;
+    title?: string;
+    salary?: string;
+    rank?: string;
+    tier?: string;
+    feedback?: string;
+  }>;
 };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams;
   const scores = params.scores ?? "70,70,70,70";
-  const title = params.title ?? "";
-  const salary = params.salary ?? "";
-  const rank = params.rank ?? "";
-  const tier = params.tier ?? "";
-  const feedback = params.feedback ?? "";
   const mode = params.mode ?? "personal";
   const t = params.t ?? "";
+  const m = params.m ?? "";
+  const sc = params.sc ?? "";
+  const g = params.g ?? "";
+
   const baseUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ai-recruiter-4o7e.vercel.app")
   ).replace(/\/$/, "");
   const origin = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
-  const titleForOg = truncateForShareUrl(title, SHARE_TITLE_MAX_LEN);
-  const salaryForOg = truncateForShareUrl(salary, SHARE_SALARY_MAX_LEN);
-  const ogParams = new URLSearchParams({ scores, mode });
-  if (titleForOg) ogParams.set("title", titleForOg);
-  if (salaryForOg) ogParams.set("salary", salaryForOg);
-  if (rank) ogParams.set("rank", rank.slice(0, 16));
-  if (tier) ogParams.set("tier", tier.slice(0, 16));
-  if (t) ogParams.set("t", t);
-  const ogImageOnly = buildOgImageSearchParams({
-    salary: salaryForOg || salary,
-    title: titleForOg || title,
-    rank,
-    tier,
-    t,
-  });
-  const ogImageAbsoluteUrl = `${origin}/api/og?${ogImageOnly.toString()}`;
 
-  const metaTitle = titleForOg ? `${titleForOg} | AI市場価値鑑定` : "鑑定結果 | AI市場価値鑑定";
+  const ogParams = new URLSearchParams();
+  ogParams.set("scores", scores);
+  ogParams.set("mode", mode);
+  if (params.v) ogParams.set("v", params.v);
+  if (m) ogParams.set("m", m);
+  if (sc) ogParams.set("sc", sc);
+  if (g) ogParams.set("g", g);
+  if (t) ogParams.set("t", t);
+
+  const ogImageAbsoluteUrl = `${origin}/api/og?${buildOgImageSearchParams({ m, sc, g, t }).toString()}`;
+
+  const metaTitle = "鑑定結果 | AI市場価値鑑定";
   const metaDesc =
-    titleForOg && (salaryForOg || rank)
-      ? `${titleForOg}。${salaryForOg ? `推定年収 ${salaryForOg}。` : ""}${tier || rank ? `格付け ${tier || rank}。` : ""}GitHubからあなたの市場価値を鑑定。`
+    m || sc
+      ? `推定年収（万円単位の数値）とスコアを表示。GitHubからあなたの市場価値を鑑定。`
       : "GitHubに基づくエンジニア市場価値鑑定。技術力・貢献度・継続力・市場性を可視化。";
 
   return {
@@ -71,16 +78,21 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SharePage({ searchParams }: Props) {
   const params = await searchParams;
   const scores = parseScores(params.scores ?? null);
-  const title = params.title ?? "";
-  const salary = params.salary ?? "";
+  const mNum = parseInt(String(params.m ?? "").replace(/\D/g, ""), 10);
+  const salaryFromM = !Number.isNaN(mNum) && mNum > 0 ? `${mNum}万円` : "";
+  const legacySalary = params.salary ?? "";
+  const salaryDisplay = salaryFromM || legacySalary;
+  const tierFromG = params.g?.trim().slice(0, 1).toUpperCase() ?? "";
+  const tier = tierFromG && /^[A-E]$/.test(tierFromG) ? tierFromG : (params.tier ?? "");
   const rank = params.rank ?? "";
-  const tier = params.tier ?? "";
   const tierFeedback = params.feedback ?? "";
+  const legacyTitle = params.title ?? "";
+
   return (
     <ShareContent
       scores={scores}
-      jobTitle={title}
-      salaryDisplay={salary}
+      jobTitle={legacyTitle}
+      salaryDisplay={salaryDisplay}
       rank={rank}
       tier={tier}
       tierFeedback={tierFeedback}
