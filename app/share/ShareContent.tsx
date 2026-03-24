@@ -144,10 +144,16 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
             <div className="h-[220px] w-full min-w-0 max-w-[260px] sm:h-[280px] sm:max-w-[320px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart margin={{ top: 20, right: 22, bottom: 20, left: 22 }} data={data}>
-                  <PolarGrid stroke="rgba(255,255,255,0.12)" />
+                  <defs>
+                    <linearGradient id="radarGradShare" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#d97706" stopOpacity={0.85} />
+                      <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.6} />
+                    </linearGradient>
+                  </defs>
+                  <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
                   <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 11 }} />
                   <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 9 }} />
-                <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
+                <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" fill="url(#radarGradShare)" fillOpacity={1} strokeWidth={2} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                 </RadarChart>
               </ResponsiveContainer>

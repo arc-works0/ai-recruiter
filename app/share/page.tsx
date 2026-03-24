@@ -22,7 +22,13 @@ function parseScore(sc: string | undefined): number {
 
 function deriveScoresFromSc(score: number): number[] {
   const normalized = clamp(score, MIN_SCORE, MAX_SCORE);
-  return [normalized, normalized, normalized, normalized];
+  // Business-view aligned distribution template:
+  // technical slightly higher, contribution slightly lower, with balanced overall average.
+  const technical = clamp(normalized + 4, MIN_SCORE, MAX_SCORE);
+  const contribution = clamp(normalized - 3, MIN_SCORE, MAX_SCORE);
+  const sustainability = clamp(normalized + 2, MIN_SCORE, MAX_SCORE);
+  const market = clamp(normalized - 1, MIN_SCORE, MAX_SCORE);
+  return [technical, contribution, sustainability, market];
 }
 
 function parseScores(scoresParam: string | undefined, fallback: number): number[] {
