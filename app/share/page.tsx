@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import ShareContent from "./ShareContent";
+import { scoreToTier } from "../../lib/tiers";
 
-const DEFAULT_SCORE = 70;
+const DEFAULT_SCORE = 40;
 const MIN_SCORE = 0;
 const MAX_SCORE = 100;
 const MIN_SALARY_MAN = 300;
@@ -12,36 +13,40 @@ function clamp(n: number, min: number, max: number): number {
 }
 
 function parseScore(sc: string | undefined): number {
-  const n = parseInt(String(sc ?? "").replace(/\D/g, ""), 10);
+  const raw = String(sc ?? "").trim();
+  if (!/^\d+$/.test(raw)) return DEFAULT_SCORE;
+  const n = parseInt(raw, 10);
   if (Number.isNaN(n)) return DEFAULT_SCORE;
   return clamp(n, MIN_SCORE, MAX_SCORE);
 }
 
-function parseScores(scoresParam: string | undefined, fallback: number): number[] {
-  if (!scoresParam) return [fallback, fallback, fallback, fallback];
-  const parts = scoresParam.split(",").map((s) => {
-    const n = parseInt(String(s).replace(/\D/g, ""), 10);
-    if (Number.isNaN(n)) return fallback;
-    return clamp(n, MIN_SCORE, MAX_SCORE);
-  });
-  if (parts.length !== 4) return [fallback, fallback, fallback, fallback];
+function deriveScoresFromSc(score: number, salaryMan: number): number[] {
+  const seed = (score * 97 + salaryMan * 13) % 17;
+  const deltas = [2, -1, 1, -2].map((base, i) => base + (((seed + i * 3) % 3) - 1));
+  return deltas.map((d) => clamp(score + d, MIN_SCORE, MAX_SCORE));
+}
+
+function parseScores(scoresParam: string | undefined, fallback: number, salaryMan: number): number[] {
+  if (!scoresParam) return deriveScoresFromSc(fallback, salaryMan);
+  const raw = scoresParam.split(",");
+  if (raw.length !== 4) return deriveScoresFromSc(fallback, salaryMan);
+  const parts: number[] = [];
+  for (const s of raw) {
+    const t = s.trim();
+    if (!/^\d+$/.test(t)) return deriveScoresFromSc(fallback, salaryMan);
+    const n = parseInt(t, 10);
+    if (Number.isNaN(n)) return deriveScoresFromSc(fallback, salaryMan);
+    parts.push(clamp(n, MIN_SCORE, MAX_SCORE));
+  }
   return parts;
 }
 
 function parseSalaryMan(s: string | undefined): number {
-  const n = parseInt(String(s ?? "").replace(/\D/g, ""), 10);
-  if (Number.isNaN(n)) return 1250;
+  const raw = String(s ?? "").trim();
+  if (!/^\d+$/.test(raw)) return 300;
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n)) return 300;
   return clamp(n, MIN_SALARY_MAN, MAX_SALARY_MAN);
-}
-
-function tierFromScore(score: number): string {
-  if (score >= 90) return "S+";
-  if (score >= 80) return "S";
-  if (score >= 70) return "A";
-  if (score >= 60) return "B";
-  if (score >= 50) return "C";
-  if (score >= 40) return "D";
-  return "E";
 }
 
 type Props = {
@@ -105,9 +110,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SharePage({ searchParams }: Props) {
   const params = await searchParams;
   const score = parseScore(params.sc);
-  const scores = parseScores(params.scores, score);
-  const salaryDisplay = `${parseSalaryMan(params.s)}万円`;
-  const tier = tierFromScore(score);
+  const salaryMan = parseSalaryMan(params.s);
+  const scores = parseScores(params.scores, score, salaryMan);
+  const salaryDisplay = `${salaryMan}万円`;
+  const tier = scoreToTier(score);
   const rank = "";
   const tierFeedback = params.feedback ?? "";
   const jobTitle = params.title ?? "";

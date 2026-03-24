@@ -77,3 +77,14 @@ export function getTierConfig(tier: string): TierConfig {
   const grade = TIER_ORDER.includes(tier as TierGrade) ? (tier as TierGrade) : "B";
   return TIER_CONFIGS[grade];
 }
+
+/** Shared score-to-tier mapping for UI surfaces that derive rank from numeric score. */
+export function scoreToTier(score: number): TierGrade {
+  if (score >= 90) return "S+";
+  if (score >= 80) return "S";
+  if (score >= 70) return "A";
+  if (score >= 60) return "B";
+  if (score >= 50) return "C";
+  if (score >= 40) return "D";
+  return "E";
+}

@@ -103,7 +103,9 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
                   boxShadow: `0 0 16px ${tierCfg.color}50`,
                 }}
               >
-                {t.tierDisplay} {tier}（{tierLabel}）
+                {locale === "ja"
+                  ? `市場価値ランク：Tier ${tier} (${tierLabel})`
+                  : `Market Value Rank: Tier ${tier} (${tierLabel})`}
               </span>
             </div>
           )}
