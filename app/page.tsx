@@ -423,7 +423,7 @@ ${appUrl}`
         : `💰 Est. Salary: ${estimatedSalary}
 🎯 Score: ${totalScore || "—"}
 AI assessed my GitHub!
-My value is 【${estimatedSalary}】.
+Value: 【${estimatedSalary}】.
 Top % in the field?
 Take the challenge 👇
 #GitHubAssessment #AI

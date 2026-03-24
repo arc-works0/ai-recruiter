@@ -1,6 +1,49 @@
 import type { Metadata } from "next";
 import ShareContent from "./ShareContent";
 
+const DEFAULT_SCORE = 70;
+const MIN_SCORE = 0;
+const MAX_SCORE = 100;
+const MIN_SALARY_MAN = 300;
+const MAX_SALARY_MAN = 3000;
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+
+function parseScore(sc: string | undefined): number {
+  const n = parseInt(String(sc ?? "").replace(/\D/g, ""), 10);
+  if (Number.isNaN(n)) return DEFAULT_SCORE;
+  return clamp(n, MIN_SCORE, MAX_SCORE);
+}
+
+function parseScores(scoresParam: string | undefined, fallback: number): number[] {
+  if (!scoresParam) return [fallback, fallback, fallback, fallback];
+  const parts = scoresParam.split(",").map((s) => {
+    const n = parseInt(String(s).replace(/\D/g, ""), 10);
+    if (Number.isNaN(n)) return fallback;
+    return clamp(n, MIN_SCORE, MAX_SCORE);
+  });
+  if (parts.length !== 4) return [fallback, fallback, fallback, fallback];
+  return parts;
+}
+
+function parseSalaryMan(s: string | undefined): number {
+  const n = parseInt(String(s ?? "").replace(/\D/g, ""), 10);
+  if (Number.isNaN(n)) return 1250;
+  return clamp(n, MIN_SALARY_MAN, MAX_SALARY_MAN);
+}
+
+function tierFromScore(score: number): string {
+  if (score >= 90) return "S+";
+  if (score >= 80) return "S";
+  if (score >= 70) return "A";
+  if (score >= 60) return "B";
+  if (score >= 50) return "C";
+  if (score >= 40) return "D";
+  return "E";
+}
+
 type Props = {
   searchParams: Promise<{
     scores?: string;
@@ -61,13 +104,11 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SharePage({ searchParams }: Props) {
   const params = await searchParams;
-  const scoresParam = params.scores ?? "70,70,70,70";
-  const scores = scoresParam.split(",").map((s) => Math.min(100, Math.max(0, parseInt(s.trim(), 10) || 70)));
-  const sNum = parseInt(String(params.s ?? "").replace(/\D/g, ""), 10);
-  const salaryFromS = !Number.isNaN(sNum) && sNum > 0 ? `${sNum}万円` : "";
-  const salaryDisplay = salaryFromS || (params.salary ?? "");
-  const tier = params.tier ?? "";
-  const rank = params.rank ?? "";
+  const score = parseScore(params.sc);
+  const scores = parseScores(params.scores, score);
+  const salaryDisplay = `${parseSalaryMan(params.s)}万円`;
+  const tier = tierFromScore(score);
+  const rank = "";
   const tierFeedback = params.feedback ?? "";
   const jobTitle = params.title ?? "";
 
