@@ -20,22 +20,21 @@ function parseScore(sc: string | undefined): number {
   return clamp(n, MIN_SCORE, MAX_SCORE);
 }
 
-function deriveScoresFromSc(score: number, salaryMan: number): number[] {
-  const seed = (score * 97 + salaryMan * 13) % 17;
-  const deltas = [2, -1, 1, -2].map((base, i) => base + (((seed + i * 3) % 3) - 1));
-  return deltas.map((d) => clamp(score + d, MIN_SCORE, MAX_SCORE));
+function deriveScoresFromSc(score: number): number[] {
+  const normalized = clamp(score, MIN_SCORE, MAX_SCORE);
+  return [normalized, normalized, normalized, normalized];
 }
 
-function parseScores(scoresParam: string | undefined, fallback: number, salaryMan: number): number[] {
-  if (!scoresParam) return deriveScoresFromSc(fallback, salaryMan);
+function parseScores(scoresParam: string | undefined, fallback: number): number[] {
+  if (!scoresParam) return deriveScoresFromSc(fallback);
   const raw = scoresParam.split(",");
-  if (raw.length !== 4) return deriveScoresFromSc(fallback, salaryMan);
+  if (raw.length !== 4) return deriveScoresFromSc(fallback);
   const parts: number[] = [];
   for (const s of raw) {
     const t = s.trim();
-    if (!/^\d+$/.test(t)) return deriveScoresFromSc(fallback, salaryMan);
+    if (!/^\d+$/.test(t)) return deriveScoresFromSc(fallback);
     const n = parseInt(t, 10);
-    if (Number.isNaN(n)) return deriveScoresFromSc(fallback, salaryMan);
+    if (Number.isNaN(n)) return deriveScoresFromSc(fallback);
     parts.push(clamp(n, MIN_SCORE, MAX_SCORE));
   }
   return parts;
@@ -111,7 +110,7 @@ export default async function SharePage({ searchParams }: Props) {
   const params = await searchParams;
   const score = parseScore(params.sc);
   const salaryMan = parseSalaryMan(params.s);
-  const scores = parseScores(params.scores, score, salaryMan);
+  const scores = parseScores(params.scores, score);
   const salaryDisplay = `${salaryMan}万円`;
   const tier = scoreToTier(score);
   const rank = "";

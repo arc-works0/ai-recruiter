@@ -17,7 +17,17 @@ const LABELS_EN = ["Tech Depth", "Code Quality", "Learning", "Demand Fit"];
 const LABELS_JA = ["技術深化", "コード品質", "学習意欲", "需要適合"];
 const KEYS = ["technical", "contribution", "sustainability", "market"] as const;
 const DEFAULT_OFFER_JA = "https://www.bizreach.jp/";
-const DEFAULT_OFFER_EN = "https://www.linkedin.com/jobs/";
+const DEFAULT_OFFER_EN = "https://arc.dev/";
+
+const GLOBAL_TIER_LABEL_EN: Record<string, string> = {
+  "S+": "Elite / Top 1%",
+  S: "Elite",
+  A: "High-Potential",
+  B: "Professional",
+  C: "Emerging",
+  D: "Developing",
+  E: "Foundation",
+};
 
 function decode(s: string): string {
   try {
@@ -53,6 +63,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
 
   const tierCfg = tier ? getTierConfig(tier) : null;
   const tierLabel = tierCfg ? (locale === "ja" ? tierCfg.labelJa : tierCfg.labelEn) : "";
+  const tierLabelEnGlobal = tier ? (GLOBAL_TIER_LABEL_EN[tier] ?? tierLabel) : "";
 
   return (
     <main className="relative min-h-screen overflow-hidden font-sans text-zinc-100 animate-page-in bg-[#050505]">
@@ -105,7 +116,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
               >
                 {locale === "ja"
                   ? `市場価値ランク：Tier ${tier} (${tierLabel})`
-                  : `Market Value Rank: Tier ${tier} (${tierLabel})`}
+                  : `Global Talent Tier: ${tier} (${tierLabelEnGlobal})`}
               </span>
             </div>
           )}
@@ -133,16 +144,10 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
             <div className="h-[220px] w-full min-w-0 max-w-[260px] sm:h-[280px] sm:max-w-[320px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart margin={{ top: 20, right: 22, bottom: 20, left: 22 }} data={data}>
-                  <defs>
-                    <linearGradient id="radarGradShare" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#d97706" stopOpacity={0.85} />
-                      <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.6} />
-                    </linearGradient>
-                  </defs>
-                  <PolarGrid stroke="rgba(217, 119, 6, 0.35)" />
+                  <PolarGrid stroke="rgba(255,255,255,0.12)" />
                   <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 11 }} />
                   <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 9 }} />
-                <Radar name={t.radarScore} dataKey="value" stroke="rgba(255,255,255,0.9)" fill="url(#radarGradShare)" fillOpacity={1} strokeWidth={2} />
+                <Radar name={t.radarScore} dataKey="value" stroke="#1e40af" fill="#2563eb" fillOpacity={0.35} strokeWidth={2} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
                 </RadarChart>
               </ResponsiveContainer>
