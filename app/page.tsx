@@ -547,13 +547,19 @@ ${appUrl}`;
       <div className="print-content-wrapper relative z-10 mx-auto w-full max-w-xl px-4 pt-6 pb-24 sm:px-6 sm:pt-16 sm:pb-12">
         <section className="mb-8 sm:mb-10 text-center">
           <h1 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl tracking-tight">
-            {locale === "ja" ? "エンジニア採用の書類選考を1分に短縮。GitHubから技術力と自社適性をAIが即座に可視化" : "Shorten document screening to 1 minute. AI visualizes technical skills and company fit from GitHub instantly."}
+            {locale === "ja" ? (
+              <>
+                エンジニア採用の書類選考を1分に短縮。
+                <br className="sm:hidden" />
+                GitHubから技術力と自社適性をAIが即座に可視化
+              </>
+            ) : "Shorten document screening to 1 minute. AI visualizes technical skills and company fit from GitHub instantly."}
           </h1>
             <Link
             href={stripeCheckoutUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-8 py-3 text-sm font-bold text-black shadow-[0_4px_24px_rgba(217,119,6,0.5)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_8px_32px_rgba(217,119,6,0.55)] active:scale-[0.98]"
+            className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 px-4 sm:px-8 py-3 text-xs sm:text-sm font-bold leading-snug text-center text-black shadow-[0_4px_24px_rgba(217,119,6,0.5)] transition-all hover:from-amber-500 hover:via-amber-400 hover:to-amber-300 hover:shadow-[0_8px_32px_rgba(217,119,6,0.55)] active:scale-[0.98]"
           >
             {t.ctaHeroMain}
           </Link>
@@ -698,9 +704,9 @@ ${appUrl}`;
                     href={offerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-3 rounded-2xl px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
+                    className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-3 rounded-2xl px-4 sm:px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
                   >
-                    <span className="text-lg font-bold text-white drop-shadow-sm">
+                    <span className="text-sm sm:text-lg leading-snug font-bold text-white drop-shadow-sm">
                       {locale === "ja" ? "この市場価値でオファーを受け取る（無料）" : "Get high-paying offers based on this value (Free)"}
                     </span>
                     <span className="text-2xl">→</span>
