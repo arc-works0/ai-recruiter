@@ -38,30 +38,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </header>
           <main>{children}</main>
           <footer className="border-t border-white/[0.06] bg-[#050505] px-4 py-6 text-xs text-zinc-400">
-            <div className="mx-auto flex max-w-4xl flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-              <p className="text-[11px] sm:text-xs">
-                &copy; {new Date().getFullYear()} AI市場価値鑑定. All rights reserved.
+            <div className="mx-auto max-w-4xl">
+              <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+                <p className="text-[11px] sm:text-xs">
+                  &copy; {new Date().getFullYear()} AI市場価値鑑定. All rights reserved.
+                </p>
+                <nav className="flex flex-wrap gap-4">
+                  <Link
+                    href="/privacy"
+                    className="transition-colors hover:text-zinc-200"
+                  >
+                    プライバシーポリシー
+                  </Link>
+                  <Link
+                    href="/terms"
+                    className="transition-colors hover:text-zinc-200"
+                  >
+                    利用規約
+                  </Link>
+                  <Link
+                    href="/tokushoho"
+                    className="transition-colors hover:text-zinc-200"
+                  >
+                    特定商取引法に基づく表記
+                  </Link>
+                </nav>
+              </div>
+              <p className="mt-3 text-[10px] leading-relaxed text-zinc-500">
+                当サイトは各転職エージェントの公式サービスではありません。推定年収はAIによる独自の算出結果であり、実際のオファー額を保証するものではありません。詳細な求人情報は各提携先サービスにてご確認ください。
               </p>
-              <nav className="flex flex-wrap gap-4">
-                <Link
-                  href="/privacy"
-                  className="transition-colors hover:text-zinc-200"
-                >
-                  プライバシーポリシー
-                </Link>
-                <Link
-                  href="/terms"
-                  className="transition-colors hover:text-zinc-200"
-                >
-                  利用規約
-                </Link>
-                <Link
-                  href="/tokushoho"
-                  className="transition-colors hover:text-zinc-200"
-                >
-                  特定商取引法に基づく表記
-                </Link>
-              </nav>
             </div>
           </footer>
         </body>

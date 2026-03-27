@@ -16,6 +16,7 @@ import {
 import { translations, getLocaleFromBrowser, type Locale, type AppMode } from "../lib/i18n";
 import { buildShareSearchParams } from "../lib/shareUrlParams";
 import { getTierConfig } from "../lib/tiers";
+import { getAffiliateOfferUrl } from "../lib/affiliate";
 
 const RADAR_KEYS = ["technical", "contribution", "sustainability", "market"] as const;
 
@@ -388,9 +389,7 @@ export default function Home() {
   const transferUrl = locale === "ja"
     ? (process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER ?? DEFAULT_TRANSFER_JA)
     : (process.env.NEXT_PUBLIC_AFFILIATE_TRANSFER_EN ?? DEFAULT_TRANSFER_EN);
-  const offerUrl = locale === "ja"
-    ? (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_JA ?? transferUrl)
-    : (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_EN ?? transferUrl);
+  const offerUrl = getAffiliateOfferUrl(locale);
   const learningUrl = locale === "ja"
     ? (process.env.NEXT_PUBLIC_AFFILIATE_LEARNING ?? DEFAULT_LEARNING_JA)
     : (process.env.NEXT_PUBLIC_AFFILIATE_LEARNING_EN ?? DEFAULT_LEARNING_EN);
@@ -707,7 +706,7 @@ ${appUrl}`;
                     className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl px-3 sm:px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
                   >
                     <span className="text-sm sm:text-lg leading-snug whitespace-nowrap font-bold text-white drop-shadow-sm">
-                      {locale === "ja" ? "dodaで非公開求人をチェック" : "Check private job listings on doda"}
+                      {locale === "ja" ? "市場価値に見合う非公開求人をチェック" : "Check private jobs matching your market value"}
                     </span>
                     <span className="text-2xl">→</span>
                   </Link>

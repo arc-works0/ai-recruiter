@@ -12,13 +12,11 @@ import {
 } from "recharts";
 import { getTierConfig } from "../../lib/tiers";
 import { translations, getLocaleFromBrowser, type Locale } from "../../lib/i18n";
+import { getAffiliateOfferUrl } from "../../lib/affiliate";
 
 const LABELS_EN = ["Tech Depth", "Code Quality", "Learning", "Demand Fit"];
 const LABELS_JA = ["技術深化", "コード品質", "学習意欲", "需要適合"];
 const KEYS = ["technical", "contribution", "sustainability", "market"] as const;
-const DEFAULT_OFFER_JA = "https://www.bizreach.jp/";
-const DEFAULT_OFFER_EN = "https://arc.dev/";
-
 const GLOBAL_TIER_LABEL_EN: Record<string, string> = {
   "S+": "Elite / Top 1%",
   S: "Elite",
@@ -52,9 +50,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
 
   const t = translations[locale];
   const labels = locale === "ja" ? LABELS_JA : LABELS_EN;
-  const offerUrl = locale === "ja"
-    ? (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_JA ?? DEFAULT_OFFER_JA)
-    : (process.env.NEXT_PUBLIC_AFFILIATE_OFFER_EN ?? DEFAULT_OFFER_EN);
+  const offerUrl = getAffiliateOfferUrl(locale);
   const data = KEYS.map((key, i) => ({
     subject: labels[i],
     value: scores[i] ?? 70,
@@ -176,7 +172,7 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
             rel="noopener noreferrer"
             className="inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-3 sm:px-6 py-2.5 text-sm sm:text-sm leading-snug text-center whitespace-nowrap font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
           >
-            {locale === "ja" ? "dodaで非公開求人をチェック" : "Check private job listings on doda"}
+            {locale === "ja" ? "市場価値に見合う非公開求人をチェック" : "Check private jobs matching your market value"}
           </a>
         </div>
       </div>
