@@ -6,7 +6,7 @@ export default clerkMiddleware();
 export const config = {
   matcher: [
     // 静的ファイルやNext.js内部動作を除外して、トップページを見れるようにする
-    "/((?!_next|icon|favicon\\.ico|api/og|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!_next|icon|favicon\\.ico|api/og|api/stripe/webhook|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
   ],
 };
 

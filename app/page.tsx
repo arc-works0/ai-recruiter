@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { JSX, useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { useAuth } from "@clerk/nextjs";
 import {
   Radar,
   RadarChart,
@@ -211,6 +212,7 @@ const USAGE_LIMIT = 999; /* 一時的に無効化（デバッグ・テスト用�
 const RATE_LIMIT_MS = 5000;
 
 export default function Home() {
+  const { isSignedIn } = useAuth();
   const [locale, setLocale] = useState<Locale>("ja");
   const [mode, setMode] = useState<AppMode>("personal");
   const [githubUrl, setGithubUrl] = useState("");
@@ -237,6 +239,7 @@ export default function Home() {
   const [usageCount, setUsageCount] = useState(0);
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const [shareSparkle, setShareSparkle] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -248,6 +251,27 @@ export default function Home() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const loadEntitlements = async () => {
+      if (!isSignedIn) {
+        if (alive) setIsPremium(false);
+        return;
+      }
+      try {
+        const res = await fetch("/api/entitlements", { cache: "no-store" });
+        const data = await res.json();
+        if (alive) setIsPremium(Boolean(data?.is_premium));
+      } catch {
+        if (alive) setIsPremium(false);
+      }
+    };
+    loadEntitlements();
+    return () => {
+      alive = false;
+    };
+  }, [isSignedIn]);
 
   useEffect(() => {
     setLocale(getLocaleFromBrowser());
@@ -264,7 +288,7 @@ export default function Home() {
   const t = translations[locale];
 
   const analyze = async () => {
-    if (usageCount >= USAGE_LIMIT) {
+    if (!isPremium && usageCount >= USAGE_LIMIT) {
       setLimitExceededOpen(true);
       return;
     }
@@ -322,11 +346,13 @@ export default function Home() {
       setInterviewConcerns(data.interviewConcerns ?? "");
       setShowFullMobile(false);
       setGithubStats(data.githubStats ?? null);
-      const newCount = usageCount + 1;
-      setUsageCount(newCount);
-      try {
-        localStorage.setItem("ai-recruiter-usage", String(newCount));
-      } catch {}
+      if (!isPremium) {
+        const newCount = usageCount + 1;
+        setUsageCount(newCount);
+        try {
+          localStorage.setItem("ai-recruiter-usage", String(newCount));
+        } catch {}
+      }
       setIsCoolingDown(true);
       setTimeout(() => setIsCoolingDown(false), RATE_LIMIT_MS);
     } catch {

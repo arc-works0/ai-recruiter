@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { normalizeSalaryDisplay } from "../../../lib/marketValue";
 
 export const runtime = "nodejs";
 
@@ -193,11 +194,14 @@ function parseScoresFromContent(content: string): {
         candidateStrengths: typeof parsed.candidateStrengths === "string" ? parsed.candidateStrengths.trim() : defaultBusinessExtra.candidateStrengths,
         interviewConcerns: typeof parsed.interviewConcerns === "string" ? parsed.interviewConcerns.trim() : defaultBusinessExtra.interviewConcerns,
       };
+      const normalizedSalaryDisplay = normalizeSalaryDisplay(
+        typeof parsed.salaryDisplay === "string" ? parsed.salaryDisplay : defaultMeta.salaryDisplay
+      );
       return {
         markdown,
         scores,
         jobTitle: typeof parsed.jobTitle === "string" ? parsed.jobTitle : defaultMeta.jobTitle,
-        salaryDisplay: typeof parsed.salaryDisplay === "string" ? parsed.salaryDisplay : defaultMeta.salaryDisplay,
+        salaryDisplay: normalizedSalaryDisplay,
         rank: typeof parsed.rank === "string" ? parsed.rank : defaultMeta.rank,
         tier,
         tierFeedback:
@@ -239,7 +243,7 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       ? `1) Markdownで、以下のセクションを日本語で記述。意味の通る自然な日本語のみ。採用担当者が面接でそのまま使える情報にする。
 
 - ### 【鑑定結果】技術アセスメント
-- **想定年収**: 300万〜1500万円の範囲で1円単位（例：5,200,000円）
+- **想定年収**: 300万〜3000万円の範囲で1円単位（例：5,200,000円）
 - **市場価値ランク**: S+ / S / A / B / C / D / E の7段階と1行の理由
 
 **【強み・採用メリット】** 候補者が自社にもたらす具体的利益を2〜3文で。技術・経験・貢献から見える採用メリットを明示。
@@ -250,7 +254,7 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       : `1) Markdownで、以下の3セクションを日本語で記述。意味の通る自然な日本語のみ。直訳や不自然な表現禁止。
 
 - ### 【鑑定結果】市場価値診断書
-- **想定年収**: 300万〜1500万円の範囲で1円単位（例：5,200,000円）
+- **想定年収**: 300万〜3000万円の範囲で1円単位（例：5,200,000円）
 - **格付け**: S+ / S / A / B / C / D / E の7段階と1行の理由
 
 **【技術的な強み】** どの言語・フレームワークを、どの程度使いこなしているか。具体例で記述。
@@ -262,7 +266,7 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       ? `1) Markdown in English. Produce hiring-manager-ready content.
 
 - ### Technical Assessment Report
-- **Estimated salary**: 3M–15M JPY, exact figure
+- **Estimated salary**: 3M–30M JPY, exact figure
 - **Market value rank**: S+ / S / A / B / C / D / E with one-line rationale
 
 **【Strengths & hiring benefits】** 2–3 sentences on concrete benefits the candidate brings to the company (from code and activity).
@@ -273,7 +277,7 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
       : `1) Markdown in English only (tables, bold, formal style). All text must be in professional English. No Japanese.
 
 - ### Certification Report — Market Value Assessment
-- **Estimated salary**: 3M–15M JPY, exact figure (e.g. 5,200,000円)
+- **Estimated salary**: 3M–30M JPY, exact figure (e.g. 5,200,000円)
 - **Grade**: S+ / S / A / B / C / D / E with one-line rationale
 
 **【Technical strengths】** Which languages and frameworks, and how well they are used. Be specific.
@@ -295,9 +299,12 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 ${langBlock}
 
 【STRICT SALARY RULES】
-- Estimated annual salary MUST be 3,000,000–15,000,000 JPY. Never overestimate.
-- Evaluate: total stars, followers, repo count, account age. Align with Japanese engineer market.
-- Examples: repos<5 + stars<10 + followers<20 → 3–5M JPY. stars>100 + followers>200 + quality → 8–12M JPY.
+- Estimated annual salary MUST be 3,000,000–30,000,000 JPY.
+- Baseline must reflect the 2026 high-class IT hiring market.
+- Apply a 1.5x skill premium when Rust, Go, TypeScript, or Python AI ecosystem strength is evident.
+- Treat stars, repository continuity (longevity), and pull request frequency as "technical assets" with strong positive impact.
+- Evaluate: total stars, followers, repo count, account age, language quality.
+- Examples: repos<5 + stars<10 + followers<20 → 3–6M JPY. stars>100 + followers>200 + strong asset profile → 10–20M JPY.
 
 Output format:
 
@@ -310,7 +317,7 @@ ${isBusiness ? (isJa ? "法人モードでは candidateStrengths（強み・採�
 ${jsonExample}
 \`\`\`
 - technical, contribution, sustainability, market: 0–100 integers
-- salaryDisplay: salary string (3–15M JPY)
+- salaryDisplay: salary string (3–30M JPY)
 - rank, tier: S+ / S / A / B / C / D / E
 - summaryStrengths, summaryMarketValue, summaryOutlook: 各1文の要約（必須）
 ${isBusiness ? "- candidateStrengths, interviewConcerns: 法人時は必須。interviewConcerns には懸念点と面接での質問推奨例の両方を含めること。" : ""}`;
@@ -337,6 +344,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const githubUrl = typeof body.githubUrl === "string" ? body.githubUrl.trim() : "";
+    // Never persist end-user OAuth tokens; process in-memory only and flush immediately.
+    let transientGithubAccessToken = typeof body.githubAccessToken === "string" ? body.githubAccessToken : "";
 
     if (!githubUrl) {
       return NextResponse.json(
@@ -354,6 +363,7 @@ export async function POST(req: NextRequest) {
     }
 
     const githubData = await fetchGitHubData(username);
+    transientGithubAccessToken = "";
 
     const profileSummary = locale === "ja"
       ? `
@@ -434,11 +444,12 @@ ${githubData.topRepos
 
     const parsed = parseScoresFromContent(content);
     const { markdown, scores, jobTitle, salaryDisplay, rank, tier, tierFeedback, summaryStrengths, summaryMarketValue, summaryOutlook, candidateStrengths, interviewConcerns } = parsed;
+    const normalizedSalary = normalizeSalaryDisplay(salaryDisplay);
     setAnalysisCache(cacheKey, {
       result: markdown,
       scores,
       jobTitle,
-      salaryDisplay,
+      salaryDisplay: normalizedSalary,
       rank,
       tier,
       tierFeedback,
@@ -452,7 +463,7 @@ ${githubData.topRepos
       result: markdown,
       scores,
       jobTitle,
-      salaryDisplay,
+      salaryDisplay: normalizedSalary,
       rank,
       tier,
       tierFeedback,
