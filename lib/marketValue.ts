@@ -1,5 +1,9 @@
 export const MIN_SALARY_JPY = 3_000_000;
 export const MAX_SALARY_JPY = 30_000_000;
+const JPY_FORMATTER = new Intl.NumberFormat("ja-JP", {
+  useGrouping: true,
+  maximumFractionDigits: 0,
+});
 
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
@@ -19,7 +23,7 @@ export function normalizeSalaryJpy(value: string): number {
 }
 
 export function formatSalaryJpy(value: number): string {
-  return `${Math.round(value).toLocaleString("ja-JP")}円`;
+  return `${JPY_FORMATTER.format(Math.round(value))}円`;
 }
 
 export function normalizeSalaryDisplay(value: string): string {

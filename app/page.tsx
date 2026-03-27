@@ -704,9 +704,9 @@ ${appUrl}`;
                     href={offerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-3 rounded-2xl px-4 sm:px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
+                    className="golden-vip-button flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl px-2 sm:px-6 py-4 text-center transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:min-h-[60px]"
                   >
-                    <span className="text-sm sm:text-lg leading-snug font-bold text-white drop-shadow-sm">
+                    <span className="text-[10px] sm:text-lg leading-snug whitespace-nowrap font-bold text-white drop-shadow-sm">
                       {locale === "ja" ? "この市場価値でオファーを受け取る（無料）" : "Get high-paying offers based on this value (Free)"}
                     </span>
                     <span className="text-2xl">→</span>

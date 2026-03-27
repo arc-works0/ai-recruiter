@@ -299,6 +299,8 @@ function buildSystemPrompt(locale: "ja" | "en", mode: "personal" | "business"): 
 ${langBlock}
 
 【STRICT SALARY RULES】
+- For identical input data (stars, repositories, languages, activity), always output the exact same salary and rank.
+- Eliminate speculative variation and perform deterministic evaluation only.
 - Estimated annual salary MUST be 3,000,000–30,000,000 JPY.
 - Baseline must reflect the 2026 high-class IT hiring market.
 - Apply a 1.5x skill premium when Rust, Go, TypeScript, or Python AI ecosystem strength is evident.
