@@ -174,9 +174,9 @@ export default function ShareContent({ scores, jobTitle, salaryDisplay, rank, ti
             href={offerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-2 sm:px-6 py-2.5 text-[10px] sm:text-sm leading-snug text-center whitespace-nowrap font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-3 sm:px-6 py-2.5 text-sm sm:text-sm leading-snug text-center whitespace-nowrap font-bold text-white shadow-[0_2px_12px_rgba(217,119,6,0.35)] transition hover:from-amber-500 hover:to-amber-400"
           >
-            {locale === "ja" ? "この市場価値でオファーを受け取る（無料）" : "Get high-paying offers based on this value (Free)"}
+            {locale === "ja" ? "dodaで非公開求人をチェック" : "Check private job listings on doda"}
           </a>
         </div>
       </div>
